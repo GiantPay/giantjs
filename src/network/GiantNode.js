@@ -46,13 +46,31 @@ export default class GiantNode extends EventEmitter {
         return this._client.deployContract(options)
     }
 
-    getLastFxContract(cb) {
-        /**
-         * get code of last contract from fx
-         * //TODO : create method get code from block tip
-         */
+    getLastContractTip(cb) {
+        this._client.getDB().getMetadata()
+            .then((metadata) => {
+                this._client.getDB().getBlock(metadata.tip)
+                    .then((block) => {
+                        // TODO : check Wallet
+
+                        const tx = block.data[0]
+                        console.log(tx.type)
+                        /**
+                         * //if tx.type == 'call'
+                         * TODO : validation logic then cb(tx.code.runTime.code)
+                         *
+                         */
+
+                        //if tx.type == 'deploy'
+                        cb(tx.data[0].code.runTime.code)
+                    })
+            })
+    }
+
+    getLastContractFx(cb) {
+        // TODO : move to tests
         let contractPath = './build/contracts/',
-            getLatestFile = () => {
+            latestContract = (() => {
                 let latest;
                 const files = fs.readdirSync(contractPath);
                 files.forEach(filename => {
@@ -69,11 +87,11 @@ export default class GiantNode extends EventEmitter {
                     }
                 });
                 return latest.filename;
-            }
-        let latestContract = getLatestFile()
+            })()
+
         let runTimeName = latestContract.slice(0, -3) + 'RunTime.js'
 
-        fs.readFile(contractPath + runTimeName, {encoding: 'utf-8'}, function(err,code){
+        fs.readFile(contractPath + runTimeName, {encoding: 'utf-8'}, function (err, code) {
             if (!err) {
                 cb(code)
             } else {
@@ -85,8 +103,7 @@ export default class GiantNode extends EventEmitter {
     mountModule(contractAddress, cb) {
         const m = require('module')
         const moduleName = `GMD_${contractAddress}`
-        //TODO: get code from chain
-        this.getLastFxContract((code)=>{
+        this.getLastContractTip((code) => {
             console.log(code)
             var res = require('vm').runInThisContext(m.wrap(code))(exports, require, module, __filename, __dirname)
             logger.info(`Mount module ${moduleName}`)
@@ -100,7 +117,7 @@ export default class GiantNode extends EventEmitter {
             this.getContractMeta(contractAddress, (meta) => {
                 logger.info(`Contract ${meta.className} metadata`)
                 console.log(meta)
-                if(typeof global.contracts == 'undefined' ){
+                if (typeof global.contracts == 'undefined') {
                     global.contracts = []
                 }
                 global.contracts[meta.className] = new ContractClass.default()
