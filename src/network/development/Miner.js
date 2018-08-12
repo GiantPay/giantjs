@@ -1,32 +1,40 @@
 import Block from './Block'
+import logger from '../../logger'
 
-import whilst from 'async/whilst'
+import async from 'async'
 
 export default class Miner {
 
     constructor (options) {
+        const self = this
+
         this.db = options.db
         this.chain = options.chain
         this.memPool = options.memPool
+        this.wallet = options.wallet
         this.started = false
         this.blockTime = options.blockTime || 500
+
+        this.chain.on('genesis', () => {
+            self.wallet.premine()
+        })
     }
 
     start () {
-        console.log('Started miner')
+        logger.info('Started miner')
         this.started = true
         this.mineBlocks()
     }
 
     stop () {
-        console.log('Stopped miner')
+        logger.info('Stopped miner')
         this.started = false
     }
 
     mineBlocks () {
         const self = this
 
-        whilst(
+        async.whilst(
             () => self.started,
             (callback) => {
                 self.mineBlock(function () {
@@ -35,7 +43,7 @@ export default class Miner {
             },
             (err) => {
                 if (err) {
-                    console.error(err)
+                    logger.error(err)
                 }
             }
         )
@@ -45,30 +53,28 @@ export default class Miner {
         const self = this
         const memPoolTransactions = self.memPool.getTransactions()
 
-        console.log('mb: ', memPoolTransactions)
-
         if (memPoolTransactions.length) {
             let transactions = []
             transactions = transactions.concat(memPoolTransactions)
             const block = new Block({
-                prevHash: self.chain.tip.hash,
-                timestamp: new Date()
+                prevHash: self.chain.tip.hash
             })
 
             self.db.addTransactionsToBlock(block, transactions)
 
-            console.log('Builder built block ' + block.hash)
+            logger.debug(`Builder built block ${block.hash}`)
 
             self.chain.addBlock(block, (err) => {
                 if (err) {
                     self.chain.emit('error', err)
                 } else {
-                    console.log('Builder successfully added block ' + block.hash + ' to chain')
+                    logger.debug(`Builder successfully added block ${block.hash} to chain`)
                 }
                 callback()
             })
         } else {
             callback()
+            logger.debug('miner: transaction doesn\'t found')
         }
     }
 }

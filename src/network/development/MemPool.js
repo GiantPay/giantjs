@@ -34,7 +34,7 @@ export default class MemPool extends EventEmitter {
             }
         }
         return false
-    };
+    }
 
     getTransactions () {
         return this.transactions

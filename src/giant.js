@@ -31,7 +31,8 @@ program
 
 program
     .command('deploy <name>')
-    .description('')
+    .description('Deploy smart contract by name')
+    .option('-c, --clean', 'Clean development network data')
     .action(deploy);
 
 program

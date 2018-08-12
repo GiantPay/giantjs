@@ -1,20 +1,30 @@
 import Hash from './Hash'
+import Transaction from './Transaction'
 
 export default class Block {
 
     constructor (options) {
+        if (!options) {
+            throw new TypeError('"options" is expected')
+        }
         if (!options.hasOwnProperty('prevHash')) {
             throw new TypeError('"prevHash" is expected')
         }
-        if (!options.timestamp) {
-            throw new TypeError('"timestamp" is expected')
-        }
 
         this.prevHash = options.prevHash
-        this.timestamp = options.timestamp
+        this.timestamp = options.timestamp || new Date().getTime()
         this.version = options.version || 1
         this.merkleRoot = options.merkleRoot
         this.data = options.data || []
+        if (!Array.isArray(this.data)) {
+            throw new TypeError('"data" is expected to be an array')
+        }
+        if (this.data.length && !(this.data[0] instanceof Transaction)) {
+            this.data = this.data.map(tx => new Transaction(tx))
+        }
+        this.height = options.height || 0
+        this.bits = options.bits || 0
+        this.nonce = options.nonce || 0
 
         Object.defineProperty(this, 'hash', {
             configurable: false,
@@ -28,29 +38,40 @@ export default class Block {
     }
 
     static fromJson (json) {
-        return JSON.parse(json)
+        return new Block(JSON.parse(json))
     }
 
-    toJson () {
-        return JSON.stringify({
+    toObject () {
+        return {
             hash: this.hash,
             prevHash: this.prevHash,
             version: this.version,
             merkleRoot: this.merkleRoot,
-            timestamp: this.timestamp.toISOString(),
+            timestamp: this.timestamp,
             bits: this.bits,
             nonce: this.nonce,
-            data: this.data.toString('hex')
-        })
+            height: this.height,
+            data: this.data ? this.data.map(tx => tx.toObject()) : []
+        }
     }
 
-    headerToJson () {
-        return JSON.stringify({
+    toHeader () {
+        return {
             version: this.version,
             prevHash: this.prevHash,
             merkleRoot: this.merkleRoot,
-            timestamp: this.timestamp
-        })
+            timestamp: this.timestamp,
+            bits: this.bits,
+            nonce: this.nonce
+        }
+    }
+
+    toJson () {
+        return JSON.stringify(this.toObject())
+    }
+
+    headerToJson () {
+        return JSON.stringify(this.toHeader())
     }
 
     getHash () {

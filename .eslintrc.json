@@ -5,5 +5,19 @@
   },
   "parserOptions": {
     "sourceType": "module"
+  },
+  "rules": {
+    "quotes": [
+      2,
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "no-var": 2,
+    "semi": [
+      2,
+      "never"
+    ]
   }
 }

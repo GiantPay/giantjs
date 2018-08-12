@@ -1,8 +1,7 @@
-import Block from './Block'
 import Database from './Database'
 import Wallet from './Wallet'
 import Chain from './Chain'
-import Transaction from './Transaction'
+import Contract from './Contract'
 
 import EventEmitter from 'events'
 
@@ -29,19 +28,27 @@ export default class MockClient extends EventEmitter {
             self.db.initialize()
         })
 
-        self.db.on('ready', () => {
+        this.db.on('ready', () => {
             self.chain.initialize()
         })
 
-        self.db.on('error', (err) => {
+        this.db.on('error', (err) => {
             self.emit('error', err)
         })
 
-        self.chain.on('ready', () => {
+        this.chain.on('ready', () => {
+            self.wallet.initialize()
+        })
+
+        this.chain.on('error', (err) => {
+            self.emit('error', err)
+        })
+
+        this.wallet.on('ready', () => {
             self.emit('ready')
         })
 
-        self.chain.on('error', (err) => {
+        this.wallet.on('error', (err) => {
             self.emit('error', err)
         })
     }
@@ -51,7 +58,7 @@ export default class MockClient extends EventEmitter {
     }
 
     getBalance () {
-
+        return this.wallet.getBalance()
     }
 
     sendFrom (from, to, amount) {
@@ -60,8 +67,37 @@ export default class MockClient extends EventEmitter {
         })
     }
 
-    deployContract (from, code) {
-        return this.db.memPool.addTransaction(Transaction.deployContract(from, code))
+    deployContract (from, code, options) {
+        const self = this
+        return new Promise((resolve, reject) => {
+            const contract = new Contract({
+                code: code,
+                feePrice: options.feePrice || 0.0000001
+            })
+            const fee = contract.getConstructorFee({
+                loops: 10
+            })
+
+            const transaction = Transaction.deployContract()
+            transaction.inputs = options.inputs || []
+            transaction.outputs = options.outputs || []
+            transaction.feePrice = contract.feePrice
+
+            this.db.memPool.addTransaction(transaction)
+                .then((tx) => {
+                    contract.name = 'MetaCoin'
+                    contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
+                    contract.fee = 10.0
+                    contract.methods = {
+                        buyCoin: [],
+                        sendCoin: ['receiver'],
+                        getBalance: ['address']
+                    }
+
+                    resolve(contract)
+                })
+                .catch(reject)
+        })
     }
 
     callContract (from, contractAddress, method, args) {
@@ -70,23 +106,7 @@ export default class MockClient extends EventEmitter {
         })
     }
 
-    connect () {
-        return new Promise((resolve, reject) => {
-            setInterval(() => {
-                if (this.mempool.length) {
-
-                    // TODO should be limited to the maximum block size
-                    const newTxs = mempool.slice(0)
-
-                    const nextBlock = new Block(this.currentBlock, newTxs, {
-                        version: 1
-                    })
-
-
-                } else {
-                    console.log('mempool is empty')
-                }
-            }, this.blockTime)
-        })
+    stop () {
+        this.chain.stop()
     }
 }

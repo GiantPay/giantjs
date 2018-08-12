@@ -44,4 +44,8 @@ export default class GiantNode extends EventEmitter {
     callContract (from, contractAddress, method, args) {
         return this._client.callContract(from, contractAddress, method, args)
     }
+
+    stop () {
+        this._client.stop()
+    }
 }

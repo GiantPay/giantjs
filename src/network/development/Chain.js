@@ -1,5 +1,6 @@
 import Miner from './Miner'
 import Block from './Block'
+import logger from '../../logger'
 
 import EventEmitter from 'events'
 import async from 'async'
@@ -16,6 +17,7 @@ export default class Chain extends EventEmitter {
         this.client = options.client
         this.db = options.db
         this.memPool = options.memPool
+        this.wallet = options.wallet
         this.genesis = options.genesis
         this.genesisOptions = options.genesisOptions
 
@@ -25,15 +27,26 @@ export default class Chain extends EventEmitter {
         this.lastSavedMetadata = null
         this.lastSavedMetadataThreshold = 0
 
+        this.cache = {
+            hashes: {}, // dictionary of hash -> prevHash
+            chainHashes: {}
+        }
+
         this.on('initialized', () => {
             self.initialized = true
             self.emit('ready')
         })
 
         this.on('ready', () => {
-            console.log('Giant is ready')
+            logger.info('Giant is ready')
             self.ready = true
-            self.startMiner()
+            if (options.mining) {
+                self.startMiner()
+            }
+
+            if (self.tip.height === 0) {
+                self.emit('genesis')
+            }
         })
     }
 
@@ -56,30 +69,26 @@ export default class Chain extends EventEmitter {
             .then((metadata) => {
                 if (!metadata || !metadata.tip) {
                     self.tip = self.genesis
-                    self.tip.__height = 0
-                    // self.tip.__weight = self.genesisWeight
-                    self.db.putBlock(self.genesis)
-                        .then(() => {
-                            self.db._onChainAddBlock(self.genesis)
-                                .then(() => {
+                    self.db.putBlock(self.genesis, (err) => {
+                        if (err) {
+                            self.emit('error', err)
+                        } else {
+                            self.db._onChainAddBlock(self.genesis, (err) => {
+                                if (err) {
+                                    self.emit('error', err)
+                                } else {
                                     self.emit('addblock', self.genesis)
                                     self.saveMetadata()
                                     self.emit('initialized')
-                                })
-                                .catch((err) => {
-                                    self.emit('error', err)
-                                })
-                        })
-                        .catch((err) => {
-                            return self.emit('error', err)
-                        })
+                                }
+                            })
+                        }
+                    })
                 } else {
                     metadata.tip = metadata.tip
                     self.db.getBlock(metadata.tip)
                         .then((tip) => {
                             self.tip = tip
-                            self.tip.__height = metadata.tipHeight
-                            // self.tip.__weight = new BN(metadata.tipWeight, 'hex')
                             self.cache = metadata.cache
                             self.emit('initialized')
                         })
@@ -107,10 +116,9 @@ export default class Chain extends EventEmitter {
             return callback()
         }
 
-        var metadata = {
+        const metadata = {
             tip: self.tip ? self.tip.hash : null,
-            tipHeight: self.tip && self.tip.__height ? self.tip.__height : 0,
-            // tipWeight: self.tip && self.tip.__weight ? self.tip.__weight.toString(16) : '0',
+            tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
             cache: self.cache
         }
 
@@ -119,12 +127,13 @@ export default class Chain extends EventEmitter {
     }
 
     startMiner () {
-        console.log('startMiner')
+        logger.info('startMiner')
         if (!this.miner) {
             this.miner = new Miner({
                 db: this.db,
                 chain: this,
-                memPool: this.memPool
+                memPool: this.memPool,
+                wallet: this.wallet
             })
             this.miner.start()
         }
@@ -138,12 +147,18 @@ export default class Chain extends EventEmitter {
         const genesis = new Block({
             prevHash: null,
             height: 0,
-            timestamp: options.timestamp || new Date()
+            timestamp: options.timestamp
         })
         const data = this.db.buildGenesisData()
         genesis.merkleRoot = data.merkleRoot
         genesis.data = data.data
         return genesis
+    }
+
+    stop () {
+        if (this.miner) {
+            this.miner.stop()
+        }
     }
 
     _validateMerkleRoot (block) {
@@ -166,7 +181,7 @@ export default class Chain extends EventEmitter {
         async.doWhilst((next) => {
                 const item = self.blockQueue.shift()
 
-                console.log('Processing block', item[0].hash)
+                logger.info('Processing block', item[0].hash)
 
                 self._processBlock(item[0], (err) => {
                     item[1].call(self, err)
@@ -189,7 +204,6 @@ export default class Chain extends EventEmitter {
 
         async.series([
                 this._writeBlock.bind(this, block),
-                this._updateWeight.bind(this, block),
                 this._updateTip.bind(this, block)
             ],
             callback
@@ -201,12 +215,14 @@ export default class Chain extends EventEmitter {
 
         self.db.getBlock(block.hash)
             .then(() => {
-                console.log('Block ' + block.hash + ' already exists, so not writing it again')
+                logger.warn(`Block ${block.hash} already exists, so not writing it again`)
                 callback()
             })
             .catch((err) => {
                 if (err instanceof levelup.errors.NotFoundError) {
-                    console.log('Chain is putting block to db:' + block.hash)
+                    block.height = self.tip.height + 1
+
+                    logger.info(`Chain is putting block[${block.height}] to db: ${block.hash}`)
 
                     self.cache.hashes[block.hash] = block.prevHash
                     self.db.putBlock(block, callback)
@@ -216,29 +232,11 @@ export default class Chain extends EventEmitter {
             })
     }
 
-    _updateWeight (block, callback) {
-        // const self = this
-        // Update weights
-        // self.getWeight(block.hash, function (err, weight) {
-        //     if (err) {
-        //         return callback(new Error('Could not get weight for block ' + block.hash + ': ' + err))
-        //     }
-        //
-        //     log.debug('Chain calculated weight as ' + weight.toString('hex'))
-        //
-        //     block.__weight = weight
-        //
-        //     self.db._updateWeight(block.hash, block.__weight, callback)
-        // })
-    }
-
     _updateTip (block, callback) {
-        console.log(`Chain updating the tip for: ${block.hash}`)
+        logger.info(`Chain updating the tip for [${block.height}]`, block.toObject())
         const self = this
 
-        // TODO check block.prevHash !== self.tip.hash and reorg
-        // Populate height
-        block.__height = self.tip.__height + 1
+        // FIXME check block.prevHash !== self.tip.hash and reorg
         async.series(
             [
                 self._validateBlock.bind(self, block),
@@ -249,21 +247,19 @@ export default class Chain extends EventEmitter {
                     return callback(err)
                 }
 
-                delete self.tip.__transactions
                 self.tip = block
 
-                console.log('Saving metadata')
+                logger.debug('Saving metadata')
                 self.saveMetadata()
-                console.log('Chain added block to main chain')
+                logger.debug('Chain added block to main chain')
 
-                self.emit('addblock', block)
                 callback()
             }
         )
     }
 
     _validateBlock (block, callback) {
-        console.log('Chain is validating block: ' + block.hash)
+        logger.info(`Chain is validating block: ${block.hash}`)
         block.validate(this, callback)
     }
 

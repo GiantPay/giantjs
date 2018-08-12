@@ -2,9 +2,12 @@ import GiantPath from '../../path'
 import MemPool from './MemPool'
 import Block from './Block'
 import Hash from './Hash'
+import logger from '../../logger'
 
 import EventEmitter from 'events'
 import async from 'async'
+import fs from 'fs'
+import path from 'path'
 
 import jsondiffpatch from 'jsondiffpatch'
 import levelup from 'levelup'
@@ -26,14 +29,23 @@ export default class Database extends EventEmitter {
             options = {}
         }
 
-        this.store = levelup(leveldown(GiantPath.getNetworkPath(options.network)))
+        const networkPath = GiantPath.getNetworkPath(options.network)
+        if (options.clean) {
+            GiantPath.cleanPath(networkPath, true)
+        }
+
+        let levelupStore = leveldown
+        if (options.store) {
+            levelupStore = options.store
+        }
+        this.store = levelup(levelupStore(networkPath))
         this.memPool = options.memPool = new MemPool({
             db: this
         })
     }
 
     initialize () {
-        this.emit('ready');
+        this.emit('ready')
     }
 
     buildGenesisData () {
@@ -86,22 +98,19 @@ export default class Database extends EventEmitter {
         })
     }
 
-    putBlock (block) {
+    putBlock (block, callback) {
         const self = this
+        const key = `${PREFIXES.BLOCK}-${block.hash}`
+        const options = {
+            valueEncoding: 'hex'
+        }
 
-        return new Promise((resolve, reject) => {
-            const key = `${PREFIXES.BLOCK}-${block.hash}`
-            const options = {
-                valueEncoding: 'hex'
+        this.store.put(key, block.toJson(), options, (err) => {
+            if (err) {
+                callback(err)
+            } else {
+                self._updatePrevHashIndex(block, callback)
             }
-
-            this.store.put(key, block.toJson(), options, (err) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    self._updatePrevHashIndex(block, resolve, reject)
-                }
-            });
         })
     }
 
@@ -113,7 +122,6 @@ export default class Database extends EventEmitter {
     }
 
     getTransactionsFromBlock (block) {
-        // TODO in mock client - block.data is JSON array of transactions, not byte buffer
         return block.data
     }
 
@@ -152,89 +160,44 @@ export default class Database extends EventEmitter {
         return tree
     }
 
-    put (key, value) {
-        const self = this
-        return new Promise((resolve, reject) => {
-
-
-        })
-    }
-
-    get (key) {
-
-    }
-
-    getDiff (key, value, callback) {
-        var self = this;
-
-        self.get(key, function (err, oldValue) {
-            if (err && !(err instanceof levelup.errors.NotFoundError)) {
-                return callback(err);
-            }
-
-            var diff;
-            try {
-                var oldValueObject = JSON.parse(oldValue);
-                var valueObject = JSON.parse(value);
-                diff = jsondiffpatch.diff(oldValueObject, valueObject);
-            } catch (e) {
-                diff = jsondiffpatch.diff(oldValue, value);
-            }
-
-            callback(null, diff);
-        });
-    }
-
-    _onChainAddBlock (block) {
+    _onChainAddBlock (block, callback) {
         var self = this
 
-        console.log('DB handling new chain block')
+        logger.debug('DB handling new chain block')
 
-        return new Promise((resolve, reject) => {
-            // Remove block from mempool
-            self.memPool.removeBlock(block.hash)
+        // Remove block from mempool
+        this.memPool.removeBlock(block.hash)
 
-            async.series([
-                self._updateTransactions.bind(self, block, true), // add transactions
-                self._updateValues.bind(self, block, true) // update values
-            ], (err, results) => {
-                if (err) {
-                    reject(err)
-                } else {
-                    let operations = []
-                    for (let i = 0; i < results.length; i++) {
-                        operations = operations.concat(results[i])
-                    }
+        this.emit('addblock', block)
 
-                    console.log('Updating the database with operations', operations)
-
-                    self.store.batch(operations, (err) => {
-                        if (err) {
-                            reject(err)
-                        } else {
-                            resolve()
-                        }
-                    })
+        async.series([
+            this._updateTransactions.bind(self, block, true), // add transactions
+            this._updateValues.bind(self, block, true) // update values
+        ], (err, results) => {
+            if (err) {
+                callback(err)
+            } else {
+                let operations = []
+                for (let i = 0; i < results.length; i++) {
+                    operations = operations.concat(results[i])
                 }
-            });
+
+                logger.debug('Updating the database with operations', operations)
+
+                self.store.batch(operations, callback)
+            }
         })
     }
 
-    _updatePrevHashIndex (block, resolve, reject) {
-        this.store.put(`${PREFIXES.PREV_HASH}-${block.hash}`, block.prevHash, (err) => {
-            if (err) {
-                reject(err)
-            } else {
-                resolve()
-            }
-        })
+    _updatePrevHashIndex (block, callback) {
+        this.store.put(`${PREFIXES.PREV_HASH}-${block.hash}`, block.prevHash, callback)
     }
 
     _updateTransactions (block, add, callback) {
         const self = this
         const txs = self.getTransactionsFromBlock(block)
 
-        console.log('Updating transactions')
+        logger.debug('Updating transactions')
 
         const action = add ? 'put' : 'del'
         let operations = []
@@ -289,10 +252,10 @@ export default class Database extends EventEmitter {
 
         self.get(key, (err, original) => {
             if (err && !(err instanceof levelup.errors.NotFoundError)) {
-                return callback(err);
+                return callback(err)
             }
 
-            let newValue;
+            let newValue
             try {
                 const originalObject = JSON.parse(original)
                 newValue = jsondiffpatch.patch(originalObject, diff)
@@ -305,7 +268,7 @@ export default class Database extends EventEmitter {
                 key: `${PREFIXES.DATA}-${key}`,
                 value: newValue
             })
-        });
+        })
     }
 
     _unpatch (key, diff, callback) {

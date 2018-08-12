@@ -1,3 +1,5 @@
+import logger from '../../logger'
+
 /**
  * Rules for the validation of a contract:
  * 1) must be declared class
@@ -21,27 +23,21 @@ export default () => {
                 })
 
                 if (!foundExportDefaultDeclaration) {
-                    // TODO need to output additional information
-                    console.log('No default export detected')
-                    process.exit(1)
+                    throw path.buildCodeFrameError('No default export detected')
                 }
             },
             ExportDefaultDeclaration: (path) => {
                 const declaration = path.get('declaration')
 
                 if (!declaration.isClassDeclaration()) {
-                    // TODO need to output additional information
-                    console.log('By default, not a class is exported')
-                    process.exit(1)
+                    throw path.buildCodeFrameError('By default, not a class is exported')
                 }
 
                 const className = declaration.get('id').name
                 const superClass = declaration.node.superClass
 
                 if (!superClass) {
-                    // TODO need to output additional information
-                    console.log('The class of the contract must be the heir of the Contract')
-                    process.exit(1)
+                    throw path.buildCodeFrameError('The class of the contract must be the heir of the Contract')
                 }
 
                 // TODO need to verify that the class is in the correct inheritance hierarchy
