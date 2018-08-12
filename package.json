@@ -1,5 +1,5 @@
 {
-  "name": "giantjs",
+  "name": "gcdk",
   "version": "1.0.0",
   "description": "The Giant Contracts Development Kit",
   "main": "./dist/giant.js",

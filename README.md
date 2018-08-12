@@ -13,7 +13,7 @@ With **Giantjs**, you get:
 ### Install
 
 ```
-$ npm install -g giantjs
+$ npm install -g gcdk
 ```
 
 ### Quick Usage
