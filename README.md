@@ -1,4 +1,4 @@
-**Giantjs** is a development environment and testing framework for Giant Contracts.
+Giantjs is the Giant Contracts Development Kit, which means a development environment and testing framework for Giant Contracts.
 With **Giantjs**, you get:
 
 * Built-in smart contract compilation, linking and deployment management.
