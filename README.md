@@ -1,5 +1,5 @@
-**giantjs** is a development environment and testing framework for Giant Contracts.
-With **giantjs**, you get:
+**Giantjs** is a development environment and testing framework for Giant Contracts.
+With **Giantjs**, you get:
 
 * Built-in smart contract compilation, linking and deployment management.
 * Automated contract testing with Mocha and Chai.
@@ -8,7 +8,7 @@ With **giantjs**, you get:
 * Network management for deploying to many public & private networks.
 * Interactive console for direct contract communication.
 * Instant rebuilding of assets during development.
-* External script runner that executes scripts within a **giantjs** environment.
+* External script runner that executes scripts within a **Giantjs** environment.
 
 ### Install
 
@@ -26,13 +26,13 @@ $ giantjs init
 
 From there, you can run `giantjs compile`, `giantjs migrate` and `giantjs test` to compile your contracts, deploy those contracts to the network, and run their associated unit tests.
 
-**giantjs** comes bundled with a local development blockchain server that launches automatically when you invoke the commands above.
+**Giantjs** comes bundled with a local development blockchain server that launches automatically when you invoke the commands above.
 
 ### Documentation
 
-The basic ideas on which the work of **giantjs** is based are described in [Giant Contracts White Paper](https://giantpay.network/whitepaper/contracts)
+The basic ideas on which the work of **Giantjs** is based are described in [Giant Contracts White Paper](https://giantpay.network/whitepaper/contracts)
 
-Please see the [official giantjs documentation](https://github.com/GiantPay/giantjs/wiki) for guides, tips, and examples.
+Please see the [Official Giantjs Documentation](https://github.com/GiantPay/giantjs/wiki) for guides, tips, and examples.
 
 ### Development
 
