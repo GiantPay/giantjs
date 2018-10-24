@@ -29,7 +29,7 @@ export default class Transaction {
 
     static generation () {
         return new Transaction({
-            type: Type.GENERATION,
+            type: TransactionType.GENERATION,
             inputs: [{
                 coinbase: '000000000000000000000000000000000000000000000000',
                 sequence: 0
