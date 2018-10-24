@@ -1,5 +1,6 @@
 import path from 'path'
 import fs from 'fs'
+import logger from '../logger'
 
 const createContract = (name) => {
     const currentDir = process.cwd()
@@ -20,7 +21,13 @@ const createContract = (name) => {
                     '\tconstructor() {\n' +
                     '\t\tsuper()\n' +
                     '\t}\n' +
-                    '}'
+                    '}',
+                    function (err) {
+                        if (err) {
+                            return console.log(err);
+                        }
+                        logger.info('The contract ' + name + ' was created!')
+                    }
                 )
             }
         })
