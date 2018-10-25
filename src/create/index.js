@@ -13,16 +13,18 @@ const createContract = (name) => {
 
         fs.stat(contracts, (err, stats) => {
             if (!err) {
+                name = name.charAt(0).toUpperCase() + name.slice(1);
                 fs.writeFile(
                     path.resolve(contracts, name + '.js'),
                     '\'use strict\'\n\n' +
                     'import Contract from \'GiantContract\'\n\n' +
-                    'export default class ' + name + ' extends Contract {\n' +
+                    'class ' + name + ' extends Contract {\n' +
                     '\tconstructor() {\n' +
                     '\t\tsuper()\n' +
                     '\t}\n' +
-                    '}',
-                    function (err) {
+                    '}\n\n' +
+                    'module.exports = ' + name,
+                    (err) => {
                         if (err) {
                             return console.log(err);
                         }
