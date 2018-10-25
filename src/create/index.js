@@ -18,12 +18,11 @@ const createContract = (name) => {
                     path.resolve(contracts, name + '.js'),
                     '\'use strict\'\n\n' +
                     'import Contract from \'GiantContract\'\n\n' +
-                    'class ' + name + ' extends Contract {\n' +
+                    'export default class ' + name + ' extends Contract {\n' +
                     '\tconstructor() {\n' +
                     '\t\tsuper()\n' +
                     '\t}\n' +
-                    '}\n\n' +
-                    'module.exports = ' + name,
+                    '}',
                     (err) => {
                         if (err) {
                             return console.log(err);
