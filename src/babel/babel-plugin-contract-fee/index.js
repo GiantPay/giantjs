@@ -10,7 +10,7 @@ export default () => {
     var pfeCount = function (price, declaration) {
         let declarationPrice = price * feePrice
         return '\tcontractAmount += ' + declarationPrice +
-            '\n\tconsole.log(\'Found CallExpression ' + declaration +
+            '\n\tconsole.log(\'Found ' + declaration +
             '. Price : ' + declarationPrice + '\')\n\tconsole.log(contractAmount)\n'
     }
     var pfeFuncStr = ''
