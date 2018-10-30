@@ -7,11 +7,11 @@ import fs from 'fs'
  */
 export default () => {
     const feePrice = 0.00000001
-    var pfeCount = function (price, declaration) {
+    var pfeCount = (price, declaration) => {
         let declarationPrice = price * feePrice
         return '\tcontractAmount += ' + declarationPrice +
             '\n\tconsole.log(\'Found ' + declaration +
-            '. Price : ' + declarationPrice + '\')\n\tconsole.log(contractAmount)\n'
+            '. Price : ' + declarationPrice + '\')\n\tconsole.log(contractAmount.toFixed(8))\n'
     }
     var pfeFuncStr = ''
 
@@ -51,7 +51,7 @@ export default () => {
             CallExpression: (path) => {
                 if (path.get('type').node == 'CallExpression') {
                     logger.info('CallExpression ' + path.get('callee').get('type').node)
-                    pfeFuncStr += pfeCount(20, path.get('callee').get('type').node)
+                    pfeFuncStr += pfeCount(30, path.get('callee').get('type').node)
                 }
             }
         }, post(state) {
