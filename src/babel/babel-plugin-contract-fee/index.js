@@ -49,7 +49,7 @@ export default () => {
                 }
             },
             CallExpression: (path) => {
-                if (path.get('type').node == 'CallExpression') {
+                if (path.isCallExpression()) {
                     logger.info('CallExpression ' + path.get('callee').get('type').node)
                     pfeFuncStr += pfeCount(30, path.get('callee').get('type').node)
                 }
