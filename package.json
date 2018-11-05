@@ -8,6 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build": "NODE_ENV=production babel src --out-dir dist",
+    "watch": "babel src -d dist -w",
     "prepublishOnly": "npm run build",
     "test": "NODE_ENV=test mocha --require babel-core/register ./test/**/*.test.js",
     "coverage": "istanbul cover _mocha -- --recursive"
@@ -46,6 +47,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-preset-es2016": "^6.24.1",
     "chai": "^4.1.2",
     "coveralls": "^3.0.2",
     "gulp": "^3.9.1",
