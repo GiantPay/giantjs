@@ -13,7 +13,24 @@ export default (name, cmd) => {
     giantNode.on('ready', () => {
         const giantContract = new GiantContract(name)
 
-        giantContract.compile()
+        try {
+            logger.debug('Compile')
+            giantContract.compile()
+        }
+        catch (error) {
+            logger.error('Contract compilation error')
+
+            if (error instanceof TypeError) {
+                logger.warn('TypeError' )
+            }
+            else if(error instanceof RangeError) {
+                logger.warn('RangeError, loops')
+            }
+            else {
+                // something else
+            }
+            console.error(error);
+        }
 
         // TODO it's necessary to take from the parameters
         const accounts = giantNode.getAccounts()

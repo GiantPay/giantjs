@@ -250,39 +250,80 @@ export default ({types: t}) => {
             Program: (path) => {
                 path.traverse({
                     ExportDefaultDeclaration: (subPath) => {
+
                         logger.debug('node type : ' + subPath.get('type').node)
+
+                        logger.debug('insert pfe : ExportDefaultDeclaration')
+
+                        /**
+                         * pfe ExportDefaultDeclaration
+                         *
+                         * */
+                        subPath.insertAfter(t.expressionStatement(t.stringLiteral("ExportDefaultDeclaration pfe, cost 3 ")));
                         found_ExportDefaultDeclaration = true
-                        subPath.insertAfter(pfeFunction)
                         subPath.stop()
                     }
                 })
             },
             ClassDeclaration: (path) => {
+
                 logger.debug('node type : ' + path.get('type').node)
+
                 found_ClassDeclaration = true
                 path.traverse({
                     ClassMethod(subPath) {
                         logger.debug('node type : ' + subPath.get('type').node)
                         let node = subPath.get('kind').node
                         logger.debug('node type : ' + node)
-                        subPath.insertAfter(pfeCallFunction)
+
+                        /**
+                         * pfe ClassMethod
+                         *
+                         * */
+                        logger.debug('insert pfe : ClassMethod')
+                        path.insertBefore(t.expressionStatement(t.stringLiteral("ClassMethod pfe, cost 3 ")));
+
+                        if(node=='constructor') {
+
+                            /**
+                             * pfe Constructor
+                             *
+                             * */
+                            logger.debug('insert pfe : Constructor')
+                            path.insertBefore(t.expressionStatement(t.stringLiteral("Constructor pfe, cost 2 ")));
+
+                        }
                         subPath.stop()
                     }
                 })
             },
-            ClassMethod: (path) => {
-                path.traverse({
-                    //logger.debug('node type : ' + path.get('type').node)
-                })
 
-            },
             FunctionDeclaration: (subPath) => {
-                subPath.insertAfter(pfeCallFunction)
+
+                logger.debug('node type : ' + subPath.get('type').node)
+
+                /**
+                 * pfe FunctionDeclaration
+                 *
+                 * */
+                logger.debug('insert pfe : FunctionDeclaration')
+                subPath.insertBefore(t.expressionStatement(t.stringLiteral("FunctionDeclaration pfe, cost 2 ")));
+
+                // subPath.insertAfter(pfeCallFunction)
 
             },
             CallExpression: (path) => {
                 if (path.isCallExpression()) {
+
                     logger.debug('CallExpression callee type : ' + path.get('type').node)
+                    /**
+                     * pfe FunctionDeclaration
+                     *
+                     * RangeError: Maximum call stack size exceeded
+                     * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")));
+                     *
+                     * */
+                    logger.debug('insert pfe : CallExpression')
                 }
             }
         }, post(state) {
