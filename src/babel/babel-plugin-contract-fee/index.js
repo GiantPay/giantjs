@@ -95,6 +95,11 @@ export default ({types: t, template: template}) => {
             }
         }, post(state) {
 
+            /**
+             * validator logic
+             *
+             * */
+
             if (!found_ExportDefaultDeclaration) {
                 // throw path.buildCodeFrameError('ExportDefaultDeclaration not found')
             }
