@@ -3,246 +3,14 @@ import logger from '../../logger'
 /**
  * @returns ast and pfe functions of the giant contract code
  */
-export default ({types: t}) => {
+export default ({types: t, template: template}) => {
     let found_ExportDefaultDeclaration = false
     let found_ClassDeclaration = false
 
-    let pfeFunction = {
-        "body": [
-            {
-                "type": "FunctionDeclaration",
-                "id": {
-                    "type": "Identifier",
-                    "name": "pfe"
-                },
-                "params": [
-                    {
-                        "type": "Identifier",
-                        "name": "contractName"
-                    },
-                    {
-                        "type": "Identifier",
-                        "name": "declaration"
-                    },
-                    {
-                        "type": "Identifier",
-                        "name": "mockClient"
-                    }
-                ],
-                "body": {
-                    "type": "BlockStatement",
-                    "body": [
-                        {
-                            "type": "VariableDeclaration",
-                            "declarations": [
-                                {
-                                    "type": "VariableDeclarator",
-                                    "id": {
-                                        "type": "Identifier",
-                                        "name": "spendFee"
-                                    },
-                                    "init": {
-                                        "type": "ObjectExpression",
-                                        "properties": [
-                                            {
-                                                "type": "Property",
-                                                "key": {
-                                                    "type": "Identifier",
-                                                    "name": "ClassDeclaration"
-                                                },
-                                                "value": {
-                                                    "type": "Literal",
-                                                    "value": 10,
-                                                    "raw": "10"
-                                                },
-                                                "kind": "init"
-                                            },
-                                            {
-                                                "type": "Property",
-                                                "key": {
-                                                    "type": "Identifier",
-                                                    "name": "ClassMethod"
-                                                },
-                                                "value": {
-                                                    "type": "Literal",
-                                                    "value": 8,
-                                                    "raw": "8"
-                                                },
-                                                "kind": "init"
-                                            },
-                                            {
-                                                "type": "Property",
-                                                "key": {
-                                                    "type": "Identifier",
-                                                    "name": "FunctionDeclaration"
-                                                },
-                                                "value": {
-                                                    "type": "Literal",
-                                                    "value": 8,
-                                                    "raw": "8"
-                                                },
-                                                "kind": "init"
-                                            }
-                                        ]
-                                    }
-                                }
-                            ],
-                            "kind": "const"
-                        },
-                        {
-                            "type": "VariableDeclaration",
-                            "declarations": [
-                                {
-                                    "type": "VariableDeclarator",
-                                    "id": {
-                                        "type": "Identifier",
-                                        "name": "arrayOfRequests"
-                                    },
-                                    "init": {
-                                        "type": "ArrayExpression",
-                                        "elements": []
-                                    }
-                                }
-                            ],
-                            "kind": "let"
-                        },
-                        {
-                            "type": "ForStatement",
-                            "init": {
-                                "type": "VariableDeclaration",
-                                "declarations": [
-                                    {
-                                        "type": "VariableDeclarator",
-                                        "id": {
-                                            "type": "Identifier",
-                                            "name": "i"
-                                        },
-                                        "init": {
-                                            "type": "Literal",
-                                            "value": 0,
-                                            "raw": "0"
-                                        }
-                                    }
-                                ],
-                                "kind": "let"
-                            },
-                            "test": {
-                                "type": "BinaryExpression",
-                                "left": {
-                                    "type": "Identifier",
-                                    "name": "i"
-                                },
-                                "operator": "<",
-                                "right": {
-                                    "type": "MemberExpression",
-                                    "object": {
-                                        "type": "Identifier",
-                                        "name": "mockClient"
-                                    },
-                                    "property": {
-                                        "type": "Identifier",
-                                        "name": "length"
-                                    },
-                                }
-                            },
-                            "update": {
-                                "type": "UpdateExpression",
-                                "operator": "++",
-                                "prefix": false,
-                                "argument": {
-                                    "type": "Identifier",
-                                    "name": "i"
-                                }
-                            },
-                            "body": {
-                                "type": "BlockStatement",
-                                "body": [
-                                    {
-                                        "type": "ExpressionStatement",
-                                        "expression": {
-                                            "type": "CallExpression",
-                                            "callee": {
-                                                "type": "MemberExpression",
-                                                "object": {
-                                                    "type": "Identifier",
-                                                    "name": "arrayOfRequests"
-                                                },
-                                                "property": {
-                                                    "type": "Identifier",
-                                                    "name": "push"
-                                                },
-                                            },
-                                            "arguments": [
-                                                {
-                                                    "type": "CallExpression",
-                                                    "callee": {
-                                                        "type": "Identifier",
-                                                        "name": "checkBalance"
-                                                    },
-                                                    "arguments": [
-                                                        {
-                                                            "type": "MemberExpression",
-                                                            "object": {
-                                                                "type": "Identifier",
-                                                                "name": "mockClient"
-                                                            },
-                                                            "property": {
-                                                                "type": "Identifier",
-                                                                "name": "i"
-                                                            }
-                                                        },
-                                                        {
-                                                            "type": "MemberExpression",
-                                                            "object": {
-                                                                "type": "Identifier",
-                                                                "name": "spendFee"
-                                                            },
-                                                            "property": {
-                                                                "type": "Identifier",
-                                                                "name": "declaration"
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-            }
-        ]
-    }
-
-    let pfeCallFunction = {
-        "body": [
-            {
-                "type": "ExpressionStatement",
-                "expression": {
-                    "type": "CallExpression",
-                    "callee": {
-                        "type": "Identifier",
-                        "name": "pfe"
-                    },
-                    "arguments": [
-                        {
-                            "type": "Identifier",
-                            "name": "contractName"
-                        },
-                        {
-                            "type": "Identifier",
-                            "name": "declaration"
-                        },
-                        {
-                            "type": "Identifier",
-                            "name": "mockClient"
-                        }
-                    ]
-                }
-            }
-        ]
+    var pfeCall = (declaration, fee) => {
+        return template(`pfe("` + declaration + `", ` + fee + `)`, {
+            sourceType: 'module'
+        })()
     }
 
     return {
@@ -252,14 +20,15 @@ export default ({types: t}) => {
                     ExportDefaultDeclaration: (subPath) => {
 
                         logger.debug('node type : ' + subPath.get('type').node)
-
-                        logger.debug('insert pfe : ExportDefaultDeclaration')
+                        //subPath.insertAfter(t.expressionStatement(t.stringLiteral("ExportDefaultDeclaration pfe, cost 3 ")));
 
                         /**
                          * pfe ExportDefaultDeclaration
                          *
                          * */
-                        subPath.insertAfter(t.expressionStatement(t.stringLiteral("ExportDefaultDeclaration pfe, cost 3 ")));
+                        logger.debug('insert pfe : ExportDefaultDeclaration')
+                        //  path.insertBefore(pfeCall('ExportDefaultDeclaration', 4));
+
                         found_ExportDefaultDeclaration = true
                         subPath.stop()
                     }
@@ -281,50 +50,48 @@ export default ({types: t}) => {
                          *
                          * */
                         logger.debug('insert pfe : ClassMethod')
-                        path.insertBefore(t.expressionStatement(t.stringLiteral("ClassMethod pfe, cost 3 ")));
+                        path.insertAfter(pfeCall('ClassMethod', 5));
 
-                        if(node=='constructor') {
+                        if (node == 'constructor') {
 
                             /**
-                             * pfe Constructor
+                             * pfe Constructor its ClassMethod
+                             * other ClassMethods is FunctionDeclaration
+                             *
+                             * logger.debug('insert pfe : Constructor')
+                             * path.insertAfter(pfeCall('Constructor', 10));
+                             *
                              *
                              * */
-                            logger.debug('insert pfe : Constructor')
-                            path.insertBefore(t.expressionStatement(t.stringLiteral("Constructor pfe, cost 2 ")));
+
 
                         }
                         subPath.stop()
                     }
                 })
+                path.insertAfter(pfeCall('ClassDeclaration', 3));
             },
 
-            FunctionDeclaration: (subPath) => {
+            FunctionDeclaration: (path) => {
 
-                logger.debug('node type : ' + subPath.get('type').node)
+                logger.debug('node type : ' + path.get('type').node)
 
                 /**
                  * pfe FunctionDeclaration
                  *
                  * */
                 logger.debug('insert pfe : FunctionDeclaration')
-                subPath.insertBefore(t.expressionStatement(t.stringLiteral("FunctionDeclaration pfe, cost 2 ")));
-
-                // subPath.insertAfter(pfeCallFunction)
+                path.insertBefore(pfeCall('FunctionDeclaration', 3));
 
             },
             CallExpression: (path) => {
-                if (path.isCallExpression()) {
-
-                    logger.debug('CallExpression callee type : ' + path.get('type').node)
-                    /**
-                     * pfe FunctionDeclaration
-                     *
-                     * RangeError: Maximum call stack size exceeded
-                     * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")));
-                     *
-                     * */
-                    logger.debug('insert pfe : CallExpression')
-                }
+                /**
+                 * pfe CallExpression RangeError
+                 *
+                 * RangeError: Maximum call stack size exceeded
+                 * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")));
+                 *
+                 * */
             }
         }, post(state) {
 

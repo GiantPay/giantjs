@@ -17,7 +17,7 @@ const createContract = (name) => {
                 fs.writeFile(
                     path.resolve(contracts, name + '.js'),
                     '\'use strict\'\n\n' +
-                    'import Contract from \'GiantContract\'\n\n' +
+                    'import Contract from \'../../dist/compile/GiantContract\'\n\n' +
                     'export default class ' + name + ' extends Contract {\n' +
                     '\tconstructor() {\n' +
                     '\t\tsuper()\n' +
