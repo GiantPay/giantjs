@@ -1,11 +1,28 @@
 import logger from '../../logger'
 
+let found_errors = []
+
+let found_ExportDefaultDeclaration = 0
+let foundMax_ExportDefaultDeclaration = 1
+
+let found_ClassDeclaration = 0
+let foundMax_ClassDeclaration = 1
+
+let found_ConstructorDeclaration = 0
+let foundMax_ConstructorDeclaration = 1
+
+let found_SuperDeclaration = 0
+let foundMax_SuperDeclaration = 1
+
+let found_FunctionDeclaration = 0
+let foundMax_FunctionDeclaration = 100
+
+
 /**
  * @returns ast and pfe functions of the giant contract code
  */
 export default ({types: t, template: template}) => {
-    let found_ExportDefaultDeclaration = false
-    let found_ClassDeclaration = false
+
 
     var pfeCall = (declaration, fee) => {
         return template(`pfe("` + declaration + `", ` + fee + `)`, {
@@ -20,16 +37,14 @@ export default ({types: t, template: template}) => {
                     ExportDefaultDeclaration: (subPath) => {
 
                         logger.debug('node type : ' + subPath.get('type').node)
-                        //subPath.insertAfter(t.expressionStatement(t.stringLiteral("ExportDefaultDeclaration pfe, cost 3 ")));
 
                         /**
                          * pfe ExportDefaultDeclaration
                          *
                          * */
-                        logger.debug('insert pfe : ExportDefaultDeclaration')
-                        //  path.insertBefore(pfeCall('ExportDefaultDeclaration', 4));
-
-                        found_ExportDefaultDeclaration = true
+                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', 4));
+                        logger.warn('insert pfe : ExportDefaultDeclaration')
+                        found_ExportDefaultDeclaration++
                         subPath.stop()
                     }
                 })
@@ -37,51 +52,56 @@ export default ({types: t, template: template}) => {
             ClassDeclaration: (path) => {
 
                 logger.debug('node type : ' + path.get('type').node)
+                path.insertBefore(pfeCall('ClassDeclaration', 3));
+                logger.warn('insert pfe : ClassDeclaration')
+                found_ClassDeclaration++
 
-                found_ClassDeclaration = true
                 path.traverse({
                     ClassMethod(subPath) {
-                        logger.debug('node type : ' + subPath.get('type').node)
-                        let node = subPath.get('kind').node
-                        logger.debug('node type : ' + node)
-
                         /**
                          * pfe ClassMethod
                          *
                          * */
-                        logger.debug('insert pfe : ClassMethod')
-                        path.insertAfter(pfeCall('ClassMethod', 5));
-
+                        let node = subPath.get('kind').node
                         if (node == 'constructor') {
-
                             /**
-                             * pfe Constructor its ClassMethod
-                             * other ClassMethods is FunctionDeclaration
-                             *
-                             * logger.debug('insert pfe : Constructor')
-                             * path.insertAfter(pfeCall('Constructor', 10));
-                             *
+                             * pfe Constructor
                              *
                              * */
+                            logger.debug('node type : ' + node)
+                            subPath.insertBefore(pfeCall('Constructor', 10));
+                            logger.warn('insert pfe : Constructor')
+                            found_ConstructorDeclaration++
 
-
+                            subPath.traverse({
+                                CallExpression(subSubPath) {
+                                    logger.debug('node type callee : ' + subSubPath.get('callee').get('type').node)
+                                    path.insertBefore(pfeCall('Super', 10))
+                                    logger.warn('insert pfe : Super')
+                                    found_SuperDeclaration++
+                                }
+                            })
                         }
+                        logger.debug('node type : ClassMethod kind ' + node)
+                        path.insertBefore(pfeCall('ClassMethod', 5));
+                        logger.warn('insert pfe : ClassMethod')
+
                         subPath.stop()
                     }
                 })
-                path.insertAfter(pfeCall('ClassDeclaration', 3));
             },
 
             FunctionDeclaration: (path) => {
-
-                logger.debug('node type : ' + path.get('type').node)
-
                 /**
                  * pfe FunctionDeclaration
                  *
                  * */
-                logger.debug('insert pfe : FunctionDeclaration')
+                logger.debug('node type : ' + path.get('type').node + ' ' + found_FunctionDeclaration)
+                //path.insertAfter(t.expressionStatement(t.stringLiteral("// insert FunctionDeclaration pfe")));
                 path.insertBefore(pfeCall('FunctionDeclaration', 3));
+                logger.warn('insert pfe : FunctionDeclaration')
+                found_FunctionDeclaration++
+
 
             },
             CallExpression: (path) => {
@@ -99,14 +119,76 @@ export default ({types: t, template: template}) => {
              * validator logic
              *
              * */
-
             if (!found_ExportDefaultDeclaration) {
-                // throw path.buildCodeFrameError('ExportDefaultDeclaration not found')
+                found_errors.push('not found ExportDefaultDeclaration')
+            } else {
+                if (found_ExportDefaultDeclaration > foundMax_ExportDefaultDeclaration) {
+                    found_errors.push('ExportDefaultDeclaration ' +
+                        found_ExportDefaultDeclaration +
+                        ' times payment, expect ' +
+                        foundMax_ExportDefaultDeclaration)
+                } else {
+                    logger.info('found ExportDefaultDeclaration ' + found_ExportDefaultDeclaration + ' times payment')
+                }
             }
+
             if (!found_ClassDeclaration) {
-                // throw path.buildCodeFrameError('ClassDeclaration not found')
+                found_errors.push('not found ClassDeclaration')
+            } else {
+                if (found_ClassDeclaration > foundMax_ClassDeclaration) {
+                    found_errors.push('ClassDeclaration ' +
+                        found_ClassDeclaration +
+                        ' times payment, expect ' +
+                        foundMax_ClassDeclaration)
+                } else {
+                    logger.info('found ClassDeclaration ' + found_ClassDeclaration + ' times payment')
+                }
             }
-            logger.debug('Contract ' + state.opts.basename + ' code and pfe transpiled')
+
+            if (!found_ConstructorDeclaration) {
+                found_errors.push('not found ConstructorDeclaration')
+            } else {
+                if (found_ConstructorDeclaration > foundMax_ConstructorDeclaration) {
+                    found_errors.push('ConstructorDeclaration ' +
+                        found_ConstructorDeclaration +
+                        ' times payment, expect ' +
+                        foundMax_ConstructorDeclaration)
+                } else {
+                    logger.info('found ConstructorDeclaration ' + found_ConstructorDeclaration + ' times payment')
+                }
+            }
+
+            if (!found_FunctionDeclaration) {
+                found_errors.push('not found FunctionDeclaration')
+            } else {
+                if (found_FunctionDeclaration > foundMax_FunctionDeclaration) {
+                    found_errors.push('FunctionDeclaration ' +
+                        found_FunctionDeclaration +
+                        ' times payment, expect ' +
+                        foundMax_FunctionDeclaration)
+                } else {
+                    logger.info('found FunctionDeclaration ' + found_FunctionDeclaration + ' times payment')
+                }
+            }
+
+            if (!found_SuperDeclaration) {
+                found_errors.push('not found SuperDeclaration')
+            } else {
+                if (found_SuperDeclaration > foundMax_SuperDeclaration) {
+                    found_errors.push('SuperDeclaration ' +
+                        found_SuperDeclaration +
+                        ' times payment, expect ' +
+                        foundMax_SuperDeclaration)
+                } else {
+                    logger.info('found SuperDeclaration ' + found_SuperDeclaration + ' times payment')
+                }
+            }
+            if (!found_errors.length) {
+                logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
+            } else {
+                logger.error('Some errors found', found_errors)
+            }
+
         }
     }
 }
