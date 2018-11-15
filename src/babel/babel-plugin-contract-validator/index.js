@@ -29,13 +29,6 @@ let foundMax_FunctionDeclaration = 100
  */
 export default ({types: t, template: template}) => {
 
-
-    var pfeCall = (declaration, fee) => {
-        return template(`pfe("` + declaration + `", ` + fee + `)`, {
-            sourceType: 'module'
-        })()
-    }
-
     return {
         visitor: {
             Program: (path) => {
