@@ -19,6 +19,12 @@ let foundMax_FunctionDeclaration = 100
 
 
 /**
+ * Rules for the validation of a contract:
+ * 1) must be declared class
+ * 2) the class is inherited from Contract or from imported contract's class
+ * 3) class must be exported by default
+ * 4) the superclass must be imported from the module (check that the module is either GiantContract or the address of the contract)
+ *
  * @returns ast validator info of the giant contract code
  */
 export default ({types: t, template: template}) => {
