@@ -1,13 +1,13 @@
 import logger from '../../logger'
 
 let validatorVars = {
-    ExportDefaultDeclaration: [0, 1], // [counter, maximum]
-    ClassDeclaration: [0, 1],
-    ClassMethodDeclaration: [0, 20],
-    ConstructorDeclaration: [0, 1],
-    ConstructorThisDeclaration: [0, 100],
-    SuperDeclaration: [0, 1],
-    FunctionDeclaration: [0, 100],
+    ExportDefaultDeclaration: [0, 1, 2], // [counter, maximum, price]
+    ClassDeclaration: [0, 1, 4],
+    ClassMethodDeclaration: [0, 20, 8],
+    ConstructorDeclaration: [0, 1, 10],
+    ConstructorThisDeclaration: [0, 100, 12],
+    SuperDeclaration: [0, 1, 12],
+    FunctionDeclaration: [0, 100, 4],
 }
 
 /**
@@ -33,7 +33,7 @@ export default ({types: t, template: template}) => {
                          * pfe ExportDefaultDeclaration
                          *
                          * */
-                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', 4));
+                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', 4, validatorVars.ExportDefaultDeclaration[2]));
                         logger.warn('insert pfe : ExportDefaultDeclaration')
                         validatorVars.ExportDefaultDeclaration[0]++
                         subPath.stop()
@@ -43,7 +43,7 @@ export default ({types: t, template: template}) => {
             ClassDeclaration: (path) => {
 
                 logger.debug('node type : ' + path.get('type').node)
-                path.insertBefore(pfeCall('ClassDeclaration', 3));
+                path.insertBefore(pfeCall('ClassDeclaration', 3, validatorVars.ClassDeclaration[2]));
                 logger.warn('insert pfe : ClassDeclaration')
                 validatorVars.ClassDeclaration[0]++
 
@@ -60,7 +60,7 @@ export default ({types: t, template: template}) => {
                              *
                              * */
                             logger.debug('node type : ' + node)
-                            subPath.insertBefore(pfeCall('Constructor', 10));
+                            subPath.insertBefore(pfeCall('Constructor', 10, validatorVars.ConstructorDeclaration[2]));
                             logger.warn('insert pfe : Constructor')
                             validatorVars.ConstructorDeclaration[0]++
 
@@ -72,7 +72,7 @@ export default ({types: t, template: template}) => {
                                          *
                                          * */
                                         logger.debug('constructor node type callee : ' + subSubPath.get('callee').get('type').node)
-                                        path.insertBefore(pfeCall('Super', 10))
+                                        path.insertBefore(pfeCall('Super', 10, validatorVars.SuperDeclaration[2]))
                                         logger.warn('constructor insert pfe : Super')
                                         validatorVars.SuperDeclaration[0]++
                                     }
@@ -82,7 +82,7 @@ export default ({types: t, template: template}) => {
                                      *
                                      * */
                                     logger.debug('constructor node type : ' + subSubPath.get('type').node)
-                                    path.insertBefore(pfeCall('ConstructorThis', 8))
+                                    path.insertBefore(pfeCall('ConstructorThis', 8, validatorVars.ConstructorThisDeclaration[2]))
                                     logger.warn('constructor insert pfe : ConstructorThis')
                                     validatorVars.ConstructorThisDeclaration[0]++
                                 }
@@ -93,14 +93,13 @@ export default ({types: t, template: template}) => {
                              *
                              * */
                             logger.debug('node type : ClassMethod kind ' + node)
-                            path.insertBefore(pfeCall('ClassMethod', 5));
+                            path.insertBefore(pfeCall('ClassMethod', 5, validatorVars.ClassMethodDeclaration[2]));
                             logger.warn('insert pfe : ClassMethod')
                             validatorVars.ClassMethodDeclaration[0]++
                         }
                     }
                 })
             },
-
             FunctionDeclaration: (path) => {
                 /**
                  * pfe FunctionDeclaration
@@ -108,7 +107,7 @@ export default ({types: t, template: template}) => {
                  * */
                 logger.debug('node type : ' + path.get('type').node + ' ' + validatorVars.FunctionDeclaration[0])
                 //path.insertAfter(t.expressionStatement(t.stringLiteral("// insert FunctionDeclaration pfe")));
-                path.insertBefore(pfeCall('FunctionDeclaration', 3));
+                path.insertBefore(pfeCall('FunctionDeclaration', 3, validatorVars.FunctionDeclaration[2]));
                 logger.warn('insert pfe : FunctionDeclaration')
                 validatorVars.FunctionDeclaration[0]++
 
@@ -127,32 +126,26 @@ export default ({types: t, template: template}) => {
              * validator logic
              *
              * */
-
             let found_errors = []
-            let countValidatorVars = (validatorVars, cb) => {
-                for (var k in validatorVars) {
-                    if (!validatorVars[k][0]) {
-                        found_errors.push('not found ' + k)
+            for (var k in validatorVars) {
+                if (!validatorVars[k][0]) {
+                    found_errors.push('not found ' + k)
+                } else {
+                    if (validatorVars[k][0] > validatorVars[k][1]) {
+                        found_errors.push(k + ' ' +
+                            validatorVars[k][0] +
+                            ' times payment, expect ' +
+                            validatorVars[k][1])
                     } else {
-                        if (validatorVars[k][0] > validatorVars[k][1]) {
-                            found_errors.push(k + ' ' +
-                                validatorVars[k][0] +
-                                ' times payment, expect ' +
-                                validatorVars[k][1])
-                        } else {
-                            logger.info('found ' + k + ' ' + validatorVars[k][0] + ' times payment')
-                        }
+                        logger.info('found ' + k + ' ' + validatorVars[k][0] + ' times payment')
                     }
                 }
-                cb()
             }
-            countValidatorVars(validatorVars, () => {
-                if (!found_errors.length) {
-                    logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
-                } else {
-                    logger.error('Some errors found', found_errors)
-                }
-            })
+            if (!found_errors.length) {
+                logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
+            } else {
+                logger.error('Some errors found', found_errors)
+            }
         }
     }
 }
