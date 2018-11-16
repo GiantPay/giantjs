@@ -1,7 +1,5 @@
 import logger from '../../logger'
 
-let found_errors = []
-
 let validatorVars = {
     ExportDefaultDeclaration: [0, 1], // [counter, maximum]
     ClassDeclaration: [0, 1],
@@ -10,24 +8,6 @@ let validatorVars = {
     ConstructorThisDeclaration: [0, 100],
     SuperDeclaration: [0, 1],
     FunctionDeclaration: [0, 100],
-}
-
-let countValidatorVars = (validatorVars, cb) => {
-    for (var k in validatorVars) {
-        if (!validatorVars[k][0]) {
-            found_errors.push('not found ' + k)
-        } else {
-            if (validatorVars[k][0] > validatorVars[k][1]) {
-                found_errors.push(k + ' ' +
-                    validatorVars[k][0] +
-                    ' times payment, expect ' +
-                    validatorVars[k][1])
-            } else {
-                logger.info('found ' + k + ' ' + validatorVars[k][0] + ' times payment')
-            }
-        }
-    }
-    cb()
 }
 
 /**
@@ -147,6 +127,25 @@ export default ({types: t, template: template}) => {
              * validator logic
              *
              * */
+
+            let found_errors = []
+            let countValidatorVars = (validatorVars, cb) => {
+                for (var k in validatorVars) {
+                    if (!validatorVars[k][0]) {
+                        found_errors.push('not found ' + k)
+                    } else {
+                        if (validatorVars[k][0] > validatorVars[k][1]) {
+                            found_errors.push(k + ' ' +
+                                validatorVars[k][0] +
+                                ' times payment, expect ' +
+                                validatorVars[k][1])
+                        } else {
+                            logger.info('found ' + k + ' ' + validatorVars[k][0] + ' times payment')
+                        }
+                    }
+                }
+                cb()
+            }
             countValidatorVars(validatorVars, () => {
                 if (!found_errors.length) {
                     logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
