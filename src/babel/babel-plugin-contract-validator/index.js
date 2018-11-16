@@ -37,7 +37,7 @@ export default ({types: t, template: template}) => {
                         logger.debug('node type : ' + subPath.get('type').node)
 
                         /**
-                         * pfe ExportDefaultDeclaration
+                         * validation  ExportDefaultDeclaration
                          *
                          * */
                         found_ExportDefaultDeclaration++
@@ -53,13 +53,13 @@ export default ({types: t, template: template}) => {
                 path.traverse({
                     ClassMethod(subPath) {
                         /**
-                         * pfe ClassMethod
+                         * validation  ClassMethod
                          *
                          * */
                         let node = subPath.get('kind').node
                         if (node == 'constructor') {
                             /**
-                             * pfe Constructor
+                             * validation  Constructor
                              *
                              * */
                             logger.debug('node type : ' + node)
@@ -70,19 +70,23 @@ export default ({types: t, template: template}) => {
                                     if (subSubPath.get('callee').get('type').node == 'Super') {
                                         logger.debug('node type callee : ' + subSubPath.get('callee').get('type').node)
                                         found_SuperDeclaration++
-                                        subSubPath.stop()
                                     }
                                 }
                             })
+                        } else {
+                            /**
+                             * validation  ClassMethodDeclaration
+                             *
+                             * */
+                            logger.debug('node type : ClassMethod kind ' + node)
+                            found_ClassMethodDeclaration++
                         }
-                        logger.debug('node type : ClassMethod kind ' + node)
-                        subPath.stop()
                     }
                 })
             },
             FunctionDeclaration: (path) => {
                 /**
-                 * pfe FunctionDeclaration
+                 * validation  FunctionDeclaration
                  *
                  * */
                 logger.debug('node type : ' + path.get('type').node + ' ' + found_FunctionDeclaration)

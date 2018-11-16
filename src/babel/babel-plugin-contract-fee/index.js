@@ -8,6 +8,9 @@ let foundMax_ExportDefaultDeclaration = 1
 let found_ClassDeclaration = 0
 let foundMax_ClassDeclaration = 1
 
+let found_ClassMethodDeclaration = 0
+let foundMax_ClassMethodDeclaration = 20
+
 let found_ConstructorDeclaration = 0
 let foundMax_ConstructorDeclaration = 1
 
@@ -80,16 +83,19 @@ export default ({types: t, template: template}) => {
                                         path.insertBefore(pfeCall('Super', 10))
                                         logger.warn('insert pfe : Super')
                                         found_SuperDeclaration++
-                                        subSubPath.stop()
                                     }
                                 }
                             })
+                        } else {
+                            /**
+                             * pfe ClassMethodDeclaration
+                             *
+                             * */
+                            logger.debug('node type : ClassMethod kind ' + node)
+                            path.insertBefore(pfeCall('ClassMethod', 5));
+                            logger.warn('insert pfe : ClassMethod')
+                            found_ClassMethodDeclaration++
                         }
-                        logger.debug('node type : ClassMethod kind ' + node)
-                        path.insertBefore(pfeCall('ClassMethod', 5));
-                        logger.warn('insert pfe : ClassMethod')
-
-                        subPath.stop()
                     }
                 })
             },
@@ -145,6 +151,19 @@ export default ({types: t, template: template}) => {
                         foundMax_ClassDeclaration)
                 } else {
                     logger.info('found ClassDeclaration ' + found_ClassDeclaration + ' times payment')
+                }
+            }
+
+            if (!found_ClassMethodDeclaration) {
+                found_errors.push('not found FunctionDeclaration')
+            } else {
+                if (found_ClassMethodDeclaration > foundMax_ClassMethodDeclaration) {
+                    found_errors.push('ClassMethodDeclaration ' +
+                        found_ClassMethodDeclaration +
+                        ' times payment, expect ' +
+                        foundMax_ClassMethodDeclaration)
+                } else {
+                    logger.info('found ClassMethodDeclaration ' + found_ClassMethodDeclaration + ' times payment')
                 }
             }
 
