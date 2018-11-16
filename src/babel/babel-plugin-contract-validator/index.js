@@ -17,7 +17,6 @@ let foundMax_SuperDeclaration = 1
 let found_FunctionDeclaration = 0
 let foundMax_FunctionDeclaration = 100
 
-
 /**
  * Rules for the validation of a contract:
  * 1) must be declared class
@@ -68,8 +67,11 @@ export default ({types: t, template: template}) => {
 
                             subPath.traverse({
                                 CallExpression(subSubPath) {
-                                    logger.debug('node type callee : ' + subSubPath.get('callee').get('type').node)
-                                    found_SuperDeclaration++
+                                    if (subSubPath.get('callee').get('type').node == 'Super') {
+                                        logger.debug('node type callee : ' + subSubPath.get('callee').get('type').node)
+                                        found_SuperDeclaration++
+                                        subSubPath.stop()
+                                    }
                                 }
                             })
                         }
@@ -156,7 +158,7 @@ export default ({types: t, template: template}) => {
                 }
             }
             if (!found_errors.length) {
-                logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
+                logger.warn('Contract ' + state.opts.basename + ' is valid')
             } else {
                 logger.error('Some errors found', found_errors)
             }

@@ -75,10 +75,13 @@ export default ({types: t, template: template}) => {
 
                             subPath.traverse({
                                 CallExpression(subSubPath) {
-                                    logger.debug('node type callee : ' + subSubPath.get('callee').get('type').node)
-                                    path.insertBefore(pfeCall('Super', 10))
-                                    logger.warn('insert pfe : Super')
-                                    found_SuperDeclaration++
+                                    if (subSubPath.get('callee').get('type').node == 'Super') {
+                                        logger.debug('node type callee : ' + subSubPath.get('callee').get('type').node)
+                                        path.insertBefore(pfeCall('Super', 10))
+                                        logger.warn('insert pfe : Super')
+                                        found_SuperDeclaration++
+                                        subSubPath.stop()
+                                    }
                                 }
                             })
                         }
