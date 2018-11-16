@@ -12,7 +12,7 @@ let validatorVars = {
     FunctionDeclaration: [0, 100],
 }
 
-let countValidatorVars = validatorVars => {
+let countValidatorVars = (validatorVars, cb) => {
     for (var k in validatorVars) {
         if (!validatorVars[k][0]) {
             found_errors.push('not found ' + k)
@@ -27,6 +27,7 @@ let countValidatorVars = validatorVars => {
             }
         }
     }
+    cb()
 }
 
 /**
@@ -146,14 +147,13 @@ export default ({types: t, template: template}) => {
              * validator logic
              *
              * */
-            countValidatorVars(validatorVars)
-
-            if (!found_errors.length) {
-                logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
-            } else {
-                logger.error('Some errors found', found_errors)
-            }
-
+            countValidatorVars(validatorVars, () => {
+                if (!found_errors.length) {
+                    logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
+                } else {
+                    logger.error('Some errors found', found_errors)
+                }
+            })
         }
     }
 }
