@@ -1,13 +1,13 @@
 import logger from '../../logger'
 
 let pfeVars = {
-    ExportDefaultDeclaration: [0, 1, 2], // [counter, maximum, price]
-    ClassDeclaration: [0, 1, 4],
-    ClassMethodDeclaration: [0, 20, 8],
-    ConstructorDeclaration: [0, 1, 10],
-    ConstructorThisDeclaration: [0, 100, 12],
-    SuperDeclaration: [0, 1, 12],
-    FunctionDeclaration: [0, 100, 4],
+    exportDefaultDeclaration: [0, 1, 2], // [counter, maximum, price]
+    classDeclaration: [0, 1, 4],
+    classMethodDeclaration: [0, 20, 8],
+    constructorDeclaration: [0, 1, 10],
+    constructorThisDeclaration: [0, 100, 12],
+    superDeclaration: [0, 1, 12],
+    functionDeclaration: [0, 100, 4],
 }
 
 /**
@@ -33,9 +33,9 @@ export default ({types: t, template: template}) => {
                          * pfe ExportDefaultDeclaration
                          *
                          * */
-                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', 4, pfeVars.ExportDefaultDeclaration[2]));
+                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', pfeVars.exportDefaultDeclaration[2]));
                         logger.warn('insert pfe : ExportDefaultDeclaration')
-                        pfeVars.ExportDefaultDeclaration[0]++
+                        pfeVars.exportDefaultDeclaration[0]++
                         subPath.stop()
                     }
                 })
@@ -46,9 +46,9 @@ export default ({types: t, template: template}) => {
                  *
                  * */
                 logger.debug('node type : ' + path.get('type').node)
-                path.insertBefore(pfeCall('ClassDeclaration', 3, pfeVars.ClassDeclaration[2]));
+                path.insertBefore(pfeCall('ClassDeclaration', pfeVars.classDeclaration[2]));
                 logger.warn('insert pfe : ClassDeclaration')
-                pfeVars.ClassDeclaration[0]++
+                pfeVars.classDeclaration[0]++
 
                 path.traverse({
                     ClassMethod(subPath) {
@@ -63,9 +63,9 @@ export default ({types: t, template: template}) => {
                              *
                              * */
                             logger.debug('node type : ' + node)
-                            subPath.insertBefore(pfeCall('Constructor', 10, pfeVars.ConstructorDeclaration[2]));
+                            subPath.insertBefore(pfeCall('Constructor', pfeVars.constructorDeclaration[2]));
                             logger.warn('insert pfe : Constructor')
-                            pfeVars.ConstructorDeclaration[0]++
+                            pfeVars.constructorDeclaration[0]++
 
                             subPath.traverse({
                                 CallExpression(subSubPath) {
@@ -75,9 +75,9 @@ export default ({types: t, template: template}) => {
                                          *
                                          * */
                                         logger.debug('constructor node type callee : ' + subSubPath.get('callee').get('type').node)
-                                        path.insertBefore(pfeCall('Super', 10, pfeVars.SuperDeclaration[2]))
+                                        path.insertBefore(pfeCall('Super', pfeVars.superDeclaration[2]))
                                         logger.warn('constructor insert pfe : Super')
-                                        pfeVars.SuperDeclaration[0]++
+                                        pfeVars.superDeclaration[0]++
                                     }
                                 }, ThisExpression(subSubPath) {
                                     /**
@@ -85,9 +85,9 @@ export default ({types: t, template: template}) => {
                                      *
                                      * */
                                     logger.debug('constructor node type : ' + subSubPath.get('type').node)
-                                    path.insertBefore(pfeCall('ConstructorThis', 8, pfeVars.ConstructorThisDeclaration[2]))
+                                    path.insertBefore(pfeCall('ConstructorThis', pfeVars.constructorThisDeclaration[2]))
                                     logger.warn('constructor insert pfe : ConstructorThis')
-                                    pfeVars.ConstructorThisDeclaration[0]++
+                                    pfeVars.constructorThisDeclaration[0]++
                                 }
                             })
                         } else {
@@ -96,9 +96,9 @@ export default ({types: t, template: template}) => {
                              *
                              * */
                             logger.debug('node type : ClassMethod kind ' + node)
-                            path.insertBefore(pfeCall('ClassMethod', 5, pfeVars.ClassMethodDeclaration[2]));
+                            path.insertBefore(pfeCall('ClassMethod', pfeVars.classMethodDeclaration[2]));
                             logger.warn('insert pfe : ClassMethod')
-                            pfeVars.ClassMethodDeclaration[0]++
+                            pfeVars.classMethodDeclaration[0]++
                         }
                     }
                 })
@@ -108,11 +108,10 @@ export default ({types: t, template: template}) => {
                  * pfe FunctionDeclaration
                  *
                  * */
-                logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.FunctionDeclaration[0])
-                //path.insertAfter(t.expressionStatement(t.stringLiteral("// insert FunctionDeclaration pfe")));
-                path.insertBefore(pfeCall('FunctionDeclaration', 3, pfeVars.FunctionDeclaration[2]));
+                logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.functionDeclaration[0])
+                path.insertBefore(pfeCall('FunctionDeclaration', pfeVars.functionDeclaration[2]));
                 logger.warn('insert pfe : FunctionDeclaration')
-                pfeVars.FunctionDeclaration[0]++
+                pfeVars.functionDeclaration[0]++
 
             },
             CallExpression: (path) => {

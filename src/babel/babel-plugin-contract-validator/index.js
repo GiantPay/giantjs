@@ -1,13 +1,13 @@
 import logger from '../../logger'
 
 let validatorVars = {
-    ExportDefaultDeclaration: [0, 1], // [counter, maximum]
-    ClassDeclaration: [0, 1],
-    ClassMethodDeclaration: [0, 20],
-    ConstructorDeclaration: [0, 1],
-    ConstructorThisDeclaration: [0, 100],
-    SuperDeclaration: [0, 1],
-    FunctionDeclaration: [0, 100],
+    exportDefaultDeclaration: [0, 1], // [counter, maximum]
+    classDeclaration: [0, 1],
+    classMethodDeclaration: [0, 20],
+    constructorDeclaration: [0, 1],
+    constructorThisDeclaration: [0, 100],
+    superDeclaration: [0, 1],
+    functionDeclaration: [0, 100],
 }
 
 /**
@@ -30,7 +30,7 @@ export default () => {
                          * validation ExportDefaultDeclaration
                          *
                          * */
-                        validatorVars.ExportDefaultDeclaration[0]++
+                        validatorVars.exportDefaultDeclaration[0]++
                         subPath.stop()
                     }
                 })
@@ -40,7 +40,7 @@ export default () => {
                  * validation ClassDeclaration
                  *
                  * */
-                validatorVars.ClassDeclaration[0]++
+                validatorVars.classDeclaration[0]++
                 path.traverse({
                     ClassMethod(subPath) {
                         /**
@@ -53,7 +53,7 @@ export default () => {
                              * validation Constructor
                              *
                              * */
-                            validatorVars.ConstructorDeclaration[0]++
+                            validatorVars.constructorDeclaration[0]++
 
                             subPath.traverse({
                                 CallExpression(subSubPath) {
@@ -62,14 +62,14 @@ export default () => {
                                          * validation Super
                                          *
                                          * */
-                                        validatorVars.SuperDeclaration[0]++
+                                        validatorVars.superDeclaration[0]++
                                     }
                                 }, ThisExpression(subSubPath) {
                                     /**
                                      * validation ThisExpression
                                      *
                                      * */
-                                    validatorVars.ConstructorThisDeclaration[0]++
+                                    validatorVars.constructorThisDeclaration[0]++
                                 }
                             })
                         } else {
@@ -77,7 +77,7 @@ export default () => {
                              * validation ClassMethodDeclaration
                              *
                              * */
-                            validatorVars.ClassMethodDeclaration[0]++
+                            validatorVars.classMethodDeclaration[0]++
                         }
                     }
                 })
@@ -87,7 +87,7 @@ export default () => {
                  * validation FunctionDeclaration
                  *
                  * */
-                validatorVars.FunctionDeclaration[0]++
+                validatorVars.functionDeclaration[0]++
             },
             CallExpression: (path) => {
                 /**
