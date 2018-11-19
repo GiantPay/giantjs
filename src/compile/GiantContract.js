@@ -8,29 +8,39 @@ import ContractFee from "../babel/babel-plugin-contract-fee";
 export default class GiantContract {
 
     constructor(name) {
+        this.valid = false
+        this.compiled = false
         this.name = name
         this.fileName = GiantPath.getContractFile(name)
         this.targetFileName = GiantPath.getTargetContractFile(name)
     }
 
     compile() {
-        // TODO need to transform & compress code for production ready network
-        // build & validate contract
+        if (this.valid) {
+            const {ast, code} = transformFileSync(this.fileName, {
+                'plugins': [ContractFee]
+            })
 
-        const {ast, code} = transformFileSync(this.fileName, {
-            'plugins': [ContractFee]
-        })
+            // TODO need to optimize ast before saving
 
-        // TODO need to optimize ast before saving
-
-        let pfeDesc = `\nfunction pfe(declaration, fee){
+            let pfeDesc = `\nfunction pfe(declaration, fee){
             console.log(declaration, fee)
         }`
 
-        fs.writeFileSync(this.targetFileName, code + pfeDesc)
+            fs.writeFileSync(this.targetFileName, code + pfeDesc)
 
-        this.ast = ast
-        this.code = code
+            this.ast = ast
+            this.code = code
+            this.compiled
+        }
+    }
+
+    validate() {
+        transformFileSync(this.fileName, {
+            'plugins': [ContractValidator]
+        })
+
+        this.valid = true
     }
 
     getCode() {

@@ -41,7 +41,10 @@ export default ({types: t, template: template}) => {
                 })
             },
             ClassDeclaration: (path) => {
-
+                /**
+                 * pfe ClassDeclaration
+                 *
+                 * */
                 logger.debug('node type : ' + path.get('type').node)
                 path.insertBefore(pfeCall('ClassDeclaration', 3, pfeVars.ClassDeclaration[2]));
                 logger.warn('insert pfe : ClassDeclaration')

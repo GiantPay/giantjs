@@ -1,21 +1,14 @@
 import logger from '../../logger'
 
-let found_errors = []
-
-let found_ExportDefaultDeclaration = 0
-let foundMax_ExportDefaultDeclaration = 1
-
-let found_ClassDeclaration = 0
-let foundMax_ClassDeclaration = 1
-
-let found_ConstructorDeclaration = 0
-let foundMax_ConstructorDeclaration = 1
-
-let found_SuperDeclaration = 0
-let foundMax_SuperDeclaration = 1
-
-let found_FunctionDeclaration = 0
-let foundMax_FunctionDeclaration = 100
+let validatorVars = {
+    ExportDefaultDeclaration: [0, 1], // [counter, maximum]
+    ClassDeclaration: [0, 1],
+    ClassMethodDeclaration: [0, 20],
+    ConstructorDeclaration: [0, 1],
+    ConstructorThisDeclaration: [0, 100],
+    SuperDeclaration: [0, 1],
+    FunctionDeclaration: [0, 100],
+}
 
 /**
  * Rules for the validation of a contract:
@@ -26,147 +19,111 @@ let foundMax_FunctionDeclaration = 100
  *
  * @returns ast validator info of the giant contract code
  */
-export default ({types: t, template: template}) => {
+export default () => {
 
     return {
         visitor: {
             Program: (path) => {
                 path.traverse({
                     ExportDefaultDeclaration: (subPath) => {
-
-                        logger.debug('node type : ' + subPath.get('type').node)
-
                         /**
-                         * validation  ExportDefaultDeclaration
+                         * validation ExportDefaultDeclaration
                          *
                          * */
-                        found_ExportDefaultDeclaration++
+                        validatorVars.ExportDefaultDeclaration[0]++
                         subPath.stop()
                     }
                 })
             },
             ClassDeclaration: (path) => {
-
-                logger.debug('node type : ' + path.get('type').node)
-                found_ClassDeclaration++
-
+                /**
+                 * validation ClassDeclaration
+                 *
+                 * */
+                validatorVars.ClassDeclaration[0]++
                 path.traverse({
                     ClassMethod(subPath) {
                         /**
-                         * validation  ClassMethod
+                         * validation ClassMethod
                          *
                          * */
                         let node = subPath.get('kind').node
                         if (node == 'constructor') {
                             /**
-                             * validation  Constructor
+                             * validation Constructor
                              *
                              * */
-                            logger.debug('node type : ' + node)
-                            found_ConstructorDeclaration++
+                            validatorVars.ConstructorDeclaration[0]++
 
                             subPath.traverse({
                                 CallExpression(subSubPath) {
                                     if (subSubPath.get('callee').get('type').node == 'Super') {
-                                        logger.debug('node type callee : ' + subSubPath.get('callee').get('type').node)
-                                        found_SuperDeclaration++
+                                        /**
+                                         * validation Super
+                                         *
+                                         * */
+                                        validatorVars.SuperDeclaration[0]++
                                     }
+                                }, ThisExpression(subSubPath) {
+                                    /**
+                                     * validation ThisExpression
+                                     *
+                                     * */
+                                    validatorVars.ConstructorThisDeclaration[0]++
                                 }
                             })
                         } else {
                             /**
-                             * validation  ClassMethodDeclaration
+                             * validation ClassMethodDeclaration
                              *
                              * */
-                            logger.debug('node type : ClassMethod kind ' + node)
-                            found_ClassMethodDeclaration++
+                            validatorVars.ClassMethodDeclaration[0]++
                         }
                     }
                 })
             },
             FunctionDeclaration: (path) => {
                 /**
-                 * validation  FunctionDeclaration
+                 * validation FunctionDeclaration
                  *
                  * */
-                logger.debug('node type : ' + path.get('type').node + ' ' + found_FunctionDeclaration)
-                found_FunctionDeclaration++
+                validatorVars.FunctionDeclaration[0]++
+            },
+            CallExpression: (path) => {
+                /**
+                 * validation CallExpression RangeError
+                 *
+                 * RangeError: Maximum call stack size exceeded
+                 * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")));
+                 *
+                 * */
             }
         }, post(state) {
             /**
              * validator logic
              *
              * */
-            if (!found_ExportDefaultDeclaration) {
-                found_errors.push('not found ExportDefaultDeclaration')
-            } else {
-                if (found_ExportDefaultDeclaration > foundMax_ExportDefaultDeclaration) {
-                    found_errors.push('ExportDefaultDeclaration ' +
-                        found_ExportDefaultDeclaration +
-                        ' times payment, expect ' +
-                        foundMax_ExportDefaultDeclaration)
+            let found_errors = []
+            for (var k in validatorVars) {
+                if (!validatorVars[k][0]) {
+                    found_errors.push('not found ' + k)
                 } else {
-                    logger.info('found ExportDefaultDeclaration ' + found_ExportDefaultDeclaration + ' times payment')
-                }
-            }
-
-            if (!found_ClassDeclaration) {
-                found_errors.push('not found ClassDeclaration')
-            } else {
-                if (found_ClassDeclaration > foundMax_ClassDeclaration) {
-                    found_errors.push('ClassDeclaration ' +
-                        found_ClassDeclaration +
-                        ' times payment, expect ' +
-                        foundMax_ClassDeclaration)
-                } else {
-                    logger.info('found ClassDeclaration ' + found_ClassDeclaration + ' times payment')
-                }
-            }
-
-            if (!found_ConstructorDeclaration) {
-                found_errors.push('not found ConstructorDeclaration')
-            } else {
-                if (found_ConstructorDeclaration > foundMax_ConstructorDeclaration) {
-                    found_errors.push('ConstructorDeclaration ' +
-                        found_ConstructorDeclaration +
-                        ' times payment, expect ' +
-                        foundMax_ConstructorDeclaration)
-                } else {
-                    logger.info('found ConstructorDeclaration ' + found_ConstructorDeclaration + ' times payment')
-                }
-            }
-
-            if (!found_FunctionDeclaration) {
-                found_errors.push('not found FunctionDeclaration')
-            } else {
-                if (found_FunctionDeclaration > foundMax_FunctionDeclaration) {
-                    found_errors.push('FunctionDeclaration ' +
-                        found_FunctionDeclaration +
-                        ' times payment, expect ' +
-                        foundMax_FunctionDeclaration)
-                } else {
-                    logger.info('found FunctionDeclaration ' + found_FunctionDeclaration + ' times payment')
-                }
-            }
-
-            if (!found_SuperDeclaration) {
-                found_errors.push('not found SuperDeclaration')
-            } else {
-                if (found_SuperDeclaration > foundMax_SuperDeclaration) {
-                    found_errors.push('SuperDeclaration ' +
-                        found_SuperDeclaration +
-                        ' times payment, expect ' +
-                        foundMax_SuperDeclaration)
-                } else {
-                    logger.info('found SuperDeclaration ' + found_SuperDeclaration + ' times payment')
+                    if (validatorVars[k][0] > validatorVars[k][1]) {
+                        found_errors.push(k + ' ' +
+                            validatorVars[k][0] +
+                            ' times, expect ' +
+                            validatorVars[k][1])
+                    } else {
+                        logger.info('found ' + k + ' ' + validatorVars[k][0] + ' times')
+                    }
                 }
             }
             if (!found_errors.length) {
                 logger.warn('Contract ' + state.opts.basename + ' is valid')
             } else {
                 logger.error('Some errors found', found_errors)
+                throw path.buildCodeFrameError('Contract ' + state.opts.basename + ' is not valid')
             }
-
         }
     }
 }
