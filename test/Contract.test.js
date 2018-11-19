@@ -65,20 +65,6 @@ describe('Contract', () => {
         })
     })
 
-    /*  describe('#getConstructorFee', () => {
-
-          it('analyze the contract code', () => {
-              const constructorFee = new Contract({
-                  code: metaCoinCode,
-                  feePrice: 0.0000001
-              }).getConstructorFee({
-                  loops: 10
-              })
-
-              should.exist(constructorFee)
-          })
-      })*/
-
     describe('#getConstructorFee', () => {
 
         it('analyze the contract code', () => {
