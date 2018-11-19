@@ -128,13 +128,13 @@ export default ({types: t, template: template}) => {
              * validator logic
              *
              * */
-            let found_errors = []
+            let foundErrors = []
             for (let k in pfeVars) {
                 if (!pfeVars[k][0]) {
-                    found_errors.push('not found ' + k)
+                    foundErrors.push('not found ' + k)
                 } else {
                     if (pfeVars[k][0] > pfeVars[k][1]) {
-                        found_errors.push(k + ' ' +
+                        foundErrors.push(k + ' ' +
                             pfeVars[k][0] +
                             ' times payment, expect ' +
                             pfeVars[k][1])
@@ -143,10 +143,10 @@ export default ({types: t, template: template}) => {
                     }
                 }
             }
-            if (!found_errors.length) {
+            if (!foundErrors.length) {
                 logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
             } else {
-                logger.error('Some errors found', found_errors)
+                logger.error('Some errors found', foundErrors)
             }
         }
     }

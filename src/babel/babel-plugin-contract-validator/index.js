@@ -103,13 +103,13 @@ export default () => {
              * validator logic
              *
              * */
-            let found_errors = []
+            let foundErrors = []
             for (let k in validatorVars) {
                 if (!validatorVars[k][0]) {
-                    found_errors.push('not found ' + k)
+                    foundErrors.push('not found ' + k)
                 } else {
                     if (validatorVars[k][0] > validatorVars[k][1]) {
-                        found_errors.push(k + ' ' +
+                        foundErrors.push(k + ' ' +
                             validatorVars[k][0] +
                             ' times, expect ' +
                             validatorVars[k][1])
@@ -118,10 +118,10 @@ export default () => {
                     }
                 }
             }
-            if (!found_errors.length) {
+            if (!foundErrors.length) {
                 logger.warn('Contract ' + state.opts.basename + ' is valid')
             } else {
-                logger.error('Some errors found', found_errors)
+                logger.error('Some errors found', foundErrors)
                 throw path.buildCodeFrameError('Contract ' + state.opts.basename + ' is not valid')
             }
         }
