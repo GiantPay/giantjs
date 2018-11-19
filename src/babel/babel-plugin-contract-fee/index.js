@@ -129,7 +129,7 @@ export default ({types: t, template: template}) => {
              *
              * */
             let found_errors = []
-            for (var k in pfeVars) {
+            for (let k in pfeVars) {
                 if (!pfeVars[k][0]) {
                     found_errors.push('not found ' + k)
                 } else {

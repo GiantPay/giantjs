@@ -104,7 +104,7 @@ export default () => {
              *
              * */
             let found_errors = []
-            for (var k in validatorVars) {
+            for (let k in validatorVars) {
                 if (!validatorVars[k][0]) {
                     found_errors.push('not found ' + k)
                 } else {
