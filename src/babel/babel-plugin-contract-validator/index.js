@@ -1,13 +1,13 @@
 import logger from '../../logger'
 
 let validatorVars = {
-    exportDefaultDeclaration: {counter: 0, maximum: 1},
-    classDeclaration: {counter: 0, maximum: 1},
-    classMethodDeclaration: {counter: 0, maximum: 20},
-    constructorDeclaration: {counter: 0, maximum: 1},
-    constructorThisDeclaration: {counter: 0, maximum: 100},
-    superDeclaration: {counter: 0, maximum: 1},
-    functionDeclaration: {counter: 0, maximum: 100}
+    exportDefaultDeclaration: {count: 0, max: 1},
+    classDeclaration: {count: 0, max: 1},
+    classMethodDeclaration: {count: 0, max: 20},
+    constructorDeclaration: {count: 0, max: 1},
+    constructorThisDeclaration: {count: 0, max: 100},
+    superDeclaration: {count: 0, max: 1},
+    functionDeclaration: {count: 0, max: 100}
 }
 
 /**
@@ -30,7 +30,7 @@ export default () => {
                          * validation ExportDefaultDeclaration
                          *
                          * */
-                        validatorVars.exportDefaultDeclaration.counter++
+                        validatorVars.exportDefaultDeclaration.count++
                         subPath.stop()
                     }
                 })
@@ -40,7 +40,7 @@ export default () => {
                  * validation ClassDeclaration
                  *
                  * */
-                validatorVars.classDeclaration.counter++
+                validatorVars.classDeclaration.count++
                 path.traverse({
                     ClassMethod(subPath) {
                         /**
@@ -53,7 +53,7 @@ export default () => {
                              * validation Constructor
                              *
                              * */
-                            validatorVars.constructorDeclaration.counter++
+                            validatorVars.constructorDeclaration.count++
 
                             subPath.traverse({
                                 CallExpression(subSubPath) {
@@ -62,14 +62,14 @@ export default () => {
                                          * validation Super
                                          *
                                          * */
-                                        validatorVars.superDeclaration.counter++
+                                        validatorVars.superDeclaration.count++
                                     }
                                 }, ThisExpression(subSubPath) {
                                     /**
                                      * validation ThisExpression
                                      *
                                      * */
-                                    validatorVars.constructorThisDeclaration.counter++
+                                    validatorVars.constructorThisDeclaration.count++
                                 }
                             })
                         } else {
@@ -77,7 +77,7 @@ export default () => {
                              * validation ClassMethodDeclaration
                              *
                              * */
-                            validatorVars.classMethodDeclaration.counter++
+                            validatorVars.classMethodDeclaration.count++
                         }
                     }
                 })
@@ -87,7 +87,7 @@ export default () => {
                  * validation FunctionDeclaration
                  *
                  * */
-                validatorVars.functionDeclaration.counter++
+                validatorVars.functionDeclaration.count++
             },
             CallExpression: (path) => {
                 /**
@@ -105,16 +105,16 @@ export default () => {
              * */
             let foundErrors = []
             for (let k in validatorVars) {
-                if (!validatorVars[k].counter) {
+                if (!validatorVars[k].count) {
                     foundErrors.push('not found ' + k)
                 } else {
-                    if (validatorVars[k].counter > validatorVars[k].maximum) {
+                    if (validatorVars[k].count > validatorVars[k].max) {
                         foundErrors.push(k + ' ' +
-                            validatorVars[k].counter +
-                            ' times, expect maximum ' +
-                            validatorVars[k].maximum)
+                            validatorVars[k].count +
+                            ' times, expect max ' +
+                            validatorVars[k].max)
                     } else {
-                        logger.info('found ' + k + ' ' + validatorVars[k].counter + ' times')
+                        logger.info('found ' + k + ' ' + validatorVars[k].count + ' times')
                     }
                 }
             }

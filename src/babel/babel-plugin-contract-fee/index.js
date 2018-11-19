@@ -1,13 +1,13 @@
 import logger from '../../logger'
 
 let pfeVars = {
-    exportDefaultDeclaration: {counter: 0, maximum: 1, price: 2},
-    classDeclaration: {counter: 0, maximum: 1, price: 4},
-    classMethodDeclaration: {counter: 0, maximum: 20, price: 8},
-    constructorDeclaration: {counter: 0, maximum: 1, price: 12},
-    constructorThisDeclaration: {counter: 0, maximum: 100, price: 12},
-    superDeclaration: {counter: 0, maximum: 1, price: 12},
-    functionDeclaration: {counter: 0, maximum: 100, price: 4}
+    exportDefaultDeclaration: {count: 0, max: 1, fee: 2},
+    classDeclaration: {count: 0, max: 1, fee: 4},
+    classMethodDeclaration: {count: 0, max: 20, fee: 8},
+    constructorDeclaration: {count: 0, max: 1, fee: 12},
+    constructorThisDeclaration: {count: 0, max: 100, fee: 12},
+    superDeclaration: {count: 0, max: 1, fee: 12},
+    functionDeclaration: {count: 0, max: 100, fee: 4}
 }
 
 /**
@@ -34,9 +34,9 @@ export default ({template: template}) => {
                          * pfe ExportDefaultDeclaration
                          *
                          * */
-                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', pfeVars.exportDefaultDeclaration.price));
+                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', pfeVars.exportDefaultDeclaration.fee));
                         logger.warn('insert pfe : ExportDefaultDeclaration')
-                        pfeVars.exportDefaultDeclaration.counter++
+                        pfeVars.exportDefaultDeclaration.count++
                         subPath.stop()
                     }
                 })
@@ -47,9 +47,9 @@ export default ({template: template}) => {
                  *
                  * */
                 logger.debug('node type : ' + path.get('type').node)
-                path.insertBefore(pfeCall('ClassDeclaration', pfeVars.classDeclaration.price));
+                path.insertBefore(pfeCall('ClassDeclaration', pfeVars.classDeclaration.fee));
                 logger.warn('insert pfe : ClassDeclaration')
-                pfeVars.classDeclaration.counter++
+                pfeVars.classDeclaration.count++
 
                 path.traverse({
                     ClassMethod(subPath) {
@@ -64,9 +64,9 @@ export default ({template: template}) => {
                              *
                              * */
                             logger.debug('node type : ' + node)
-                            subPath.insertBefore(pfeCall('Constructor', pfeVars.constructorDeclaration.price));
+                            subPath.insertBefore(pfeCall('Constructor', pfeVars.constructorDeclaration.fee));
                             logger.warn('insert pfe : Constructor')
-                            pfeVars.constructorDeclaration.counter++
+                            pfeVars.constructorDeclaration.count++
 
                             subPath.traverse({
                                 CallExpression(subSubPath) {
@@ -76,9 +76,9 @@ export default ({template: template}) => {
                                          *
                                          * */
                                         logger.debug('constructor node type callee : ' + subSubPath.get('callee').get('type').node)
-                                        path.insertBefore(pfeCall('Super', pfeVars.superDeclaration.price))
+                                        path.insertBefore(pfeCall('Super', pfeVars.superDeclaration.fee))
                                         logger.warn('constructor insert pfe : Super')
-                                        pfeVars.superDeclaration.counter++
+                                        pfeVars.superDeclaration.count++
                                     }
                                 }, ThisExpression(subSubPath) {
                                     /**
@@ -86,9 +86,9 @@ export default ({template: template}) => {
                                      *
                                      * */
                                     logger.debug('constructor node type : ' + subSubPath.get('type').node)
-                                    path.insertBefore(pfeCall('ConstructorThis', pfeVars.constructorThisDeclaration.price))
+                                    path.insertBefore(pfeCall('ConstructorThis', pfeVars.constructorThisDeclaration.fee))
                                     logger.warn('constructor insert pfe : ConstructorThis')
-                                    pfeVars.constructorThisDeclaration.counter++
+                                    pfeVars.constructorThisDeclaration.count++
                                 }
                             })
                         } else {
@@ -97,9 +97,9 @@ export default ({template: template}) => {
                              *
                              * */
                             logger.debug('node type : ClassMethod kind ' + node)
-                            path.insertBefore(pfeCall('ClassMethod', pfeVars.classMethodDeclaration.price));
+                            path.insertBefore(pfeCall('ClassMethod', pfeVars.classMethodDeclaration.fee));
                             logger.warn('insert pfe : ClassMethod')
-                            pfeVars.classMethodDeclaration.counter++
+                            pfeVars.classMethodDeclaration.count++
                         }
                     }
                 })
@@ -109,10 +109,10 @@ export default ({template: template}) => {
                  * pfe FunctionDeclaration
                  *
                  * */
-                logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.functionDeclaration.counter)
-                path.insertBefore(pfeCall('FunctionDeclaration', pfeVars.functionDeclaration.price));
+                logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.functionDeclaration.count)
+                path.insertBefore(pfeCall('FunctionDeclaration', pfeVars.functionDeclaration.fee));
                 logger.warn('insert pfe : FunctionDeclaration')
-                pfeVars.functionDeclaration.counter++
+                pfeVars.functionDeclaration.count++
 
             },
             CallExpression: (path) => {
@@ -131,16 +131,16 @@ export default ({template: template}) => {
              * */
             let foundErrors = []
             for (let k in pfeVars) {
-                if (!pfeVars[k].counter) {
+                if (!pfeVars[k].count) {
                     foundErrors.push('not found ' + k)
                 } else {
-                    if (pfeVars[k].counter > pfeVars[k].maximum) {
+                    if (pfeVars[k].count > pfeVars[k].max) {
                         foundErrors.push(k + ' ' +
-                            pfeVars[k].counter +
-                            ' times payment, expect maximum ' +
-                            pfeVars[k].maximum)
+                            pfeVars[k].count +
+                            ' times payment, expect max ' +
+                            pfeVars[k].max)
                     } else {
-                        logger.info('found ' + k + ' ' + pfeVars[k].counter + ' times payment')
+                        logger.info('found ' + k + ' ' + pfeVars[k].count + ' times payment')
                     }
                 }
             }
