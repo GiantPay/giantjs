@@ -13,10 +13,15 @@ export default class GiantContract {
         this.name = name
         this.fileName = GiantPath.getContractFile(name)
         this.targetFileName = GiantPath.getTargetContractFile(name)
+        this.targetFileNameRunTime = GiantPath.getTargetContractFileRunTime(name)
     }
 
     compile() {
         if (this.valid) {
+            let data = fs.readFileSync(this.fileName, 'utf8');
+
+            fs.writeFileSync(this.targetFileName, data)
+
             const {ast, code} = transformFileSync(this.fileName, {
                 'plugins': [ContractFee]
             })
@@ -24,14 +29,14 @@ export default class GiantContract {
             // TODO need to optimize ast before saving
 
             let pfeDesc = `\nfunction pfe(declaration, fee){
-            console.log(declaration, fee)
-        }`
+                console.log(declaration, fee)
+            }`
 
-            fs.writeFileSync(this.targetFileName, code + pfeDesc)
+            fs.writeFileSync(this.targetFileNameRunTime, code + pfeDesc)
 
             this.ast = ast
             this.code = code
-            this.compiled
+            this.compiled = true
         }
     }
 

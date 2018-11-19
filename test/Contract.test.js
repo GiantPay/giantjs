@@ -3,6 +3,9 @@
 import fs from 'fs'
 import path from 'path'
 
+import {transformFileSync} from 'babel-core'
+import ContractFee from "../dist/babel/babel-plugin-contract-fee";
+
 import 'chai/register-should'
 import Contract from '../src/network/development/Contract'
 
@@ -62,6 +65,20 @@ describe('Contract', () => {
         })
     })
 
+    /*  describe('#getConstructorFee', () => {
+
+          it('analyze the contract code', () => {
+              const constructorFee = new Contract({
+                  code: metaCoinCode,
+                  feePrice: 0.0000001
+              }).getConstructorFee({
+                  loops: 10
+              })
+
+              should.exist(constructorFee)
+          })
+      })*/
+
     describe('#getConstructorFee', () => {
 
         it('analyze the contract code', () => {
@@ -73,6 +90,15 @@ describe('Contract', () => {
             })
 
             should.exist(constructorFee)
+        })
+    })
+
+    describe('#runTime', () => {
+        it('Some contracts files exist', () => {
+            fs.readdir('./build/contracts', function (err, flist) {
+                if (err) console.log('Some contracts files error', err.message, err.stack)
+                flist.should.not.be.null
+            })
         })
     })
 
