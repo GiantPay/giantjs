@@ -1,6 +1,7 @@
 import logger from '../../logger'
 
 let validatorVars = {
+    importDeclaration: {count: 0, max: 20, fee: 2},
     exportDefaultDeclaration: {count: 0, max: 1},
     classDeclaration: {count: 0, max: 1},
     classMethodDeclaration: {count: 0, max: 20},
@@ -25,6 +26,17 @@ export default () => {
         visitor: {
             Program: (path) => {
                 path.traverse({
+                    ImportDeclaration: (subPath) => {
+                        /**
+                         * validation ImportDeclaration
+                         * import from GiantContract, GiantBlockChain
+                         *
+                         * */
+                        if (subPath.get('source').get('value').node.indexOf('GiantContract')
+                            || subPath.get('source').get('value').node.indexOf('GiantBlockChain')) {
+                            validatorVars.importDeclaration.count++
+                        }
+                    },
                     ExportDefaultDeclaration: (subPath) => {
                         /**
                          * validation ExportDefaultDeclaration

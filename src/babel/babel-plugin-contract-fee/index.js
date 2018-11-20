@@ -1,6 +1,7 @@
 import logger from '../../logger'
 
 let pfeVars = {
+    importDeclaration: {count: 0, max: 20, fee: 2},
     exportDefaultDeclaration: {count: 0, max: 1, fee: 2},
     classDeclaration: {count: 0, max: 1, fee: 4},
     classMethodDeclaration: {count: 0, max: 20, fee: 8},
@@ -26,6 +27,19 @@ export default ({template: template}) => {
         visitor: {
             Program: (path) => {
                 path.traverse({
+                    ImportDeclaration: (subPath) => {
+
+                        logger.debug('node type : ' + subPath.get('type').node)
+
+                        /**
+                         * pfe ImportDeclaration
+                         *
+                         * */
+                        subPath.insertBefore(pfeCall('ImportDeclaration', pfeVars.importDeclaration.fee));
+                        logger.warn('insert pfe : ImportDeclaration')
+                        pfeVars.importDeclaration.count++
+
+                    },
                     ExportDefaultDeclaration: (subPath) => {
 
                         logger.debug('node type : ' + subPath.get('type').node)
