@@ -4,6 +4,7 @@ let pfeVars = {
     importDeclaration: {count: 0, max: 20, fee: 2},
     exportDefaultDeclaration: {count: 0, max: 1, fee: 2},
     classDeclaration: {count: 0, max: 1, fee: 4},
+    superClassExtend: {count: 0, max: 1, fee: 8},
     classMethodDeclaration: {count: 0, max: 20, fee: 8},
     constructorDeclaration: {count: 0, max: 1, fee: 12},
     constructorThisDeclaration: {count: 0, max: 100, fee: 12},
@@ -35,7 +36,7 @@ export default ({template: template}) => {
                          * pfe ImportDeclaration
                          *
                          * */
-                        subPath.insertBefore(pfeCall('ImportDeclaration', pfeVars.importDeclaration.fee));
+                        subPath.insertBefore(pfeCall('ImportDeclaration', pfeVars.importDeclaration.fee))
                         logger.warn('insert pfe : ImportDeclaration')
                         pfeVars.importDeclaration.count++
 
@@ -48,7 +49,7 @@ export default ({template: template}) => {
                          * pfe ExportDefaultDeclaration
                          *
                          * */
-                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', pfeVars.exportDefaultDeclaration.fee));
+                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', pfeVars.exportDefaultDeclaration.fee))
                         logger.warn('insert pfe : ExportDefaultDeclaration')
                         pfeVars.exportDefaultDeclaration.count++
                         subPath.stop()
@@ -61,9 +62,20 @@ export default ({template: template}) => {
                  *
                  * */
                 logger.debug('node type : ' + path.get('type').node)
-                path.insertBefore(pfeCall('ClassDeclaration', pfeVars.classDeclaration.fee));
+                path.insertBefore(pfeCall('ClassDeclaration', pfeVars.classDeclaration.fee))
                 logger.warn('insert pfe : ClassDeclaration')
                 pfeVars.classDeclaration.count++
+
+                /**
+                 * validation superClassExtend
+                 *
+                 * */
+                if(path.get('superClass').get('name').node=='Contract'){
+                    logger.debug('node type : SuperClassExtend')
+                    path.insertBefore(pfeCall('SuperClassExtend', pfeVars.superClassExtend.fee))
+                    logger.warn('insert pfe : SuperClassExtend')
+                    pfeVars.superClassExtend.count++
+                }
 
                 path.traverse({
                     ClassMethod(subPath) {
@@ -78,7 +90,7 @@ export default ({template: template}) => {
                              *
                              * */
                             logger.debug('node type : ' + node)
-                            subPath.insertBefore(pfeCall('Constructor', pfeVars.constructorDeclaration.fee));
+                            subPath.insertBefore(pfeCall('Constructor', pfeVars.constructorDeclaration.fee))
                             logger.warn('insert pfe : Constructor')
                             pfeVars.constructorDeclaration.count++
 
@@ -111,7 +123,7 @@ export default ({template: template}) => {
                              *
                              * */
                             logger.debug('node type : ClassMethod kind ' + node)
-                            path.insertBefore(pfeCall('ClassMethod', pfeVars.classMethodDeclaration.fee));
+                            path.insertBefore(pfeCall('ClassMethod', pfeVars.classMethodDeclaration.fee))
                             logger.warn('insert pfe : ClassMethod')
                             pfeVars.classMethodDeclaration.count++
                         }
@@ -124,7 +136,7 @@ export default ({template: template}) => {
                  *
                  * */
                 logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.functionDeclaration.count)
-                path.insertBefore(pfeCall('FunctionDeclaration', pfeVars.functionDeclaration.fee));
+                path.insertBefore(pfeCall('FunctionDeclaration', pfeVars.functionDeclaration.fee))
                 logger.warn('insert pfe : FunctionDeclaration')
                 pfeVars.functionDeclaration.count++
 
@@ -134,7 +146,7 @@ export default ({template: template}) => {
                  * pfe CallExpression RangeError
                  *
                  * RangeError: Maximum call stack size exceeded
-                 * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")));
+                 * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")))
                  *
                  * */
             }

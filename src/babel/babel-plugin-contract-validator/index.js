@@ -3,6 +3,7 @@ import logger from '../../logger'
 let validatorVars = {
     importDeclaration: {count: 0, max: 20, fee: 2},
     exportDefaultDeclaration: {count: 0, max: 1},
+    superClassExtend: {count: 0, max: 1},
     classDeclaration: {count: 0, max: 1},
     classMethodDeclaration: {count: 0, max: 20},
     constructorDeclaration: {count: 0, max: 1},
@@ -53,6 +54,15 @@ export default () => {
                  *
                  * */
                 validatorVars.classDeclaration.count++
+
+                /**
+                 * validation superClassExtend
+                 *
+                 * */
+                if(path.get('superClass').get('name').node=='Contract'){
+                    validatorVars.superClassExtend.count++
+                }
+
                 path.traverse({
                     ClassMethod(subPath) {
                         /**
@@ -106,7 +116,7 @@ export default () => {
                  * validation CallExpression RangeError
                  *
                  * RangeError: Maximum call stack size exceeded
-                 * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")));
+                 * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")))
                  *
                  * */
             }
