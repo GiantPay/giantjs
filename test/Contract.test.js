@@ -80,10 +80,29 @@ describe('Contract', () => {
     })
 
     describe('#runTime', () => {
+
         it('Some contracts files exist', () => {
             fs.readdir('./build/contracts', function (err, flist) {
                 if (err) console.log('Some contracts files error', err.message, err.stack)
                 flist.should.not.be.null
+            })
+        })
+        
+        it('All contract have RunTime version', () => {
+            fs.readdir('./build/contracts', function (err, flist) {
+                if (err) console.log('Some contracts files error', err.message, err.stack)
+                const contractsRunTime = flist.filter(f => f.indexOf('RunTime.js') > -1)
+                const contracts = flist.filter(f => f.indexOf('RunTime.js') === -1 && f.indexOf('.js') > -1)
+                contracts.length.should.be.equal(contractsRunTime.length)
+                let c = 0
+                for (let i in contracts) {
+                    let RunTimeName = contracts[i].slice(0, -3) + 'RunTime.js'
+                    const found = flist.find(f => f == RunTimeName)
+                    if(typeof found != 'undefined'){
+                        c++
+                    }
+                }
+                c.should.be.equal(contracts.length)
             })
         })
     })
