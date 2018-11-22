@@ -2,7 +2,9 @@
 
 import fs from 'fs'
 import path from 'path'
+import async from 'async'
 
+//import 'babel/polyfill'
 import {transformFileSync} from 'babel-core'
 import ContractFee from "../dist/babel/babel-plugin-contract-fee";
 
@@ -87,24 +89,82 @@ describe('Contract', () => {
                 flist.should.not.be.null
             })
         })
-        
-        it('All contract have RunTime version', () => {
+
+        it('All contracts have RunTime version', () => {
+
             fs.readdir('./build/contracts', function (err, flist) {
                 if (err) console.log('Some contracts files error', err.message, err.stack)
                 const contractsRunTime = flist.filter(f => f.indexOf('RunTime.js') > -1)
                 const contracts = flist.filter(f => f.indexOf('RunTime.js') === -1 && f.indexOf('.js') > -1)
+
                 contracts.length.should.be.equal(contractsRunTime.length)
+
                 let c = 0
                 for (let i in contracts) {
                     let RunTimeName = contracts[i].slice(0, -3) + 'RunTime.js'
                     const found = flist.find(f => f == RunTimeName)
-                    if(typeof found != 'undefined'){
+                    if (typeof found != 'undefined') {
                         c++
                     }
                 }
+
                 c.should.be.equal(contracts.length)
             })
         })
+
+        it('Readable contracts is equals by his RunTime versions', () => {
+
+            let contractPath = './build/contracts/', codeIteration, contracts = [], contractsRunTime = [], pfeDesc = `\nfunction pfe(declaration, fee){
+                    console.log(declaration, fee)
+                }`
+
+            new Promise(function (resolve, reject) {
+                fs.readdir(contractPath, function (err, flist) {
+                    if (err) {
+                        reject('Some contracts files error', err.message, err.stack)
+                    }
+                    contractsRunTime = flist.filter(f => f.indexOf('RunTime.js') > -1)
+                    contracts = flist.filter(f => f.indexOf('RunTime.js') === -1 && f.indexOf('.js') > -1)
+                    resolve();
+                })
+            }).then(() => {
+                async.forEachOf(contracts, (value, key, cb) => {
+                    var data = fs.readFileSync(contractPath + value, 'utf8');
+                    console.log(data);
+                    console.log("----------------------------" + contractPath + value);
+                    console.log("--------------contracts------");
+                    console.log("----------------------------");
+                    cb();
+                }, err => {
+                    if (err) console.error(err.message);
+                })
+            }).then(() => {
+                // resolve promise.all
+                //https://itnext.io/https-medium-com-popov4ik4-what-about-promises-in-loops-e94c97ad39c0
+
+
+                const waitFor = (ms) => new Promise(r => setTimeout(r, ms));
+                contractsRunTime.forEach(async (value) => {
+                    await waitFor(50);
+                    console.log(contractPath + value)
+                    console.log("----------------------------" + contractPath + value);
+                    console.log("------------contractsRunTime");
+                    console.log("----------------------------");
+                    let {ast, code} = transformFileSync(contractPath + value, {
+                        'plugins': [ContractFee]
+                    })
+                    if (code) {
+                        codeIteration += code + pfeDesc
+                        //resolve(); // fulfilled
+                    } else {
+                        var reason = new Error('hm..');
+                        //reject(reason);
+                    }
+                });
+            })
+        })
+
+
     })
 
     describe('#getMethodFee', () => {

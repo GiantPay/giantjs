@@ -19,6 +19,7 @@
   "preferGlobal": true,
   "bin": "./src/giantjs.js",
   "dependencies": {
+    "async": "^2.6.1",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-plugin-remove-comments": "^2.0.0",
