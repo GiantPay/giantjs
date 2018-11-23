@@ -108,11 +108,11 @@ describe('Contract', () => {
                     }
                 }
 
-                c.should.be.equal(contracts.length)
+                contracts.length.should.be.equal(c)
             })
         })
 
-        it('Last readable contracts is equals by his RunTime versions', () => {
+        it('Last readable contract should be equal by his RunTime version', () => {
 
             let contractPath = './build/contracts/', contract, contractRunTime,
                 contractData,
