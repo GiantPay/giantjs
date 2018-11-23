@@ -28,9 +28,7 @@ export default class GiantContract {
 
             // TODO need to optimize ast before saving
 
-            let pfeDesc = `\nfunction pfe(declaration, fee){
-                console.log(declaration, fee)
-            }`
+            let pfeDesc = '\nfunction pfe(declaration, fee){console.log(declaration, fee)}'
 
             fs.writeFileSync(this.targetFileNameRunTime, code + pfeDesc)
 

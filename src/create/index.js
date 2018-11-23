@@ -21,6 +21,11 @@ const createContract = (name) => {
                     'export default class ' + name + ' extends Contract {\n' +
                     '\tconstructor() {\n' +
                     '\t\tsuper()\n' +
+                    '\t\tthis.balances = []\n' +
+                    '\t}\n' +
+                    '\n' +
+                    '\tgetBalance () {\n' +
+                    '\t\treturn this.balances\n' +
                     '\t}\n' +
                     '}',
                     (err) => {

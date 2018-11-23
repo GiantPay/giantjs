@@ -95,7 +95,7 @@ describe('Contract', () => {
             fs.readdir('./build/contracts', function (err, flist) {
                 if (err) console.log('Some contracts files error', err.message, err.stack)
                 const contractsRunTime = flist.filter(f => f.indexOf('RunTime.js') > -1)
-                const contracts = flist.filter(f => f.indexOf('RunTime.js') === -1 && f.indexOf('.js') > -1)
+                const contracts = flist.filter(f => f.indexOf('RunTime.js') == -1 && f.indexOf('.js') > -1)
 
                 contracts.length.should.be.equal(contractsRunTime.length)
 
@@ -112,59 +112,55 @@ describe('Contract', () => {
             })
         })
 
-        it('Readable contracts is equals by his RunTime versions', () => {
+        it('Last readable contracts is equals by his RunTime versions', () => {
 
-            let contractPath = './build/contracts/', codeIteration, contracts = [], contractsRunTime = [], pfeDesc = `\nfunction pfe(declaration, fee){
-                    console.log(declaration, fee)
-                }`
+            let contractPath = './build/contracts/', contract, contractRunTime,
+                contractData,
+                contractRunTimeData,
+                newContractRunTimeData,
+                pfeDesc = '\nfunction pfe(declaration, fee){console.log(declaration, fee)}',
+                getLatestFile = () => {
+                    let latest;
+                    const files = fs.readdirSync(contractPath);
+                    files.forEach(filename => {
+                        const stat = fs.lstatSync(path.join(contractPath, filename));
+                        if (stat.isDirectory())
+                            return;
+                        if (!latest) {
+                            latest = {filename, mtime: stat.mtime};
+                            return;
+                        }
+                        if (stat.mtime > latest.mtime) {
+                            latest.filename = filename;
+                            latest.mtime = stat.mtime;
+                        }
+                    });
+                    return latest.filename;
+                }
+
+            let latestContract = getLatestFile()
+
+            if (latestContract.indexOf('RunTime.js') == -1) {
+                contract = latestContract
+                contractRunTime = latestContract.slice(0, -3) + 'RunTime.js'
+            } else {
+                contract = latestContract.slice(0, -10) + '.js'
+                contractRunTime = latestContract
+            }
 
             new Promise(function (resolve, reject) {
-                fs.readdir(contractPath, function (err, flist) {
-                    if (err) {
-                        reject('Some contracts files error', err.message, err.stack)
-                    }
-                    contractsRunTime = flist.filter(f => f.indexOf('RunTime.js') > -1)
-                    contracts = flist.filter(f => f.indexOf('RunTime.js') === -1 && f.indexOf('.js') > -1)
-                    resolve();
-                })
+                contractRunTimeData = fs.readFileSync(contractPath + contractRunTime, 'utf8')
+                resolve()
             }).then(() => {
-                async.forEachOf(contracts, (value, key, cb) => {
-                    var data = fs.readFileSync(contractPath + value, 'utf8');
-                    console.log(data);
-                    console.log("----------------------------" + contractPath + value);
-                    console.log("--------------contracts------");
-                    console.log("----------------------------");
-                    cb();
-                }, err => {
-                    if (err) console.error(err.message);
+                let {ast, code} = transformFileSync(contractPath + contract, {
+                    'plugins': [ContractFee]
                 })
-            }).then(() => {
-                // resolve promise.all
-                //https://itnext.io/https-medium-com-popov4ik4-what-about-promises-in-loops-e94c97ad39c0
-
-
-                const waitFor = (ms) => new Promise(r => setTimeout(r, ms));
-                contractsRunTime.forEach(async (value) => {
-                    await waitFor(50);
-                    console.log(contractPath + value)
-                    console.log("----------------------------" + contractPath + value);
-                    console.log("------------contractsRunTime");
-                    console.log("----------------------------");
-                    let {ast, code} = transformFileSync(contractPath + value, {
-                        'plugins': [ContractFee]
-                    })
-                    if (code) {
-                        codeIteration += code + pfeDesc
-                        //resolve(); // fulfilled
-                    } else {
-                        var reason = new Error('hm..');
-                        //reject(reason);
-                    }
-                });
+                if (code) {
+                    newContractRunTimeData = code + pfeDesc
+                }
+                contractRunTimeData.should.be.equal(newContractRunTimeData)
             })
         })
-
-
     })
 
     describe('#getMethodFee', () => {
