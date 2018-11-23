@@ -2,9 +2,7 @@
 
 import fs from 'fs'
 import path from 'path'
-import async from 'async'
 
-//import 'babel/polyfill'
 import {transformFileSync} from 'babel-core'
 import ContractFee from "../dist/babel/babel-plugin-contract-fee";
 
