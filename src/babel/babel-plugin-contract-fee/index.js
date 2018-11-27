@@ -1,14 +1,37 @@
 import logger from '../../logger'
 
+/**
+ * Literal
+ ExpressionStatement
+ Identifier
+ MemberExpression
+ Property
+ ObjectExpression
+ CallExpression
+ VariableDeclarator
+ VariableDeclaration
+ BinaryExpression
+ UpdateExpression
+ LogicalExpression
+ AssignmentExpression
+ IfStatement
+ BlockStatement
+ ForStatement
+ FunctionDeclaration
+ ReturnStatement
+ FunctionExpression
+ ConditionalExpression
+ UnaryExpression
+ NewExpression
+ ThrowStatement
+ ThisExpression
+ SequenceExpression
+ ArrayExpression
+ Program
+ *
+ */
+
 let pfeVars = {
-    importDeclaration: {count: 0, max: 20, fee: 2},
-    exportDefaultDeclaration: {count: 0, max: 1, fee: 2},
-    classDeclaration: {count: 0, max: 1, fee: 4},
-    superClassExtend: {count: 0, max: 1, fee: 8},
-    classMethodDeclaration: {count: 0, max: 20, fee: 8},
-    constructorDeclaration: {count: 0, max: 1, fee: 12},
-    constructorThisDeclaration: {count: 0, max: 100, fee: 12},
-    superDeclaration: {count: 0, max: 1, fee: 12},
     functionDeclaration: {count: 0, max: 100, fee: 4}
 }
 
