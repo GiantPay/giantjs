@@ -32,7 +32,32 @@ import logger from '../../logger'
  */
 
 let pfeVars = {
-    functionDeclaration: {count: 0, max: 100, fee: 4}
+    literal: {count: 0, max: 1000, fee: 4, required: false},
+    expressionStatement: {count: 0, max: 1000, fee: 4, required: false},
+    identifier: {count: 0, max: 1000, fee: 4, required: false},
+    property: {count: 0, max: 1000, fee: 4, required: false},
+    objectExpression: {count: 0, max: 100, fee: 4, required: false},
+    memberExpression: {count: 0, max: 100, fee: 4, required: false},
+    callExpression: {count: 0, max: 100, fee: 4, required: false},
+    variableDeclarator: {count: 0, max: 100, fee: 4, required: false},
+    variableDeclaration: {count: 0, max: 100, fee: 4, required: false},
+    binaryExpression: {count: 0, max: 100, fee: 4, required: false},
+    updateExpression: {count: 0, max: 100, fee: 4, required: false},
+    logicalExpression: {count: 0, max: 100, fee: 4, required: false},
+    assignmentExpression: {count: 0, max: 100, fee: 4, required: false},
+    blockStatement: {count: 0, max: 100, fee: 4, required: false},
+    forStatement: {count: 0, max: 100, fee: 4, required: false},
+    functionDeclaration: {count: 0, max: 100, fee: 4, required: true},
+    returnStatement: {count: 0, max: 100, fee: 4, required: false},
+    functionExpression: {count: 0, max: 100, fee: 4, required: false},
+    conditionalExpression: {count: 0, max: 100, fee: 4, required: false},
+    unaryExpression: {count: 0, max: 100, fee: 4, required: false},
+    newExpression: {count: 0, max: 100, fee: 4, required: false},
+    throwStatement: {count: 0, max: 100, fee: 4, required: false},
+    thisExpression: {count: 0, max: 100, fee: 4, required: false},
+    sequenceExpression: {count: 0, max: 100, fee: 4, required: false},
+    arrayExpression: {count: 0, max: 100, fee: 4, required: false},
+    program: {count: 0, max: 1, fee: 10, required: false},
 }
 
 /**
@@ -50,128 +75,27 @@ export default ({template: template}) => {
     return {
         visitor: {
             Program: (path) => {
+                /**
+                 * pfe Program
+                 *
+                 *
+                 logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.program.count)
+                 path.insertAfter(pfeCall('Program', pfeVars.program.fee))
+                 logger.warn('insert pfe : Program')
+                 pfeVars.program.count++
+                 */
                 path.traverse({
-                    ImportDeclaration: (subPath) => {
-
-                        logger.debug('node type : ' + subPath.get('type').node)
-
+                    FunctionDeclaration: (path) => {
                         /**
-                         * pfe ImportDeclaration
+                         * pfe FunctionDeclaration
                          *
                          * */
-                        subPath.insertBefore(pfeCall('ImportDeclaration', pfeVars.importDeclaration.fee))
-                        logger.warn('insert pfe : ImportDeclaration')
-                        pfeVars.importDeclaration.count++
-
-                    },
-                    ExportDefaultDeclaration: (subPath) => {
-
-                        logger.debug('node type : ' + subPath.get('type').node)
-
-                        /**
-                         * pfe ExportDefaultDeclaration
-                         *
-                         * */
-                        subPath.insertBefore(pfeCall('ExportDefaultDeclaration', pfeVars.exportDefaultDeclaration.fee))
-                        logger.warn('insert pfe : ExportDefaultDeclaration')
-                        pfeVars.exportDefaultDeclaration.count++
-                        subPath.stop()
+                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.functionDeclaration.count)
+                        path.insertBefore(pfeCall('FunctionDeclaration', pfeVars.functionDeclaration.fee))
+                        logger.warn('insert pfe : FunctionDeclaration')
+                        pfeVars.functionDeclaration.count++
                     }
                 })
-            },
-            ClassDeclaration: (path) => {
-                /**
-                 * pfe ClassDeclaration
-                 *
-                 * */
-                logger.debug('node type : ' + path.get('type').node)
-                path.insertBefore(pfeCall('ClassDeclaration', pfeVars.classDeclaration.fee))
-                logger.warn('insert pfe : ClassDeclaration')
-                pfeVars.classDeclaration.count++
-
-                /**
-                 * validation superClassExtend
-                 *
-                 * */
-                if(path.get('superClass').get('name').node=='Contract'){
-                    logger.debug('node type : SuperClassExtend')
-                    path.insertBefore(pfeCall('SuperClassExtend', pfeVars.superClassExtend.fee))
-                    logger.warn('insert pfe : SuperClassExtend')
-                    pfeVars.superClassExtend.count++
-                }
-
-                path.traverse({
-                    ClassMethod(subPath) {
-                        /**
-                         * pfe ClassMethod
-                         *
-                         * */
-                        let node = subPath.get('kind').node
-                        if (node == 'constructor') {
-                            /**
-                             * pfe Constructor
-                             *
-                             * */
-                            logger.debug('node type : ' + node)
-                            subPath.insertBefore(pfeCall('Constructor', pfeVars.constructorDeclaration.fee))
-                            logger.warn('insert pfe : Constructor')
-                            pfeVars.constructorDeclaration.count++
-
-                            subPath.traverse({
-                                CallExpression(subSubPath) {
-                                    if (subSubPath.get('callee').get('type').node == 'Super') {
-                                        /**
-                                         * pfe Super
-                                         *
-                                         * */
-                                        logger.debug('constructor node type callee : ' + subSubPath.get('callee').get('type').node)
-                                        path.insertBefore(pfeCall('Super', pfeVars.superDeclaration.fee))
-                                        logger.warn('constructor insert pfe : Super')
-                                        pfeVars.superDeclaration.count++
-                                    }
-                                }, ThisExpression(subSubPath) {
-                                    /**
-                                     * pfe ThisExpression
-                                     *
-                                     * */
-                                    logger.debug('constructor node type : ' + subSubPath.get('type').node)
-                                    path.insertBefore(pfeCall('ConstructorThis', pfeVars.constructorThisDeclaration.fee))
-                                    logger.warn('constructor insert pfe : ConstructorThis')
-                                    pfeVars.constructorThisDeclaration.count++
-                                }
-                            })
-                        } else {
-                            /**
-                             * pfe ClassMethodDeclaration
-                             *
-                             * */
-                            logger.debug('node type : ClassMethod kind ' + node)
-                            path.insertBefore(pfeCall('ClassMethod', pfeVars.classMethodDeclaration.fee))
-                            logger.warn('insert pfe : ClassMethod')
-                            pfeVars.classMethodDeclaration.count++
-                        }
-                    }
-                })
-            },
-            FunctionDeclaration: (path) => {
-                /**
-                 * pfe FunctionDeclaration
-                 *
-                 * */
-                logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.functionDeclaration.count)
-                path.insertBefore(pfeCall('FunctionDeclaration', pfeVars.functionDeclaration.fee))
-                logger.warn('insert pfe : FunctionDeclaration')
-                pfeVars.functionDeclaration.count++
-
-            },
-            CallExpression: (path) => {
-                /**
-                 * pfe CallExpression RangeError
-                 *
-                 * RangeError: Maximum call stack size exceeded
-                 * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")))
-                 *
-                 * */
             }
         }, post(state) {
             /**
@@ -180,19 +104,19 @@ export default ({template: template}) => {
              * */
             let foundErrors = []
             for (let k in pfeVars) {
-                if (!pfeVars[k].count) {
+                if (pfeVars[k].required && !pfeVars[k].count) {
                     foundErrors.push('not found ' + k)
+                }
+                if (pfeVars[k].count > pfeVars[k].max) {
+                    foundErrors.push(k + ' ' +
+                        pfeVars[k].count +
+                        ' times payment, expect max ' +
+                        pfeVars[k].max)
                 } else {
-                    if (pfeVars[k].count > pfeVars[k].max) {
-                        foundErrors.push(k + ' ' +
-                            pfeVars[k].count +
-                            ' times payment, expect max ' +
-                            pfeVars[k].max)
-                    } else {
-                        logger.info('found ' + k + ' ' + pfeVars[k].count + ' times payment')
-                    }
+                    logger.info('found ' + k + ' ' + pfeVars[k].count + ' times payment')
                 }
             }
+
             if (!foundErrors.length) {
                 logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
             } else {

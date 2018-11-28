@@ -1,5 +1,5 @@
 import fs from 'fs'
-import {transformFileSync} from 'babel-core'
+import {transformFileSync, transform} from 'babel-core'
 
 import GiantPath from '../path'
 import ContractValidator from '../babel/babel-plugin-contract-validator'
@@ -18,23 +18,20 @@ export default class GiantContract {
 
     compile() {
         if (this.valid) {
-            let data = fs.readFileSync(this.fileName, 'utf8');
+            let data = fs.readFileSync(this.fileName, 'utf8')
 
             fs.writeFileSync(this.targetFileName, data)
 
-            const {ast, code} = transformFileSync(this.fileName, {
+            let {code} = transformFileSync(this.fileName)
+
+            let result = transform(code, {
                 'plugins': [ContractFee]
             })
-
-            // TODO need to optimize ast before saving
-
             let pfeDesc = '\nfunction pfe(declaration, fee){console.log(declaration, fee)}'
 
-            fs.writeFileSync(this.targetFileNameRunTime, code + pfeDesc)
+            // TODO need to optimize ast before saving
+            fs.writeFileSync(this.targetFileNameRunTime, result.code + pfeDesc)
 
-            this.ast = ast
-            this.code = code
-            this.compiled = true
         }
     }
 
