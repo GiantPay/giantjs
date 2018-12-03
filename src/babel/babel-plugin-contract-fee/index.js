@@ -1,67 +1,37 @@
 import logger from '../../logger'
 
-/**
- *
- *
- Literal - RangeError: Maximum call stack size exceeded
- ExpressionStatement - RangeError: Maximum call stack size exceeded
- Identifier - RangeError: Maximum call stack size exceeded
- MemberExpression - RangeError: Maximum call stack size exceeded
- Property - insertBefore broke syntax
- ObjectExpression - RangeError: Maximum call stack size exceeded
- CallExpression - RangeError: Maximum call stack size exceeded
- VariableDeclarator - insertBefore broke syntax
- VariableDeclaration - insertBefore broke syntax
- BinaryExpression - RangeError: Maximum call stack size exceeded
- UpdateExpression - RangeError: Maximum call stack size exceeded
- LogicalExpression - RangeError: Maximum call stack size exceeded
- AssignmentExpression - RangeError: Maximum call stack size exceeded
- IfStatement           +
- BlockStatement - insertBefore broke syntax
- ForStatement - not found, was found here https://viswesh.github.io/astVisualizer/index.html
- FunctionDeclaration   +
- ReturnStatement  - not found, but exist
- FunctionExpression - RangeError: Maximum call stack size exceeded
- ConditionalExpression - RangeError: Maximum call stack size exceeded
- UnaryExpression - RangeError: Maximum call stack size exceeded
- NewExpression - RangeError: Maximum call stack size exceeded
- ThrowStatement - not found, was found here https://viswesh.github.io/astVisualizer/index.html
- ThisExpression - not found, was found here https://viswesh.github.io/astVisualizer/index.html
- SequenceExpression - RangeError: Maximum call stack size exceeded
- ArrayExpression - not found, was found here https://viswesh.github.io/astVisualizer/index.html
- Program
- *
- */
-
 let pfeVars = {
-    literal: {count: 0, max: 1000, fee: 4, required: false},
-    expressionStatement: {count: 0, max: 1000, fee: 4, required: false},
-    identifier: {count: 0, max: 1000, fee: 4, required: false},
-    memberExpression: {count: 0, max: 100, fee: 4, required: false},
-    property: {count: 0, max: 1000, fee: 4, required: false},
-    objectExpression: {count: 0, max: 100, fee: 4, required: false},
-    callExpression: {count: 0, max: 100, fee: 4, required: false},
-    variableDeclarator: {count: 0, max: 100, fee: 4, required: false},
-    variableDeclaration: {count: 0, max: 100, fee: 4, required: false},
-    binaryExpression: {count: 0, max: 100, fee: 4, required: false},
-    updateExpression: {count: 0, max: 100, fee: 4, required: false},
-    logicalExpression: {count: 0, max: 100, fee: 4, required: false},
-    assignmentExpression: {count: 0, max: 100, fee: 4, required: false},
-    ifStatement: {count: 0, max: 100, fee: 4, required: false},
-    blockStatement: {count: 0, max: 100, fee: 4, required: false},
-    forStatement: {count: 0, max: 100, fee: 4, required: false},
-    functionDeclaration: {count: 0, max: 100, fee: 4, required: true},
-    returnStatement: {count: 0, max: 100, fee: 4, required: false},
-    functionExpression: {count: 0, max: 100, fee: 4, required: false},
-    conditionalExpression: {count: 0, max: 100, fee: 4, required: false},
-    unaryExpression: {count: 0, max: 100, fee: 4, required: false},
-    newExpression: {count: 0, max: 100, fee: 4, required: false},
-    throwStatement: {count: 0, max: 100, fee: 4, required: false},
-    thisExpression: {count: 0, max: 100, fee: 4, required: false},
-    sequenceExpression: {count: 0, max: 100, fee: 4, required: false},
-    arrayExpression: {count: 0, max: 100, fee: 4, required: false},
-    program: {count: 0, max: 1, fee: 10, required: false},
+    StringLiteral: {count: 0, max: 1000, fee: 4, required: true},
+    ExpressionStatement: {count: 0, max: 1000, fee: 4, required: true},
+    Identifier: {count: 0, max: 1000, fee: 4, required: true},
+    MemberExpression: {count: 0, max: 100, fee: 4, required: true},
+    ObjectProperty: {count: 0, max: 1000, fee: 4, required: true},
+    ObjectExpression: {count: 0, max: 100, fee: 4, required: true},
+    CallExpression: {count: 0, max: 100, fee: 4, required: true},
+    VariableDeclarator: {count: 0, max: 100, fee: 4, required: true},
+    VariableDeclaration: {count: 0, max: 100, fee: 4, required: true},
+    BinaryExpression: {count: 0, max: 100, fee: 4, required: true},
+    UpdateExpression: {count: 0, max: 100, fee: 4, required: true},
+    LogicalExpression: {count: 0, max: 100, fee: 4, required: true},
+    AssignmentExpression: {count: 0, max: 100, fee: 4, required: true},
+    IfStatement: {count: 0, max: 100, fee: 4, required: true},
+    BlockStatement: {count: 0, max: 100, fee: 4, required: true},
+    ForStatement: {count: 0, max: 100, fee: 4, required: true},
+    FunctionDeclaration: {count: 0, max: 100, fee: 4, required: true},
+    ReturnStatement: {count: 0, max: 100, fee: 4, required: true},
+    FunctionExpression: {count: 0, max: 100, fee: 4, required: true},
+    ConditionalExpression: {count: 0, max: 100, fee: 4, required: true},
+    UnaryExpression: {count: 0, max: 100, fee: 4, required: true},
+    NewExpression: {count: 0, max: 100, fee: 4, required: true},
+    ThrowStatement: {count: 0, max: 100, fee: 4, required: true},
+    ThisExpression: {count: 0, max: 100, fee: 4, required: true},
+    SequenceExpression: {count: 0, max: 100, fee: 4, required: false},
+    ArrayExpression: {count: 0, max: 100, fee: 4, required: true},
+    Program: {count: 0, max: 1, fee: 10, required: true},
+}, pfeVarsCount = (type) => {
+    pfeVars.hasOwnProperty(type) ? pfeVars[type].count++ : pfeVars[type] = {count: 1}
 }
+
 
 /**
  * @returns ast and pfe functions of the giant contract code
@@ -76,307 +46,91 @@ export default ({template: template}) => {
     }, hash = {}
 
     return {
-        pre(path) {
-
-            if (path.body && !Array.isArray(path.body)) {
-                path.body = [path.body]
-            }
-            path.children = path.body ? path.body : []
-            /*console.log(path.children)*/
-        },
         visitor: {
             Program: (path) => {
-                /**
-                 * pfe Program
-                 *
-                 *
-                 logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.program.count)
-                 path.insertAfter(pfeCall('Program', pfeVars.program.fee))
-                 logger.warn('insert pfe : Program')
-                 pfeVars.program.count++
-                 */
-                hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                pfeVarsCount(path.type)
                 path.traverse({
-                    /**
-                     * pfe StringLiteral
-                     *
-                     *  StringLiteral: (path) => {
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.literal.count)
-                        path.insertBefore(pfeCall('StringLiteral', pfeVars.literal.fee))
-                        logger.warn('insert pfe : StringLiteral')
-                        pfeVars.literal.count++
-                    },*/
+                    StringLiteral: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    ExpressionStatement: (path) => {
+                        pfeVarsCount(path.type)
+                    },
                     FunctionDeclaration: (path) => {
-                        /**
-                         * pfe FunctionDeclaration
-                         *
-                         * */
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.functionDeclaration.count)
-                        path.insertBefore(pfeCall('FunctionDeclaration', pfeVars.functionDeclaration.fee))
-                        logger.warn('insert pfe : FunctionDeclaration')
-                        pfeVars.functionDeclaration.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
-                    Property: (path) => {
-                        /**
-                         * pfe Property
-                         *
-                         * */
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.property.count)
-                        /**
-                         * path.insertBefore(pfeCall('Property', pfeVars.property.fee))
-                         *
-                         * broken syntax
-                         *
-                         * */
-                        logger.warn('insert pfe : Property')
-                        pfeVars.functionDeclaration.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                    Identifier: (path) => {
+                        pfeVarsCount(path.type)
                     },
-                    /* ObjectExpression: (path) => {
-                         /!**
-                          * pfe ObjectExpression
-                          *
-                          * *!/
-                         logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.objectExpression.count)
-                         path.insertBefore(pfeCall('ObjectExpression', pfeVars.objectExpression.fee))
-                         logger.warn('insert pfe : ObjectExpression')
-                         pfeVars.objectExpression.count++
-
-                     }, CallExpression: (path) => {
-                         /!**
-                          * pfe CallExpression
-                          *
-                          * *!/
-                         logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.callExpression.count)
-                         path.insertBefore(pfeCall('CallExpression', pfeVars.callExpression.fee))
-                         logger.warn('insert pfe : CallExpression')
-                         pfeVars.callExpression.count++
-
-                     },*/
+                    MemberExpression: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    ObjectProperty: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    ObjectExpression: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    CallExpression: (path) => {
+                        pfeVarsCount(path.type)
+                    },
                     VariableDeclarator: (path) => {
-                        /**
-                         * pfe VariableDeclarator
-                         *
-                         * */
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.variableDeclarator.count)
-                        /**
-                         * path.insertBefore(pfeCall('VariableDeclarator', pfeVars.variableDeclarator.fee))
-                         *
-                         * broken syntax
-                         *
-                         * */
-                        logger.warn('insert pfe : VariableDeclarator')
-                        pfeVars.variableDeclarator.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     VariableDeclaration: (path) => {
-                        /**
-                         * pfe VariableDeclaration
-                         *
-                         * */
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.variableDeclaration.count)
-                        /**
-                         * path.insertBefore(pfeCall('VariableDeclaration', pfeVars.callExpression.fee))
-                         *
-                         * broken syntax
-                         *
-                         * */
-                        logger.warn('insert pfe : VariableDeclaration')
-                        pfeVars.variableDeclaration.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
-                    /* BinaryExpression: (path) => {
-                         /!**
-                          * pfe BinaryExpression
-                          *
-                          * *!/
-                         logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.binaryExpression.count)
-                         path.insertBefore(pfeCall('BinaryExpression', pfeVars.binaryExpression.fee))
-                         logger.warn('insert pfe : BinaryExpression')
-                         pfeVars.binaryExpression.count++
-                     },*/
-                    /* UpdateExpression: (path) => {
-                         /!**
-                          * pfe UpdateExpression
-                          *
-                          * *!/
-                         logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.updateExpression.count)
-                         path.insertBefore(pfeCall('UpdateExpression', pfeVars.updateExpression.fee))
-                         logger.warn('insert pfe : UpdateExpression')
-                         pfeVars.updateExpression.count++
-                     },*/
-                    /*LogicalExpression: (path) => {
-                        /!**
-                         * pfe LogicalExpression
-                         *
-                         * *!/
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.logicalExpression.count)
-                        path.insertBefore(pfeCall('LogicalExpression', pfeVars.logicalExpression.fee))
-                        logger.warn('insert pfe : LogicalExpression')
-                        pfeVars.logicalExpression.count++
-                    },*/
-                    /*AssignmentExpression: (path) => {
-                        /!**
-                         * pfe AssignmentExpression
-                         *
-                         * *!/
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.assignmentExpression.count)
-                        path.insertBefore(pfeCall('AssignmentExpression', pfeVars.assignmentExpression.fee))
-                        logger.warn('insert pfe : AssignmentExpression')
-                        pfeVars.assignmentExpression.count++
-                    },*/
+                    BinaryExpression: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    UpdateExpression: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    LogicalExpression: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    AssignmentExpression: (path) => {
+                        pfeVarsCount(path.type)
+                    },
                     IfStatement: (path) => {
-                        /**
-                         * pfe IfStatement
-                         *
-                         * */
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.ifStatement.count)
-                        path.insertBefore(pfeCall('IfStatement', pfeVars.ifStatement.fee))
-                        logger.warn('insert pfe : IfStatement')
-                        pfeVars.ifStatement.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     BlockStatement: (path) => {
-                        /**
-                         * pfe BlockStatement
-                         *
-                         * */
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.blockStatement.count)
-                        /**
-                         * path.insertBefore(pfeCall('BlockStatement', pfeVars.blockStatement.fee))
-                         *
-                         * broken syntax
-                         *
-                         * */
-                        /*path.traverse({
-                            StringLiteral: (subPath) => {
-                                logger.debug('node type : ' + subPath.get('type').node + ' ' + pfeVars.literal.count)
-                                subPath.insertBefore(pfeCall('StringLiteral', pfeVars.literal.fee))
-                                logger.warn('insert pfe : StringLiteral')
-                                pfeVars.literal.count++
-                            }
-                        })*/
-
-
-                        logger.warn('insert pfe : BlockStatement')
-                        pfeVars.blockStatement.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     ForStatement: (path) => {
-                        /**
-                         * pfe ForStatement
-                         *
-                         * */
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.forStatement.count)
-                        path.insertBefore(pfeCall('ForStatement', pfeVars.forStatement.fee))
-                        logger.warn('insert pfe : ForStatement')
-                        pfeVars.forStatement.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     ReturnStatement: (path) => {
-                        /**
-                         * pfe ReturnStatement
-                         *
-                         * */
-                        logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.returnStatement.count)
-                        path.insertBefore(pfeCall('ReturnStatement', pfeVars.returnStatement.fee))
-                        logger.warn('insert pfe : ReturnStatement')
-                        pfeVars.returnStatement.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     FunctionExpression: (path) => {
-                        /**
-                         * pfe FunctionExpression
-                         *
-                         * */
-                        /*logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.functionExpression.count)
-                        path.insertBefore(pfeCall('FunctionExpression', pfeVars.functionExpression.fee))
-                        logger.warn('insert pfe : FunctionExpression')
-                        pfeVars.functionExpression.count++*/
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     ConditionalExpression: (path) => {
-                        /**
-                         * pfe ConditionalExpression
-                         *
-                         * */
-                        /* logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.conditionalExpression.count)
-                         path.insertBefore(pfeCall('ConditionalExpression', pfeVars.conditionalExpression.fee))
-                         logger.warn('insert pfe : ConditionalExpression')
-                         */
-                        pfeVars.conditionalExpression.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     UnaryExpression: (path) => {
-                        /**
-                         * pfe UnaryExpression
-                         *
-                         * */
-                        /*logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.unaryExpression.count)
-                        path.insertBefore(pfeCall('UnaryExpression', pfeVars.unaryExpression.fee))
-                        logger.warn('insert pfe : UnaryExpression')*/
-                        pfeVars.unaryExpression.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     NewExpression: (path) => {
-                        /**
-                         * pfe NewExpression
-                         *
-                         * */
-                        /*logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.newExpression.count)
-                        path.insertBefore(pfeCall('NewExpression', pfeVars.newExpression.fee))
-                        logger.warn('insert pfe : NewExpression')*/
-                        pfeVars.newExpression.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     ThrowStatement: (path) => {
-                        /**
-                         * pfe ThrowStatement
-                         *
-                         * */
-                        /* logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.throwStatement.count)
-                         path.insertBefore(pfeCall('ThrowStatement', pfeVars.throwStatement.fee))
-                         logger.warn('insert pfe : ThrowStatement')*/
-                        pfeVars.throwStatement.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1
+                        pfeVarsCount(path.type)
                     },
                     ThisExpression: (path) => {
-                        /**
-                         * pfe ThisExpression
-                         *
-                         * */
-                        /*logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.thisExpression.count)
-                        path.insertBefore(pfeCall('ThisExpression', pfeVars.thisExpression.fee))
-                        logger.warn('insert pfe : ThisExpression')*/
-                        pfeVars.thisExpression.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1;
+                        pfeVarsCount(path.type)
                     },
-
                     SequenceExpression: (path) => {
-                        /**
-                         * pfe SequenceExpression
-                         *
-                         * */
-                        /*logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.sequenceExpression.count)
-                        path.insertBefore(pfeCall('SequenceExpression', pfeVars.sequenceExpression.fee))
-                        logger.warn('insert pfe : SequenceExpression')*/
-                        pfeVars.sequenceExpression.count++
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1;
+                        pfeVarsCount(path.type)
                     },
                     ArrayExpression: (path) => {
-                        /**
-                         * pfe ArrayExpression
-                         *
-                         * */
-                        /*logger.debug('node type : ' + path.get('type').node + ' ' + pfeVars.arrayExpression.count)
-                        path.insertBefore(pfeCall('ArrayExpression', pfeVars.arrayExpression.fee))
-                        logger.warn('insert pfe : ArrayExpression')
-                        pfeVars.arrayExpression.count++*/
-                        hash.hasOwnProperty(path.type) ? hash[path.type] = hash[path.type] + 1 : hash[path.type] = 1;
+                        pfeVarsCount(path.type)
                     },
                 })
-                console.log(hash)
+                //  path.insertAfter(pfeCall('CallExpression', pfeVars))
+                console.info(pfeVars)
             }
         }, post(state) {
             /**
