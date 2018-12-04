@@ -38,12 +38,16 @@ let pfeVars = {
  *
  */
 export default ({template: template}) => {
-
-    let pfeCall = (declaration, fee) => {
-        return template(`pfe("` + declaration + `", ` + fee + `)`, {
+    let pfeCall = (pfeVars) => {
+        let str = '{'
+        for (let i in pfeVars) {
+            str += i + ': {count: ' + pfeVars[i]['count'] + ', fee: ' + pfeVars[i]['fee'] + '},\n'
+        }
+        str += '}'
+        return template(`var pfeVars = ${str}`, {
             sourceType: 'module'
         })()
-    }, hash = {}
+    }, injectionPath
 
     return {
         visitor: {
@@ -51,6 +55,16 @@ export default ({template: template}) => {
                 pfeVarsCount(path.type)
                 path.traverse({
                     StringLiteral: (path) => {
+                        /**
+                         *  its possible use like White Paper marker
+                         *
+                         *  logger.info("Visiting StringLiteral : " + path.node.value)
+                         *
+                         {giantjs} info  : Visiting StringLiteral : buyCoin
+                         {giantjs} info  : Visiting StringLiteral : sendCoin
+                         {giantjs} info  : Visiting StringLiteral : getBalance
+                         *
+                         */
                         pfeVarsCount(path.type)
                     },
                     ExpressionStatement: (path) => {
@@ -58,9 +72,29 @@ export default ({template: template}) => {
                     },
                     FunctionDeclaration: (path) => {
                         pfeVarsCount(path.type)
+                        if (path.node.id.name == '_inherits') {
+                            /**
+                             *  Some place for injection pfeVars
+                             */
+                            injectionPath = path
+                        }
                     },
                     Identifier: (path) => {
                         pfeVarsCount(path.type)
+                        /**
+                         *  its possible use like White Paper marker
+                         *
+                         *  logger.info("Visiting Identifier : " + path.node.name)
+                         *
+                         {giantjs} info  : Visiting Identifier : getBalance
+                         {giantjs} info  : Visiting Identifier : address
+                         {giantjs} info  : Visiting Identifier : balances
+                         {giantjs} info  : Visiting Identifier : get
+                         {giantjs} info  : Visiting Identifier : address
+                         {giantjs} info  : Visiting Identifier : MetaCoin
+                         *
+                         */
+                        logger.info("Visiting Identifier : " + path.node.name)
                     },
                     MemberExpression: (path) => {
                         pfeVarsCount(path.type)
@@ -129,10 +163,10 @@ export default ({template: template}) => {
                         pfeVarsCount(path.type)
                     },
                 })
-                //  path.insertAfter(pfeCall('CallExpression', pfeVars))
-                console.info(pfeVars)
+                injectionPath.insertAfter(pfeCall(pfeVars))
             }
         }, post(state) {
+
             /**
              * validator logic
              *
@@ -157,6 +191,7 @@ export default ({template: template}) => {
             } else {
                 logger.error('Some errors found', foundErrors)
             }
+
         }
     }
 }

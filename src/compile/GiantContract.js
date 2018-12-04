@@ -1,9 +1,9 @@
 import fs from 'fs'
 import {transformFileSync, transform} from 'babel-core'
-
+import UglifyJS from 'uglify-js'
 import GiantPath from '../path'
 import ContractValidator from '../babel/babel-plugin-contract-validator'
-import ContractFee from "../babel/babel-plugin-contract-fee";
+import ContractFee from '../babel/babel-plugin-contract-fee'
 
 export default class GiantContract {
 
@@ -27,10 +27,12 @@ export default class GiantContract {
             let result = transform(code, {
                 'plugins': [ContractFee]
             })
-            let pfeDesc = '\nfunction pfe(declaration, fee){console.log(declaration, fee)}'
+            let pfeDesc = '\nfunction pfe(pfeVars){console.log(pfeVars)}'
+
+            let runTimeCode = UglifyJS.minify(result.code + pfeDesc)
 
             // TODO need to optimize ast before saving
-            fs.writeFileSync(this.targetFileNameRunTime, result.code + pfeDesc)
+            fs.writeFileSync(this.targetFileNameRunTime, runTimeCode.code)
 
         }
     }

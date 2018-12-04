@@ -47,6 +47,7 @@
     "require-from-string": "^2.0.2"
   },
   "devDependencies": {
+    "async_hooks": "^1.0.0",
     "babel-core": "^6.26.3",
     "babel-preset-es2016": "^6.24.1",
     "chai": "^4.1.2",
@@ -58,6 +59,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "proxyquire": "^2.0.1",
-    "sinon": "^6.1.5"
+    "sinon": "^6.1.5",
+    "uglify-js": "^3.4.9"
   }
 }

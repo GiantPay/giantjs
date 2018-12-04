@@ -3,11 +3,12 @@
 import fs from 'fs'
 import path from 'path'
 
-import {transformFileSync} from 'babel-core'
+import {transform, transformFileSync} from 'babel-core'
 import ContractFee from "../dist/babel/babel-plugin-contract-fee";
 
 import 'chai/register-should'
 import Contract from '../src/network/development/Contract'
+import UglifyJS from 'uglify-js'
 
 const metaCoinCode = fs.readFileSync(path.resolve(__dirname, './contracts/MetaCoin.js'), {
     encoding: 'utf8'
@@ -116,7 +117,7 @@ describe('Contract', () => {
                 contractData,
                 contractRunTimeData,
                 newContractRunTimeData,
-                pfeDesc = '\nfunction pfe(declaration, fee){console.log(declaration, fee)}',
+                pfeDesc = '\nfunction pfe(pfeVars){console.log(pfeVars)}',
                 getLatestFile = () => {
                     let latest;
                     const files = fs.readdirSync(contractPath);
@@ -150,13 +151,17 @@ describe('Contract', () => {
                 contractRunTimeData = fs.readFileSync(contractPath + contractRunTime, 'utf8')
                 resolve()
             }).then(() => {
-                let {ast, code} = transformFileSync(contractPath + contract, {
+                let {code} = transformFileSync(contractPath + contract)
+
+                let result = transform(code, {
                     'plugins': [ContractFee]
                 })
-                if (code) {
-                    newContractRunTimeData = code + pfeDesc
-                }
-                contractRunTimeData.should.be.equal(newContractRunTimeData)
+
+                newContractRunTimeData = result.code + pfeDesc
+
+                let runTimeCode = UglifyJS.minify(newContractRunTimeData)
+
+                contractRunTimeData.should.be.equal(runTimeCode.code)
             })
         })
     })
