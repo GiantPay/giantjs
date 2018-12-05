@@ -13,6 +13,7 @@ export default class GiantContract {
         this.valid = false
         this.compiled = false
         this.name = name
+        this.code = ''
         this.fileName = GiantPath.getContractFile(name)
         this.targetFileName = GiantPath.getTargetContractFile(name)
         this.targetFileNameRunTime = GiantPath.getTargetContractFileRunTime(name)
@@ -32,10 +33,10 @@ export default class GiantContract {
             })
             let pfeDesc = '\nfunction pfe(pfeVars){console.log(pfeVars)}'
 
-            let runTimeCode = UglifyJS.minify(result.code + pfeDesc)
+            this.code = UglifyJS.minify(result.code + pfeDesc)
 
             // TODO need to optimize ast before saving
-            fs.writeFileSync(this.targetFileNameRunTime, runTimeCode.code)
+            fs.writeFileSync(this.targetFileNameRunTime, this.code)
             figlet('transpiled es5', function (err, data) {
                 if (err) {
                     console.log('Something went wrong...');
@@ -43,10 +44,8 @@ export default class GiantContract {
                     return;
                 }
                 console.log(data)
-                logger.warn(`Succeseful! Contract ${that.name} was compiled in file ./build/contracts/${that.name}RunTime.js`)
+                logger.warn(`Succeseful! Contract ${that.name} was compiled ./build/contracts/${that.name}RunTime.js`)
             })
-
-
         }
     }
 
