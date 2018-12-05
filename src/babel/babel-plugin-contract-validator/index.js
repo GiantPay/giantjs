@@ -110,15 +110,6 @@ export default () => {
                  *
                  * */
                 validatorVars.functionDeclaration.count++
-            },
-            CallExpression: (path) => {
-                /**
-                 * validation CallExpression RangeError
-                 *
-                 * RangeError: Maximum call stack size exceeded
-                 * path.insertBefore(t.expressionStatement(t.stringLiteral("CallExpression pfe, cost 2 ")))
-                 *
-                 * */
             }
         }, post(state) {
             /**
