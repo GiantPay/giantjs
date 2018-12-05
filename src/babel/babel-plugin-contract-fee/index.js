@@ -1,6 +1,7 @@
 import logger from '../../logger'
 
 let pfeVars = {
+    Program: {count: 0, max: 1, fee: 10, required: true},
     StringLiteral: {count: 0, max: 1000, fee: 4, required: true},
     ExpressionStatement: {count: 0, max: 1000, fee: 4, required: true},
     Identifier: {count: 0, max: 1000, fee: 4, required: true},
@@ -27,7 +28,10 @@ let pfeVars = {
     ThisExpression: {count: 0, max: 100, fee: 4, required: true},
     SequenceExpression: {count: 0, max: 100, fee: 4, required: false},
     ArrayExpression: {count: 0, max: 100, fee: 4, required: true},
-    Program: {count: 0, max: 1, fee: 10, required: true},
+    ForStatement: {count: 0, max: 10, fee: 20, required: false},
+    ForInStatement: {count: 0, max: 10, fee: 20, required: false},
+    WhileStatement: {count: 0, max: 10, fee: 20, required: false},
+    DoWhileStatement: {count: 0, max: 10, fee: 20, required: false},
 }, pfeVarsCount = (type) => {
     pfeVars.hasOwnProperty(type) ? pfeVars[type].count++ : pfeVars[type] = {count: 1}
 }
@@ -41,7 +45,7 @@ export default ({template: template}) => {
     let pfeCall = (pfeVars) => {
         let str = '{'
         for (let i in pfeVars) {
-            str += i + ': {count: ' + pfeVars[i]['count'] + ', fee: ' + pfeVars[i]['fee'] + '},\n'
+            str += i + `: {count: ${pfeVars[i]['count']}, fee: ${pfeVars[i]['fee']}},\n`
         }
         str += '}'
         return template(`var pfeVars = ${str}`, {
@@ -94,7 +98,6 @@ export default ({template: template}) => {
                          {giantjs} info  : Visiting Identifier : MetaCoin
                          *
                          */
-                        logger.info("Visiting Identifier : " + path.node.name)
                     },
                     MemberExpression: (path) => {
                         pfeVarsCount(path.type)
@@ -162,6 +165,18 @@ export default ({template: template}) => {
                     ArrayExpression: (path) => {
                         pfeVarsCount(path.type)
                     },
+                    ForStatement: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    ForInStatement: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    WhileStatement: (path) => {
+                        pfeVarsCount(path.type)
+                    },
+                    DoWhileStatement: (path) => {
+                        pfeVarsCount(path.type)
+                    },
                 })
                 injectionPath.insertAfter(pfeCall(pfeVars))
             }
@@ -182,12 +197,12 @@ export default ({template: template}) => {
                         ' times payment, expect max ' +
                         pfeVars[k].max)
                 } else {
-                    logger.info('found ' + k + ' ' + pfeVars[k].count + ' times payment')
+                    logger.info(k + ' ' + pfeVars[k].count + ' times payment')
                 }
             }
 
             if (!foundErrors.length) {
-                logger.warn('Succeseful! Contract ' + state.opts.basename + ' code and pfe transpiled.')
+                logger.warn('Succeseful! Contract code transpiled.')
             } else {
                 logger.error('Some errors found', foundErrors)
             }
