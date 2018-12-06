@@ -67,6 +67,8 @@ export default class GiantContract {
 
             fs.writeFileSync(this.targetFileNameRunTime, this.code.runTime)
 
+            this.compiled = true
+
             figlet('runtime', function (err, data) {
                 if (err) {
                     logger.error('Something went wrong...');
@@ -74,7 +76,7 @@ export default class GiantContract {
                     return;
                 }
                 console.log(data)
-                logger.warn(`Succeseful! Contract ${that.name} was compiled ./build/contracts/${that.name}RunTime.js`)
+                logger.warn(`Succeseful! Contract ${that.name} was compiled ${GiantPath.getTargetContractFileRunTime(that.name)}`)
             })
             console.log(this.getCode())
         }
@@ -96,7 +98,7 @@ export default class GiantContract {
                 return;
             }
             console.log(data)
-            logger.warn(`Contract ${that.name} is valid ./build/contracts/${that.name}.js`)
+            logger.warn(`Contract ${that.name} is valid ${GiantPath.getTargetContractFile(that.name)}`)
         })
     }
 
