@@ -108,6 +108,14 @@ export default class GiantContract {
         }
     }
 
+    getEs6Code() {
+        if (this.code.es6) {
+            return this.code.es6
+        } else {
+            logger.warn(`Contract code ${this.name} not compiled.`)
+        }
+    }
+
     test() {
 
     }
