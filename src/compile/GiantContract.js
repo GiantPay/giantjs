@@ -13,7 +13,11 @@ export default class GiantContract {
         this.valid = false
         this.compiled = false
         this.name = name
-        this.code = ''
+        this.code = {}
+        this.code.es5 = false
+        this.code.es6 = false
+        this.code.es5pfe = false
+        this.code.runTime = false
         this.fileName = GiantPath.getContractFile(name)
         this.targetFileName = GiantPath.getTargetContractFile(name)
         this.targetFileNameRunTime = GiantPath.getTargetContractFileRunTime(name)
@@ -22,30 +26,57 @@ export default class GiantContract {
     compile() {
         if (this.valid) {
             let that = this
-            let data = fs.readFileSync(this.fileName, 'utf8')
 
-            fs.writeFileSync(this.targetFileName, data)
+            /**
+             * TODO : pfeDesc - fn for init payment proccess
+             */
+
+            let pfeDesc = '\nfunction pfe(pfeVars){console.log(pfeVars)}'
+
+            /**
+             * this.code.es6 - the original, readable contract code
+             */
+
+            this.code.es6 = fs.readFileSync(this.fileName, 'utf8')
+
+            fs.writeFileSync(this.targetFileName, this.code.es6)
 
             let {code} = transformFileSync(this.fileName)
 
-            let result = transform(code, {
+            /**
+             * this.code.es5 - the es5 transpiled code
+             */
+
+            this.code.es5 = code
+
+            let result = transform(this.code.es5, {
                 'plugins': [ContractFee]
             })
-            let pfeDesc = '\nfunction pfe(pfeVars){console.log(pfeVars)}'
 
-            this.code = UglifyJS.minify(result.code + pfeDesc)
+            /**
+             * this.code.es5pfe - the es5 contract code and pfe
+             */
 
-            // TODO need to optimize ast before saving
-            fs.writeFileSync(this.targetFileNameRunTime, this.code)
-            figlet('transpiled es5', function (err, data) {
+            this.code.es5pfe = result.code + pfeDesc
+
+            /**
+             * this.code.runTime - final, runtime version
+             */
+
+            this.code.runTime = UglifyJS.minify(this.code.es5pfe)
+
+            fs.writeFileSync(this.targetFileNameRunTime, this.code.runTime)
+
+            figlet('runtime', function (err, data) {
                 if (err) {
-                    console.log('Something went wrong...');
+                    logger.error('Something went wrong...');
                     console.dir(err);
                     return;
                 }
                 console.log(data)
                 logger.warn(`Succeseful! Contract ${that.name} was compiled ./build/contracts/${that.name}RunTime.js`)
             })
+            console.log(this.getCode())
         }
     }
 
@@ -60,16 +91,24 @@ export default class GiantContract {
 
         figlet('valid es6', function (err, data) {
             if (err) {
-                console.log('Something went wrong...');
+                logger.error('Something went wrong...');
                 console.dir(err);
                 return;
             }
             console.log(data)
-            logger.warn(`Contract ${that.name} is valid.`)
+            logger.warn(`Contract ${that.name} is valid ./build/contracts/${that.name}.js`)
         })
     }
 
     getCode() {
-        return this.code
+        if (this.code.runTime) {
+            return this.code.runTime
+        } else {
+            logger.warn(`Contract code ${this.name} not compiled.`)
+        }
+    }
+
+    test() {
+
     }
 }
