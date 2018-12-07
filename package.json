@@ -7,7 +7,7 @@
   "author": "GiantCodeDev <admin@giantpay.network>",
   "license": "MIT",
   "scripts": {
-    "build": "NODE_ENV=production babel src --out-dir dist",
+    "build": "NODE_ENV=production babel src --out-dir dist; node dist/giant init",
     "watch": "babel src -d dist -w",
     "prepublishOnly": "npm run build",
     "test": "NODE_ENV=test mocha --require babel-core/register ./test/**/*.test.js",
