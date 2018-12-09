@@ -96,7 +96,7 @@ export default class MockClient extends EventEmitter {
                         contract.name = 'MetaCoin'
                         contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
                         contract.fee = 10
-                        contract.code = 10
+                        contract.code = options.code
                         contract.methods = {
                             buyCoin: [],
                             sendCoin: ['receiver'],

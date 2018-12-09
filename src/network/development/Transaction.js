@@ -4,22 +4,19 @@ import Contract from './Contract'
 
 export default class Transaction {
 
-    constructor (options) {
+    constructor(options) {
         if (!options) {
             options = {}
         }
 
         this.type = options.type || TransactionType.TRANSFER
-        this.data = options.data
+        this.data = options.code
 
         this.inputs = options.inputs || []
         this.outputs = options.outputs || []
 
         //TODO count
-        options.feePrice  = options.feePrice || 10
-        this.feePrice = options.feePrice
-        this.options = options
-
+        this.feePrice = options.feePrice || 10
 
         const hashProperty = {
             configurable: false,
@@ -33,7 +30,7 @@ export default class Transaction {
         Object.defineProperty(this, 'id', hashProperty)
     }
 
-    static generation () {
+    static generation() {
         return new Transaction({
             type: TransactionType.GENERATION,
             inputs: [{
@@ -43,19 +40,19 @@ export default class Transaction {
         })
     }
 
-    static sendFrom () {
+    static sendFrom() {
         return new Transaction({type: TransactionType.TRANSFER})
     }
 
-    static deployContract (code) {
+    static deployContract(code) {
         return new Transaction({type: TransactionType.CONTRACT_DEPLOY, code: code})
     }
 
-    static callContract () {
+    static callContract() {
         return new Transaction({type: TransactionType.CONTRACT_CALL})
     }
 
-    toObject () {
+    toObject() {
         const json = {
             type: this.type,
             data: this.data,
@@ -69,22 +66,22 @@ export default class Transaction {
         return json
     }
 
-    toJson () {
+    toJson() {
         return JSON.stringify(this.toObject())
     }
 
-    getHash () {
+    getHash() {
         return Hash.sha256(this.toJson())
     }
 
-    validate () {
+    validate() {
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
                 // TODO deploy contract
 
-                const contract = new Contract(this.options) // Deployed contract object
+                const contract = new Contract({code: this.data, feePrice: this.feePrice}) // Deployed contract object
                 contract.name = 'MetaCoin'
-                contract.code = this.code
+                contract.code = this.data
                 contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
                 contract.fee = 10
                 contract.methods = {

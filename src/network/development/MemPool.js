@@ -1,33 +1,26 @@
 import EventEmitter from 'events'
+import Contract from "./Contract";
 
 export default class MemPool extends EventEmitter {
 
-    constructor (options) {
+    constructor(options) {
         super()
         this.db = options.db
         this.blocks = []
         this.transactions = []
     }
 
-    addTransaction (transaction) {
+    addTransaction(transaction) {
         const self = this
 
-        return new Promise((resolve, reject) => {
-            transaction.validate()
-                .then((result) => {
-                    if (!self.hasTransaction(transaction.hash)) {
-                        self.transactions.push(transaction)
-                        self.emit('transaction', transaction)
-                        resolve(result)
-                    } else {
-                        resolve(result)
-                    }
-                })
-                .catch(reject)
-        })
+        //TODO   transaction.validate()
+
+        self.transactions.push(transaction)
+        self.emit('transaction', transaction)
+
     }
 
-    hasTransaction (hash) {
+    hasTransaction(hash) {
         for (let i = 0; i < this.transactions.length; i++) {
             if (this.transactions[i].hash === hash) {
                 return true
@@ -36,11 +29,11 @@ export default class MemPool extends EventEmitter {
         return false
     }
 
-    getTransactions () {
+    getTransactions() {
         return this.transactions
     }
 
-    getTransaction (hash) {
+    getTransaction(hash) {
         for (let i = 0; i < this.transactions.length; i++) {
             if (this.transactions[i].hash === hash) {
                 return this.transactions[i]
@@ -49,7 +42,7 @@ export default class MemPool extends EventEmitter {
         return null
     }
 
-    removeTransaction (txid) {
+    removeTransaction(txid) {
         var newTransactions = []
         this.transactions.forEach(function (tx) {
             if (tx.hash !== txid) {
@@ -59,26 +52,26 @@ export default class MemPool extends EventEmitter {
         this.transactions = newTransactions
     }
 
-    addBlock (block) {
+    addBlock(block) {
         if (!this.blocks[block.hash]) {
             this.blocks[block.hash] = block
             this.emit('block', block)
         }
     }
 
-    hasBlock (hash) {
+    hasBlock(hash) {
         return this.blocks[hash] ? true : false
     }
 
-    getBlock (hash) {
+    getBlock(hash) {
         return this.blocks[hash]
     }
 
-    removeBlock (hash) {
+    removeBlock(hash) {
         delete this.blocks[hash]
     }
 
-    getBlocks () {
+    getBlocks() {
         return this.blocks
     }
 }
