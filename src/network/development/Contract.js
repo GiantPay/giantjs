@@ -6,7 +6,7 @@ import ContractCodeReflection from '../../babel/babel-plugin-contract-code-refle
  */
 export default class Contract {
 
-    constructor (options) {
+    constructor(options) {
         if (!options) {
             throw new TypeError('"options" is expected')
         }
@@ -17,7 +17,7 @@ export default class Contract {
             throw new TypeError('"feePrice" is expected')
         }
 
-        this.code = options.code
+        this.code = options.code.es6
         this.feePrice = options.feePrice
 
         const result = transform(this.code, {
@@ -38,9 +38,8 @@ export default class Contract {
      * calculates sufficient fee to call the constructor
      * @param options
      */
-    getConstructorFee (options) {
+    getConstructorFee(options) {
         const loops = options.loops || 1
-
         return {}
     }
 
@@ -48,7 +47,7 @@ export default class Contract {
      * calculates sufficient fee to call the specified method
      * @param options
      */
-    getMethodFee (options) {
+    getMethodFee(options) {
 
     }
 }

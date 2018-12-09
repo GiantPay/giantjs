@@ -11,9 +11,15 @@ export default class Transaction {
 
         this.type = options.type || TransactionType.TRANSFER
         this.data = options.data
-        this.feePrice = options.feePrice
+
         this.inputs = options.inputs || []
         this.outputs = options.outputs || []
+
+        //TODO count
+        options.feePrice  = options.feePrice || 10
+        this.feePrice = options.feePrice
+        this.options = options
+
 
         const hashProperty = {
             configurable: false,
@@ -41,8 +47,8 @@ export default class Transaction {
         return new Transaction({type: TransactionType.TRANSFER})
     }
 
-    static deployContract () {
-        return new Transaction({type: TransactionType.CONTRACT_DEPLOY})
+    static deployContract (code) {
+        return new Transaction({type: TransactionType.CONTRACT_DEPLOY, code: code})
     }
 
     static callContract () {
@@ -75,10 +81,12 @@ export default class Transaction {
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
                 // TODO deploy contract
-                const contract = new Contract() // Deployed contract object
+
+                const contract = new Contract(this.options) // Deployed contract object
                 contract.name = 'MetaCoin'
+                contract.code = this.code
                 contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
-                contract.fee = 10.0
+                contract.fee = 10
                 contract.methods = {
                     buyCoin: [],
                     sendCoin: ['receiver'],

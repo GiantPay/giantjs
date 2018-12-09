@@ -2,15 +2,17 @@ import Database from './Database'
 import Wallet from './Wallet'
 import Chain from './Chain'
 import Contract from './Contract'
+import Transaction from './Transaction'
 
 import EventEmitter from 'events'
+import TransactionType from "./TransactionType";
 
 /**
  * The Giant mock network, used to compile, test, and debug smart contracts in a development environment
  */
 export default class MockClient extends EventEmitter {
 
-    constructor (options) {
+    constructor(options) {
         super()
 
         if (!options) {
@@ -53,60 +55,79 @@ export default class MockClient extends EventEmitter {
         })
     }
 
-    getAccounts () {
+    getAccounts() {
         return this.wallet.getAccounts()
     }
 
-    getBalance () {
+    getBalance() {
         return this.wallet.getBalance()
     }
 
-    sendFrom (from, to, amount) {
+    sendFrom(from, to, amount) {
         return new Promise((resolve, reject) => {
 
         })
     }
 
-    deployContract (from, code, options) {
+    deployContract(from, code, options) {
         const self = this
+
         return new Promise((resolve, reject) => {
-            const contract = new Contract({
-                code: code,
-                feePrice: options.feePrice || 0.0000001
-            })
-            const fee = contract.getConstructorFee({
-                loops: 10
-            })
+            try {
 
-            const transaction = Transaction.deployContract()
-            transaction.inputs = options.inputs || []
-            transaction.outputs = options.outputs || []
-            transaction.feePrice = contract.feePrice
+                if (!options) {
+                    options = {}
+                }
+                options = {
+                    code: code,
+                    feePrice: options.feePrice || 0.0000001
+                }
 
-            this.db.memPool.addTransaction(transaction)
-                .then((tx) => {
-                    contract.name = 'MetaCoin'
-                    contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
-                    contract.fee = 10.0
-                    contract.methods = {
-                        buyCoin: [],
-                        sendCoin: ['receiver'],
-                        getBalance: ['address']
-                    }
 
-                    resolve(contract)
-                })
-                .catch(reject)
+
+                const transaction = Transaction.deployContract(code)
+                transaction.inputs = options.inputs || []
+                transaction.outputs = options.outputs || []
+               // transaction.feePrice = contract.feePrice
+
+                this.db.memPool.addTransaction(transaction)
+                    .then((tx) => {
+                        let contract = new Contract(options)
+                        const fee = contract.getConstructorFee({
+                            loops: 10
+                        })
+
+                        contract.name = 'MetaCoin'
+                        contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
+                        contract.fee = 10
+                        contract.code = 10
+                        contract.methods = {
+                            buyCoin: [],
+                            sendCoin: ['receiver'],
+                            getBalance: ['address']
+                        }
+                        resolve(contract)
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                        reject()
+                    })
+
+            } catch (err) {
+
+                console.log(err);
+
+            }
         })
     }
 
-    callContract (from, contractAddress, method, args) {
+    callContract(from, contractAddress, method, args) {
         return new Promise((resolve, reject) => {
 
         })
     }
 
-    stop () {
+    stop() {
         this.chain.stop()
     }
 }
