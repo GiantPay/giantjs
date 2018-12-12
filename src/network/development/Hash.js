@@ -1,6 +1,9 @@
 import crypto from 'crypto'
 
 const sha256 = (string) => {
+    if(typeof string != 'string'){
+        string = JSON.stringify(string)
+    }
     return crypto.createHash('sha256')
         .update(string)
         .digest()

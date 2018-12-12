@@ -78,7 +78,6 @@ export default class GiantContract {
                 console.log(data)
                 logger.warn(`Succeseful! Contract ${that.name} was compiled ${GiantPath.getTargetContractFileRunTime(that.name)}`)
             })
-            console.log(this.getCode())
         }
     }
 
@@ -104,15 +103,7 @@ export default class GiantContract {
 
     getCode() {
         if (this.code.runTime) {
-            return this.code.runTime
-        } else {
-            logger.warn(`Contract code ${this.name} not compiled.`)
-        }
-    }
-
-    getEs6Code() {
-        if (this.code.es6) {
-            return this.code.es6
+            return this.code
         } else {
             logger.warn(`Contract code ${this.name} not compiled.`)
         }

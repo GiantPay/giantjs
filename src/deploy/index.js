@@ -27,9 +27,6 @@ export default (name, cmd) => {
                 else if (error instanceof RangeError) {
                     logger.warn('RangeError, loops')
                 }
-                else {
-                    // something else
-                }
                 console.error(error);
             }
         }

@@ -22,7 +22,6 @@ let validatorVars = {
  * @returns ast validator info of the giant contract code
  */
 export default () => {
-
     return {
         visitor: {
             Program: (path) => {
@@ -54,7 +53,6 @@ export default () => {
                  *
                  * */
                 validatorVars.classDeclaration.count++
-
                 /**
                  * validation superClassExtend
                  *
@@ -62,7 +60,6 @@ export default () => {
                 if(path.get('superClass').get('name').node=='Contract'){
                     validatorVars.superClassExtend.count++
                 }
-
                 path.traverse({
                     ClassMethod(subPath) {
                         /**
@@ -76,7 +73,6 @@ export default () => {
                              *
                              * */
                             validatorVars.constructorDeclaration.count++
-
                             subPath.traverse({
                                 CallExpression(subSubPath) {
                                     if (subSubPath.get('callee').get('type').node == 'Super') {
