@@ -15,9 +15,19 @@ export default class MemPool extends EventEmitter {
 
         //TODO   transaction.validate()
 
-        self.transactions.push(transaction)
-        self.emit('transaction', transaction)
-
+        return new Promise((resolve, reject) => {
+            transaction.validate()
+                .then((result) => {
+                    if (!self.hasTransaction(transaction.hash)) {
+                        self.transactions.push(transaction)
+                        self.emit('transaction', transaction)
+                        resolve(result)
+                    } else {
+                        resolve(result)
+                    }
+                })
+                .catch(reject)
+        })
     }
 
     hasTransaction(hash) {

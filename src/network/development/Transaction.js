@@ -77,8 +77,6 @@ export default class Transaction {
     validate() {
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
-                // TODO deploy contract
-
                 const contract = new Contract({code: this.data, feePrice: this.feePrice}) // Deployed contract object
                 contract.name = 'MetaCoin'
                 contract.code = this.data
