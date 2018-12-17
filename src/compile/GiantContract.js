@@ -65,7 +65,7 @@ export default class GiantContract {
 
             this.code.runTime = UglifyJS.minify(this.code.es5pfe)
 
-            fs.writeFileSync(this.targetFileNameRunTime, this.code.runTime)
+            fs.writeFileSync(this.targetFileNameRunTime, this.code.runTime.code, 'utf-8')
 
             this.compiled = true
 
@@ -78,6 +78,7 @@ export default class GiantContract {
                 console.log(data)
                 logger.warn(`Succeseful! Contract ${that.name} was compiled ${GiantPath.getTargetContractFileRunTime(that.name)}`)
             })
+            console.log(this.getCode())
         }
     }
 
@@ -97,12 +98,12 @@ export default class GiantContract {
                 return;
             }
             console.log(data)
-            logger.warn(`Contract ${that.name} is valid ${GiantPath.getTargetContractFile(that.name)}`)
+            logger.warn(`Contract ${that.name} is valid ${GiantPath.getContractFile(that.name)}`)
         })
     }
 
     getCode() {
-        if (this.code.runTime) {
+        if (this.code) {
             return this.code
         } else {
             logger.warn(`Contract code ${this.name} not compiled.`)

@@ -32,8 +32,18 @@ let pfeVars = {
     ForInStatement: {count: 0, max: 10, fee: 20, required: false},
     WhileStatement: {count: 0, max: 10, fee: 20, required: false},
     DoWhileStatement: {count: 0, max: 10, fee: 20, required: false},
-}, pfeVarsCount = (type) => {
-    pfeVars.hasOwnProperty(type) ? pfeVars[type].count++ : pfeVars[type] = {count: 1}
+    WhitePaper: {
+        getBalance: {count: 0, max: 10, fee: 20, required: false},
+        address: {count: 0, max: 10, fee: 20, required: false},
+        buyCoin: {count: 0, max: 10, fee: 20, required: false},
+        sendCoin: {count: 0, max: 10, fee: 20, required: false},
+    },
+}, pfeVarsCount = (type, whitePaper) => {
+    if (type) {
+        pfeVars.hasOwnProperty(type) ? pfeVars[type].count++ : pfeVars[type] = {count: 1}
+    } else if(whitePaper){
+        pfeVars.WhitePaper[whitePaper].count++
+    }
 }
 
 
@@ -47,6 +57,9 @@ export default ({template: template}) => {
         for (let i in pfeVars) {
             str += i + `: {count: ${pfeVars[i]['count']}, fee: ${pfeVars[i]['fee']}},\n`
         }
+        for (let i in pfeVars.WhitePaper) {
+            str += i + `: {count: ${pfeVars.WhitePaper[i]['count']}, fee: ${pfeVars.WhitePaper[i]['fee']}},\n`
+        }
         str += '}'
         return template(`var pfeVars = ${str}`, {
             sourceType: 'module'
@@ -56,7 +69,7 @@ export default ({template: template}) => {
     return {
         visitor: {
             Program: (path) => {
-                pfeVarsCount(path.type)
+                pfeVarsCount(path.type, false)
                 path.traverse({
                     StringLiteral: (path) => {
                         /**
@@ -69,13 +82,16 @@ export default ({template: template}) => {
                          {giantjs} info  : Visiting StringLiteral : getBalance
                          *
                          */
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
+                        if(pfeVars.WhitePaper.hasOwnProperty(path.node.value)){
+                            pfeVarsCount(false, path.node.value)
+                        }
                     },
                     ExpressionStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     FunctionDeclaration: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                         if (path.node.id.name == '_inherits') {
                             /**
                              *  Some place for injection pfeVars
@@ -84,7 +100,7 @@ export default ({template: template}) => {
                         }
                     },
                     Identifier: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                         /**
                          *  its possible use like White Paper marker
                          *
@@ -100,82 +116,82 @@ export default ({template: template}) => {
                          */
                     },
                     MemberExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ObjectProperty: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ObjectExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     CallExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     VariableDeclarator: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     VariableDeclaration: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     BinaryExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     UpdateExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     LogicalExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     AssignmentExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     IfStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     BlockStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ForStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ReturnStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     FunctionExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ConditionalExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     UnaryExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     NewExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ThrowStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ThisExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     SequenceExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ArrayExpression: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ForStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     ForInStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     WhileStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                     DoWhileStatement: (path) => {
-                        pfeVarsCount(path.type)
+                        pfeVarsCount(path.type, false)
                     },
                 })
                 injectionPath.insertAfter(pfeCall(pfeVars))
