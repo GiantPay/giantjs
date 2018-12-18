@@ -36,7 +36,11 @@ export default (name, cmd) => {
 
         giantNode.deployContract(accounts[0], giantContract.getCode())
             .then((contract) => {
-                logger.info(contract)
+                let node = new GiantNode()
+                let accounts = node.getAccounts()
+                logger.info('Your account : ' + accounts[0])
+                logger.info('Your balance : ' + node.getBalance() + ' GIC')
+                logger.info('Your contract ' + giantContract.name + ' was deployed')
             })
             .catch((err) => {
                 logger.error(err)

@@ -90,7 +90,7 @@ export default class Wallet extends EventEmitter {
     }
 
     getBalance () {
-        return 0
+        return 1000
     }
 
     _loadUnpentOutputs () {
