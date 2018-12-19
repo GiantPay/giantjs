@@ -9,7 +9,7 @@ import levelup from 'levelup'
 
 export default class Chain extends EventEmitter {
 
-    constructor (options) {
+    constructor(options) {
         super()
 
         const self = this
@@ -50,7 +50,7 @@ export default class Chain extends EventEmitter {
         })
     }
 
-    initialize () {
+    initialize() {
         const self = this
 
         if (!this.genesis) {
@@ -102,12 +102,12 @@ export default class Chain extends EventEmitter {
             })
     }
 
-    addBlock (block, callback) {
+    addBlock(block, callback) {
         this.blockQueue.push([block, callback])
         this._processBlockQueue()
     }
 
-    saveMetadata (callback) {
+    saveMetadata(callback) {
         const self = this
         callback = callback || function () {
         }
@@ -126,7 +126,14 @@ export default class Chain extends EventEmitter {
         self.db.putMetadata(metadata, callback)
     }
 
-    startMiner () {
+    getMetadata() {
+        self.db.getMetadata()
+            .then((metadata) => {
+                return metadata
+            })
+    }
+
+    startMiner() {
         logger.info('startMiner')
         if (!this.miner) {
             this.miner = new Miner({
@@ -139,7 +146,7 @@ export default class Chain extends EventEmitter {
         }
     }
 
-    buildGenesisBlock (options) {
+    buildGenesisBlock(options) {
         if (!options) {
             options = {}
         }
@@ -155,13 +162,13 @@ export default class Chain extends EventEmitter {
         return genesis
     }
 
-    stop () {
+    stop() {
         if (this.miner) {
             this.miner.stop()
         }
     }
 
-    _validateMerkleRoot (block) {
+    _validateMerkleRoot(block) {
         const transactions = this.db.getTransactionsFromBlock(block)
         const merkleRoot = this.db.getMerkleRoot(transactions)
         if (!merkleRoot || block.merkleRoot === merkleRoot) {
@@ -170,7 +177,7 @@ export default class Chain extends EventEmitter {
         return new Error('Invalid merkleRoot for block, expected merkleRoot to equal: ' + merkleRoot + ' instead got: ' + block.merkleRoot)
     }
 
-    _processBlockQueue () {
+    _processBlockQueue() {
         var self = this
 
         if (self.processingBlockQueue) {
@@ -196,7 +203,7 @@ export default class Chain extends EventEmitter {
         )
     }
 
-    _processBlock (block, callback) {
+    _processBlock(block, callback) {
         const merkleError = this._validateMerkleRoot(block)
         if (merkleError) {
             return callback(merkleError)
@@ -210,7 +217,7 @@ export default class Chain extends EventEmitter {
         )
     }
 
-    _writeBlock (block, callback) {
+    _writeBlock(block, callback) {
         const self = this
 
         self.db.getBlock(block.hash)
@@ -232,7 +239,7 @@ export default class Chain extends EventEmitter {
             })
     }
 
-    _updateTip (block, callback) {
+    _updateTip(block, callback) {
         logger.info(`Chain updating the tip for [${block.height}]`, block.toObject())
         const self = this
 
@@ -258,12 +265,12 @@ export default class Chain extends EventEmitter {
         )
     }
 
-    _validateBlock (block, callback) {
+    _validateBlock(block, callback) {
         logger.info(`Chain is validating block: ${block.hash}`)
         block.validate(this, callback)
     }
 
-    _onMempoolBlock () {
+    _onMempoolBlock() {
         var self = this
         this.addBlock(block, (err) => {
             if (err) {
