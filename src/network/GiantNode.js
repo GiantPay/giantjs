@@ -1,5 +1,5 @@
 import MockClient from './development/MockClient'
-
+import logger from '../logger'
 import EventEmitter from 'events'
 
 /**
@@ -7,7 +7,7 @@ import EventEmitter from 'events'
  */
 export default class GiantNode extends EventEmitter {
 
-    constructor (options) {
+    constructor(options) {
         super()
 
         const self = this
@@ -25,27 +25,49 @@ export default class GiantNode extends EventEmitter {
         })
     }
 
-    getAccounts () {
+    getAccounts() {
         return this._client.getAccounts()
     }
 
-    getBalance () {
+    getBalance() {
         return this._client.getBalance()
     }
 
-    sendFrom (from, to, amount) {
+    sendFrom(from, to, amount) {
         return this._client.sendFrom(from, to, amount)
     }
 
-    deployContract (from, code) {
-       return this._client.deployContract(from, code, {})
+    deployContract(from, code) {
+        return this._client.deployContract(from, code,)
     }
 
-    callContract (from, contractAddress, method, args) {
+    callContract(from, contractAddress, method, args) {
         return this._client.callContract(from, contractAddress, method, args)
     }
 
-    stop () {
+    getInfo() {
+        this._client.getDB().getMetadata()
+            .then((metadata) => {
+                logger.info('Blocks : ' + metadata.tipHeight)
+
+                logger.info('Hashes : ')
+                console.log(Object.keys(metadata.cache.hashes))
+
+                logger.info('Accounts : ')
+                console.log(this._client.getAccounts())
+
+                this._client.getDB().getBlock(metadata.tip)
+                    .then((block) => {
+                        logger.info('LAST BLOCK v' + block.version + ' : ' + metadata.tip)
+
+                        logger.info('Prev hash : ' + block.prevHash)
+
+                        logger.info('Merkel root  : ' + block.merkleRoot)
+                    })
+            })
+    }
+
+    stop() {
         this._client.stop()
     }
 }

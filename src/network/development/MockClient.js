@@ -63,6 +63,10 @@ export default class MockClient extends EventEmitter {
         return this.wallet.getBalance()
     }
 
+    getDB() {
+        return this.db
+    }
+
     sendFrom(from, to, amount) {
         return new Promise((resolve, reject) => {
 
