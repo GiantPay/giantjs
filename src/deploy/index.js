@@ -1,6 +1,7 @@
 import GiantNode from '../network/GiantNode'
 import GiantContract from '../compile/GiantContract'
 import logger from '../logger'
+import GiantPath from "../path";
 
 
 export default (name, cmd) => {
@@ -36,9 +37,9 @@ export default (name, cmd) => {
 
         giantNode.deployContract(accounts[0], giantContract.getCode())
             .then((contract) => {
-                logger.info('Your account : ' + accounts[0])
-                logger.info('Your balance : ' + giantNode.getBalance() + ' GIC')
-                logger.info('Your contract ' + giantContract.name + ' was deployed')
+                logger.info(`Your account :  ${accounts[0]}`)
+                logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)
+                logger.info(`Your contract  :  ${giantContract.name} was deployed`)
             })
             .catch((err) => {
                 logger.error(err)

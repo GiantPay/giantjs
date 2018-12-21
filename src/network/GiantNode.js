@@ -9,7 +9,7 @@ export default class GiantNode extends EventEmitter {
 
     constructor(options) {
         super()
-
+        this.options = options
         const self = this
         // TODO need to set up network parameters from giantjs-config.js
         // TODO need to set up current network settings from console arguments
@@ -45,24 +45,29 @@ export default class GiantNode extends EventEmitter {
         return this._client.callContract(from, contractAddress, method, args)
     }
 
-    getInfo() {
+    getInfo(options) {
+        //console.log(this.options)
         this._client.getDB().getMetadata()
             .then((metadata) => {
-                logger.info('Blocks : ' + metadata.tipHeight)
+                logger.info(`Network ${options.network} ${metadata.tipHeight} Blocks`)
 
-                logger.info('Hashes : ')
+                logger.info(`Hashes`)
                 console.log(Object.keys(metadata.cache.hashes))
 
-                logger.info('Accounts : ')
+                logger.info(`Accounts`)
                 console.log(this._client.getAccounts())
 
                 this._client.getDB().getBlock(metadata.tip)
                     .then((block) => {
-                        logger.info('LAST BLOCK v' + block.version + ' : ' + metadata.tip)
-
-                        logger.info('Prev hash : ' + block.prevHash)
-
-                        logger.info('Merkel root  : ' + block.merkleRoot)
+                        logger.info(`
+                        LAST BLOCK v${block.version} : ${metadata.tip}
+                        --------------------------------------------------------------------------------
+                        Prev hash : ${block.prevHash}
+                        Merkel root : ${block.merkleRoot} 
+                        Height: : ${block.height} 
+                        Timestamp : ${block.timestamp} 
+                        Nonce : ${block.nonce}
+                        `)
                     })
             })
     }
