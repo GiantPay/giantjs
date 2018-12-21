@@ -78,7 +78,6 @@ export default class GiantContract {
                 console.log(data)
                 logger.warn(`Succeseful! Contract ${that.name} was compiled ${GiantPath.getTargetContractFileRunTime(that.name)}`)
             })
-            console.log(this.getCode())
         }
     }
 

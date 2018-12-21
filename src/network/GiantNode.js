@@ -37,8 +37,8 @@ export default class GiantNode extends EventEmitter {
         return this._client.sendFrom(from, to, amount)
     }
 
-    deployContract(from, code) {
-        return this._client.deployContract(from, code,)
+    deployContract(from, contract) {
+        return this._client.deployContract(from, contract)
     }
 
     callContract(from, contractAddress, method, args) {
@@ -46,7 +46,7 @@ export default class GiantNode extends EventEmitter {
     }
 
     getInfo(options) {
-        //console.log(this.options)
+        console.log(this.options)
         this._client.getDB().getMetadata()
             .then((metadata) => {
                 logger.info(`Network ${options.network} ${metadata.tipHeight} Blocks`)
@@ -59,6 +59,7 @@ export default class GiantNode extends EventEmitter {
 
                 this._client.getDB().getBlock(metadata.tip)
                     .then((block) => {
+                        //console.log(block.data)
                         logger.info(`
                         LAST BLOCK v${block.version} : ${metadata.tip}
                         --------------------------------------------------------------------------------

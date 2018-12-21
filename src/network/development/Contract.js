@@ -10,14 +10,14 @@ export default class Contract {
         if (!options) {
             throw new TypeError('"options" is expected')
         }
-        if (!options.hasOwnProperty('code') || !options.code || options.code.length <= 2) {
-            throw new TypeError('"code" is expected')
+        if (!options.hasOwnProperty('contract') || !options.contract || options.contract.length <= 2) {
+            throw new TypeError('"contract" is expected')
         }
         if (!options.hasOwnProperty('feePrice')) {
             throw new TypeError('"feePrice" is expected')
         }
 
-        this.code = options.code.es6
+        this.code = options.contract.code.es6
         this.feePrice = options.feePrice
 
         const result = transform(this.code, {

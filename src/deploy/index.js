@@ -33,7 +33,7 @@ export default (name, cmd) => {
         // TODO it's necessary to take from the parameters
         const accounts = giantNode.getAccounts()
 
-        giantNode.deployContract(accounts[0], giantContract.getCode())
+        giantNode.deployContract(accounts[0], giantContract)
             .then((contract) => {
                 logger.info(`Your account :  ${accounts[0]}`)
                 logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)

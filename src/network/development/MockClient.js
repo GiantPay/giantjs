@@ -73,7 +73,7 @@ export default class MockClient extends EventEmitter {
         })
     }
 
-    deployContract(from, code, options) {
+    deployContract(from, contract, options) {
         const self = this
 
         return new Promise((resolve, reject) => {
@@ -83,11 +83,11 @@ export default class MockClient extends EventEmitter {
                     options = {}
                 }
 
-                options.code = code
+                options.code = contract.code
                 options.feePrice = options.feePrice || 0.0000001
 
 
-                const transaction = Transaction.deployContract(code)
+                const transaction = Transaction.deployContract(contract)
                 transaction.inputs = options.inputs || []
                 transaction.outputs = options.outputs || []
 

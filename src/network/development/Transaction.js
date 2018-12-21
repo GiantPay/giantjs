@@ -10,7 +10,7 @@ export default class Transaction {
         }
 
         this.type = options.type || TransactionType.TRANSFER
-        this.data = options.code
+        this.data = options.contract
 
         this.inputs = options.inputs || []
         this.outputs = options.outputs || []
@@ -44,8 +44,9 @@ export default class Transaction {
         return new Transaction({type: TransactionType.TRANSFER})
     }
 
-    static deployContract(code) {
-        return new Transaction({type: TransactionType.CONTRACT_DEPLOY, code: code})
+    static deployContract(contract) {
+        console.log(contract)
+        return new Transaction({type: TransactionType.CONTRACT_DEPLOY, contract: contract})
     }
 
     static callContract() {
@@ -77,7 +78,7 @@ export default class Transaction {
     validate() {
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
-                const contract = new Contract({code: this.data, feePrice: this.feePrice}) // Deployed contract object
+                const contract = new Contract({contract: this.data, feePrice: this.feePrice}) // Deployed contract object
                 contract.name = 'MetaCoin'
                 contract.code = this.data
                 contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
