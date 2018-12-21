@@ -1,8 +1,6 @@
 import GiantNode from '../network/GiantNode'
 import GiantContract from '../compile/GiantContract'
 import logger from '../logger'
-import GiantPath from "../path";
-
 
 export default (name, cmd) => {
     const giantNode = new GiantNode({
