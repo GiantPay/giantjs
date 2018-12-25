@@ -44,9 +44,9 @@ export default class Transaction {
         return new Transaction({type: TransactionType.TRANSFER})
     }
 
-    static deployContract(contract) {
-        console.log(contract)
-        return new Transaction({type: TransactionType.CONTRACT_DEPLOY, contract: contract})
+    static deployContract(options) {
+        options.type = TransactionType.CONTRACT_DEPLOY
+        return new Transaction(options)
     }
 
     static callContract() {

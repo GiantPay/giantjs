@@ -83,11 +83,13 @@ export default class MockClient extends EventEmitter {
                     options = {}
                 }
 
+                options.data = contract
                 options.code = contract.code
                 options.feePrice = options.feePrice || 0.0000001
 
 
-                const transaction = Transaction.deployContract(contract)
+
+                const transaction = Transaction.deployContract(options)
                 transaction.inputs = options.inputs || []
                 transaction.outputs = options.outputs || []
 
