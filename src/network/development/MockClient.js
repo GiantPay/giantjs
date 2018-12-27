@@ -73,7 +73,7 @@ export default class MockClient extends EventEmitter {
         })
     }
 
-    deployContract(from, contract, options) {
+    deployContract(from, options) {
         const self = this
 
         return new Promise((resolve, reject) => {
@@ -82,12 +82,8 @@ export default class MockClient extends EventEmitter {
                 if (!options) {
                     options = {}
                 }
-
-                options.data = contract
-                options.code = contract.code
+                
                 options.feePrice = options.feePrice || 0.0000001
-
-
 
                 const transaction = Transaction.deployContract(options)
                 transaction.inputs = options.inputs || []
@@ -102,7 +98,6 @@ export default class MockClient extends EventEmitter {
                         contract.name = 'MetaCoin'
                         contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
                         contract.fee = 10
-                        contract.code = options.code
                         contract.methods = {
                             buyCoin: [],
                             sendCoin: ['receiver'],

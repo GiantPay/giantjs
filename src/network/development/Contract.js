@@ -7,17 +7,18 @@ import ContractCodeReflection from '../../babel/babel-plugin-contract-code-refle
 export default class Contract {
 
     constructor(options) {
+
         if (!options) {
             throw new TypeError('"options" is expected')
         }
-        if (!options.hasOwnProperty('contract') || !options.contract || options.contract.length <= 2) {
-            throw new TypeError('"contract" is expected')
+        if (!options.hasOwnProperty('contractName') || !options.contractName) {
+            throw new TypeError('"contractName" is expected')
         }
         if (!options.hasOwnProperty('feePrice')) {
             throw new TypeError('"feePrice" is expected')
         }
 
-        this.code = options.contract.code.es6
+        this.code = options.contractCode.es6
         this.feePrice = options.feePrice
 
         const result = transform(this.code, {

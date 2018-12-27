@@ -10,8 +10,13 @@ export default class Transaction {
         }
 
         this.type = options.type || TransactionType.TRANSFER
-        this.data = options.contract
-
+        if (typeof options.data != 'undefined') {
+            let contract = {}
+            contract.contractName = options.data[0].contractName
+            contract.contractCode = options.data[0].contractCode
+            contract.contractAddress = options.data[0].contractAddress
+            this.data = [contract]
+        }
         this.inputs = options.inputs || []
         this.outputs = options.outputs || []
 
@@ -78,7 +83,8 @@ export default class Transaction {
     validate() {
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
-                const contract = new Contract({contract: this.data, feePrice: this.feePrice}) // Deployed contract object
+                const contract = new Contract({})
+
                 contract.name = 'MetaCoin'
                 contract.code = this.data
                 contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
