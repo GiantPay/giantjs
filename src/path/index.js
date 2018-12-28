@@ -36,7 +36,7 @@ const cleanPath = (targetPath, root) => {
 // FIXME
 const currentPath = process.cwd()
 const contractPath = touchPath(path.resolve(currentPath, './contracts'))
-const buildPath = touchPath(path.resolve(currentPath, '../build/contracts/'))
+const buildPath = touchPath(path.resolve(currentPath, './build/contracts/'))
 const networkPath = touchPath(path.resolve(currentPath, './networks'))
 
 export default {

@@ -28,9 +28,8 @@ $ npm run build
 Compile your contracts, deploy those contracts to the network.
 
 ```
-cd ./dist
-node giant create contract {ContractName}
-node giant deploy {ContractName}
+node dist/giant create contract {ContractName}
+node dist/giant deploy {ContractName}
 ```
 
 ### Tests

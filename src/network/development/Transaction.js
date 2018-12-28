@@ -10,18 +10,21 @@ export default class Transaction {
         }
 
         this.type = options.type || TransactionType.TRANSFER
-        if (typeof options.data != 'undefined') {
-            let contract = {}
-            contract.contractName = options.data[0].contractName
-            contract.contractCode = options.data[0].contractCode
-            contract.contractAddress = options.data[0].contractAddress
-            this.data = [contract]
-        }
-        this.inputs = options.inputs || []
-        this.outputs = options.outputs || []
 
         //TODO count
         this.feePrice = options.feePrice || 10
+
+        if (typeof options.contractName != 'undefined') {
+            let contract = {}
+            contract.contractName = options.contractName
+            contract.contractCode = options.contractCode
+            contract.contractAddress = options.contractAddress
+            contract.feePrice = this.feePrice
+            this.data = [contract]
+        }
+
+        this.inputs = options.inputs || []
+        this.outputs = options.outputs || []
 
         const hashProperty = {
             configurable: false,
@@ -83,10 +86,10 @@ export default class Transaction {
     validate() {
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
-                const contract = new Contract({})
-
+                let options = this.data[0]
+                const contract = new Contract(options)
                 contract.name = 'MetaCoin'
-                contract.code = this.data
+                contract.code = this.data[0].contractCode
                 contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
                 contract.fee = 10
                 contract.methods = {

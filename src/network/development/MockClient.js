@@ -78,11 +78,11 @@ export default class MockClient extends EventEmitter {
 
         return new Promise((resolve, reject) => {
             try {
-
+                
                 if (!options) {
                     options = {}
                 }
-                
+
                 options.feePrice = options.feePrice || 0.0000001
 
                 const transaction = Transaction.deployContract(options)

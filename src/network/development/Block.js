@@ -19,9 +19,14 @@ export default class Block {
         if (!Array.isArray(this.data)) {
             throw new TypeError('"data" is expected to be an array')
         }
-        if (this.data.length && !(this.data[0] instanceof Transaction)) {
+        /***
+         *  TODO :
+         *  some losses when store like array of instances of Transaction
+         *
+         if (this.data.length && !(this.data[0] instanceof Transaction)) {
             this.data = this.data.map(tx => new Transaction(tx))
-        }
+        }*/
+
         this.height = options.height || 0
         this.bits = options.bits || 0
         this.nonce = options.nonce || 0
