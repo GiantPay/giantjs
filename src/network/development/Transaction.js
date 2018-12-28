@@ -21,6 +21,7 @@ export default class Transaction {
             contract.contractAddress = options.contractAddress
             contract.feePrice = this.feePrice
             this.data = [contract]
+            //let contract = new Contract(options)
         }
 
         this.inputs = options.inputs || []

@@ -3,7 +3,7 @@ import Transaction from './Transaction'
 
 export default class Block {
 
-    constructor (options) {
+    constructor(options) {
         if (!options) {
             throw new TypeError('"options" is expected')
         }
@@ -25,7 +25,31 @@ export default class Block {
          *
          if (this.data.length && !(this.data[0] instanceof Transaction)) {
             this.data = this.data.map(tx => new Transaction(tx))
-        }*/
+         }
+
+         *
+         * this.data = 2 transaction transfer, deploy
+         *
+
+
+         { type: 'transfer',
+             data: [ { feePrice: 10 } ],
+             inputs: [],
+             outputs: [] },
+         { type: 'deploy',
+             data:
+             [ { contractName: 'M',
+                 contractCode:
+
+                 ...
+          *
+          *
+          *
+
+          let tx = new Transaction(this.data[1])
+          this.data = [tx]
+
+          */
 
         this.height = options.height || 0
         this.bits = options.bits || 0
@@ -42,11 +66,11 @@ export default class Block {
         })
     }
 
-    static fromJson (json) {
+    static fromJson(json) {
         return new Block(JSON.parse(json))
     }
 
-    toObject () {
+    toObject() {
         return {
             hash: this.hash,
             prevHash: this.prevHash,
@@ -60,7 +84,7 @@ export default class Block {
         }
     }
 
-    toHeader () {
+    toHeader() {
         return {
             version: this.version,
             prevHash: this.prevHash,
@@ -71,19 +95,19 @@ export default class Block {
         }
     }
 
-    toJson () {
+    toJson() {
         return JSON.stringify(this.toObject())
     }
 
-    headerToJson () {
+    headerToJson() {
         return JSON.stringify(this.toHeader())
     }
 
-    getHash () {
+    getHash() {
         return Hash.sha256sha256(this.headerToJson())
     }
 
-    validate (chain, callback) {
+    validate(chain, callback) {
         const self = this
 
         chain.db.getBlock(self.prevHash)
