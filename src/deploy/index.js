@@ -36,8 +36,9 @@ export default (name, cmd) => {
         options.contractCode = giantContract.code
         options.contractName = giantContract.name
         options.contractAddress = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
+        options.from = accounts[0]
 
-        giantNode.deployContract(accounts[0], options)
+            giantNode.deployContract(options)
             .then((contract) => {
                 logger.info(`Your account :  ${accounts[0]}`)
                 logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)

@@ -37,8 +37,8 @@ export default class GiantNode extends EventEmitter {
         return this._client.sendFrom(from, to, amount)
     }
 
-    deployContract(from, options) {
-        return this._client.deployContract(from, options)
+    deployContract(options) {
+        return this._client.deployContract(options)
     }
 
     callContract(from, contractAddress, method, args) {
