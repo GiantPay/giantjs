@@ -1,9 +1,10 @@
-import fs from 'fs'
 import {transformFileSync, transform} from 'babel-core'
-import UglifyJS from 'uglify-js'
-import GiantPath from '../path'
 import ContractValidator from '../babel/babel-plugin-contract-validator'
 import ContractFee from '../babel/babel-plugin-contract-fee'
+import ContractCodeReflection from '../babel/babel-plugin-contract-code-reflection'
+import fs from 'fs'
+import UglifyJS from 'uglify-js'
+import GiantPath from '../path'
 import figlet from 'figlet'
 import logger from '../logger'
 
@@ -99,6 +100,20 @@ export default class GiantContract {
             console.log(data)
             logger.warn(`Contract ${that.name} is valid ${GiantPath.getContractFile(that.name)}`)
         })
+    }
+
+
+    getMetadata() {
+        const result = transform(this.code.es6, {
+            plugins: [
+                [ContractCodeReflection]
+            ],
+            ast: true,
+            comments: false,
+            code: false
+        })
+        this.metadata = result.ast.metadata
+        return this.metadata
     }
 
     getCode() {

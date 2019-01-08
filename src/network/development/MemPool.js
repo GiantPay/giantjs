@@ -13,6 +13,9 @@ export default class MemPool extends EventEmitter {
     addTransaction(transaction) {
         const self = this
 
+        console.log('------------------------MemPool addTransaction(transaction) ------------------------')
+        console.log('transaction.id', transaction.id)
+
         //TODO   transaction.validate()
 
         return new Promise((resolve, reject) => {

@@ -85,25 +85,10 @@ export default class MockClient extends EventEmitter {
                 transaction.outputs = options.outputs || []
 
                 this.db.memPool.addTransaction(transaction)
-                    .then((tx) => {
-                        let contract = new Contract(options)
-                        const fee = contract.getConstructorFee({
-                            loops: 10
-                        })
-                        contract.name = 'MetaCoin'
-                        contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
-                        contract.fee = 10
-                        contract.methods = {
-                            buyCoin: [],
-                            sendCoin: ['receiver'],
-                            getBalance: ['address']
-                        }
-                        resolve(contract)
-                    })
+                    /*
                     .then(() => {
                         console.log(this.db.memPool.getTransactions())
-                    })
-
+                    })*/
 
                     .catch(function (error) {
                         console.log(error)

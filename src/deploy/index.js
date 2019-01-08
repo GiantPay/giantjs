@@ -36,6 +36,7 @@ export default (name, cmd) => {
         options.contractCode = giantContract.code
         options.contractName = giantContract.name
         options.contractAddress = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
+        options.metadata = giantContract.getMetadata()
         options.from = accounts[0]
 
             giantNode.deployContract(options)

@@ -5,9 +5,9 @@ import Contract from './Contract'
 export default class Transaction {
 
     constructor(options) {
-        if (!options) {
-            options = {}
-        }
+        this.options = options
+        console.log('------------------------Transaction constructor(options)------------------------')
+        console.log(options)
 
         this.type = options.type || TransactionType.TRANSFER
 
@@ -15,13 +15,8 @@ export default class Transaction {
         this.feePrice = options.feePrice || 10
 
         if (typeof options.contractName != 'undefined') {
-            let contract = {}
-            contract.contractName = options.contractName
-            contract.contractCode = options.contractCode
-            contract.contractAddress = options.contractAddress
-            contract.feePrice = this.feePrice
+            let contract = new Contract(options)
             this.data = [contract]
-            //let contract = new Contract(options)
         }
 
         this.inputs = options.inputs || []
@@ -85,19 +80,11 @@ export default class Transaction {
     }
 
     validate() {
+
+        // TODO : validate
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
-                let options = this.data[0]
-                const contract = new Contract(options)
-                contract.name = 'MetaCoin'
-                contract.code = this.data[0].contractCode
-                contract.address = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
-                contract.fee = 10
-                contract.methods = {
-                    buyCoin: [],
-                    sendCoin: ['receiver'],
-                    getBalance: ['address']
-                }
+                const contract = new Contract(this.options)
                 resolve(contract)
             } else if (this.type === 'call') {
                 // TODO call contract method
