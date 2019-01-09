@@ -20,7 +20,7 @@ export default class Contract {
             throw new TypeError('"feePrice" is expected')
         }
 
-        this.code = options.contractCode.es6
+        this.code = options.contractCode
         this.feePrice = options.feePrice
         this.metadata = options.metadata
 

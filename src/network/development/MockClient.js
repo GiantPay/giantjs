@@ -85,11 +85,11 @@ export default class MockClient extends EventEmitter {
                 transaction.outputs = options.outputs || []
 
                 this.db.memPool.addTransaction(transaction)
-                    /*
-                    .then(() => {
-                        console.log(this.db.memPool.getTransactions())
-                    })*/
 
+                    .then(() => {
+                        console.log('Add transaction to memPool. Success.')
+                        //console.log(this.db.memPool.getTransactions())
+                    })
                     .catch(function (error) {
                         console.log(error)
                         reject()

@@ -138,9 +138,9 @@ export default class Database extends EventEmitter {
     validateBlockData (block, callback) {
         const self = this
         const transactions = self.getTransactionsFromBlock(block)
-
         async.each(transactions, (transaction, done) => {
             transaction.validate().finally(() => done())
+            transaction.options = ['contract valid']
         }, callback)
     }
 

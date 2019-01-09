@@ -19,38 +19,6 @@ export default class Block {
         if (!Array.isArray(this.data)) {
             throw new TypeError('"data" is expected to be an array')
         }
-        /***
-         *  TODO :
-         *  some losses when store like array of instances of Transaction
-         *
-         if (this.data.length && !(this.data[0] instanceof Transaction)) {
-            this.data = this.data.map(tx => new Transaction(tx))
-         }
-
-         *
-         * this.data = 2 transaction transfer, deploy
-         *
-
-
-         { type: 'transfer',
-             data: [ { feePrice: 10 } ],
-             inputs: [],
-             outputs: [] },
-         { type: 'deploy',
-             data:
-             [ { contractName: 'M',
-                 contractCode:
-
-                 ...
-          *
-          *
-          *
-
-          let tx = new Transaction(this.data[1])
-          this.data = [tx]
-
-          */
-
         this.height = options.height || 0
         this.bits = options.bits || 0
         this.nonce = options.nonce || 0
