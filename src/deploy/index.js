@@ -1,12 +1,13 @@
+import giantConfig from '../config'
 import GiantNode from '../network/GiantNode'
 import GiantContract from '../compile/GiantContract'
 import logger from '../logger'
 
 export default (name, cmd) => {
     const giantNode = new GiantNode({
-        network: 'development',
+        network: giantConfig.network,
         clean: cmd.clean,
-        mining: true
+        mining: giantConfig.mining
     })
 
     giantNode.on('ready', () => {

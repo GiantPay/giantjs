@@ -1,3 +1,4 @@
+import giantConfig from '../../config'
 import Block from './Block'
 import logger from '../../logger'
 
@@ -13,7 +14,7 @@ export default class Miner {
         this.memPool = options.memPool
         this.wallet = options.wallet
         this.started = false
-        this.blockTime = options.blockTime || 500
+        this.blockTime = options.blockTime || giantConfig.blockTime
 
         this.chain.on('genesis', () => {
             self.wallet.premine()

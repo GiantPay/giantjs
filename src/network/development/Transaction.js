@@ -1,3 +1,4 @@
+import giantConfig from '../../config'
 import Hash from './Hash'
 import TransactionType from './TransactionType'
 import Contract from './Contract'
@@ -12,7 +13,7 @@ export default class Transaction {
         this.type = options.type || TransactionType.TRANSFER
 
         //TODO count
-        this.feePrice = options.feePrice || 10
+        this.feePrice = options.feePrice || giantConfig.feePrice
 
         if (typeof options.contractName != 'undefined') {
             let contract = new Contract(options)
