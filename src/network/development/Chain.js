@@ -116,14 +116,30 @@ export default class Chain extends EventEmitter {
             return callback()
         }
 
-        const metadata = {
-            tip: self.tip ? self.tip.hash : null,
-            tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
-            cache: self.cache
-        }
+        self.db.getMetadata()
+            .then((metadata) => {
 
-        self.lastSavedMetadata = new Date()
-        self.db.putMetadata(metadata, callback)
+                self.db.getBlock(self.tip.hash)
+                    .then((block) => {
+
+                        let contractsArr = []
+                        if (typeof metadata != 'undefined' && typeof metadata.contracts != 'undefined') {
+                            let contractsArr = metadata.contracts
+                        }
+
+                        contractsArr.push(block.data[0].data[0].metadata)
+
+                        const metadata = {
+                            tip: self.tip ? self.tip.hash : null,
+                            tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
+                            cache: self.cache,
+                            contracts: contractsArr
+                        }
+
+                        self.lastSavedMetadata = new Date()
+                        self.db.putMetadata(metadata, callback)
+                    })
+            })
     }
 
     getMetadata() {
