@@ -125,6 +125,7 @@ export default class Chain extends EventEmitter {
                 }
 
                 let contractId = '0x' + Hash.sha256(metadata.contracts.length)
+                let blockId = metadata.tip
 
                 self.db.getBlock(self.tip.hash)
                     .then((block) => {
@@ -133,7 +134,7 @@ export default class Chain extends EventEmitter {
                         let contractMetadata = block.data[0].data[0].metadata
 
                         contractMetadata.version = "1.0"
-                        contractMetadata.block = "e0c809c23780435ec5248172f869ba0bb6967425e6679d65c094557b7895c04b"
+                        contractMetadata.block = blockId
                         contractMetadata.txid = "13239077a4754a5c41c2621f67efbb0b10bc67babaf9e369ffd58f88202a7b67"
                         contractMetadata.owner = "GUuf1RCuFmLAbyNFT5WifEpZTnLYk2rtVd"
                         contractMetadata.initialized = false
