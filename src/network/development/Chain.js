@@ -1,5 +1,6 @@
 import Miner from './Miner'
 import Block from './Block'
+import Hash from './Hash'
 import logger from '../../logger'
 
 import EventEmitter from 'events'
@@ -118,16 +119,32 @@ export default class Chain extends EventEmitter {
 
         self.db.getMetadata()
             .then((metadata) => {
+                let contractsArr = []
+                if (typeof metadata != 'undefined' && typeof metadata.contracts != 'undefined') {
+                    contractsArr = metadata.contracts
+                }
+
+                let contractId = '0x' + Hash.sha256(metadata.contracts.length)
 
                 self.db.getBlock(self.tip.hash)
                     .then((block) => {
+                        let contract = {}
 
-                        let contractsArr = []
-                        if (typeof metadata != 'undefined' && typeof metadata.contracts != 'undefined') {
-                            let contractsArr = metadata.contracts
+                        let contractMetadata = block.data[0].data[0].metadata
+
+                        contractMetadata.version = "1.0"
+                        contractMetadata.block = "e0c809c23780435ec5248172f869ba0bb6967425e6679d65c094557b7895c04b"
+                        contractMetadata.txid = "13239077a4754a5c41c2621f67efbb0b10bc67babaf9e369ffd58f88202a7b67"
+                        contractMetadata.owner = "GUuf1RCuFmLAbyNFT5WifEpZTnLYk2rtVd"
+                        contractMetadata.initialized = false
+                        contractMetadata.description = "sandbox Contract"
+                        contractMetadata.dependencies = {
+                            "giant-exchange-api": "^0.1.0",
+                            "some-giant-api": "^0.3.6"
                         }
 
-                        contractsArr.push(block.data[0].data[0].metadata)
+                        contract[contractId] = contractMetadata
+                        contractsArr.push(contract)
 
                         const metadata = {
                             tip: self.tip ? self.tip.hash : null,
@@ -135,6 +152,8 @@ export default class Chain extends EventEmitter {
                             cache: self.cache,
                             contracts: contractsArr
                         }
+
+                        //console.log(contractsArr)
 
                         self.lastSavedMetadata = new Date()
                         self.db.putMetadata(metadata, callback)
