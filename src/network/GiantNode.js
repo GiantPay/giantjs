@@ -57,9 +57,16 @@ export default class GiantNode extends EventEmitter {
                 logger.info(`Accounts`)
                 console.log(this._client.getAccounts())
 
+                logger.info(`Contracts ${metadata.contracts.length}`)
+                for (var c in metadata.contracts) {
+                    for (var k in metadata.contracts[c]) {
+                        logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
+                    }
+
+                }
                 this._client.getDB().getBlock(metadata.tip)
                     .then((block) => {
-                        console.log(block)
+                        //console.log(block)
                         logger.info(`
                         LAST BLOCK v${block.version} : ${metadata.tip}
                         --------------------------------------------------------------------------------
