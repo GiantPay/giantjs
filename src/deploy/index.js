@@ -39,7 +39,6 @@ export default (name, cmd) => {
         options.contractAddress = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
         options.metadata = giantContract.getMetadata()
         options.from = accounts[0]
-
             giantNode.deployContract(options)
             .then((contract) => {
                 logger.info(`Your account :  ${accounts[0]}`)

@@ -1,6 +1,7 @@
 import MockClient from './development/MockClient'
 import logger from '../logger'
 import EventEmitter from 'events'
+import vm from 'vm'
 
 /**
  * Encapsulates all methods of working with the Giant network
@@ -10,6 +11,8 @@ export default class GiantNode extends EventEmitter {
     constructor(options) {
         super()
         this.options = options
+        this.vm = vm
+        this.contractCalls = new Map()
         const self = this
         // TODO need to set up network parameters from giantjs-config.js
         // TODO need to set up current network settings from console arguments
@@ -41,8 +44,65 @@ export default class GiantNode extends EventEmitter {
         return this._client.deployContract(options)
     }
 
+    mountModule(contractAddress) {
+        const m = require('module')
+        const moduleName = `GMD_${contractAddress}`
+
+        //TODO: get code from chain
+        const code = '"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var _createClass=function(){function o(e,t){for(var n=0;n<t.length;n++){var o=t[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(e,o.key,o)}}return function(e,t,n){return t&&o(e.prototype,t),n&&o(e,n),e}}(),_GiantContract=require("../../dist/compile/GiantContract"),_GiantContract2=_interopRequireDefault(_GiantContract);function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function _possibleConstructorReturn(e,t){if(!e)throw new ReferenceError("this hasn\'t been initialised - super() hasn\'t been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function _inherits(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}var pfeVars={Program:{count:1,fee:10},StringLiteral:{count:10,fee:4},ExpressionStatement:{count:14,fee:4},Identifier:{count:134,fee:4},MemberExpression:{count:24,fee:4},ObjectProperty:{count:9,fee:4},ObjectExpression:{count:5,fee:4},CallExpression:{count:16,fee:4},VariableDeclarator:{count:7,fee:4},VariableDeclaration:{count:7,fee:4},BinaryExpression:{count:8,fee:4},UpdateExpression:{count:1,fee:4},LogicalExpression:{count:7,fee:4},AssignmentExpression:{count:7,fee:4},IfStatement:{count:7,fee:4},BlockStatement:{count:14,fee:4},ForStatement:{count:1,fee:20},FunctionDeclaration:{count:6,fee:4},ReturnStatement:{count:7,fee:4},FunctionExpression:{count:4,fee:4},ConditionalExpression:{count:3,fee:4},UnaryExpression:{count:6,fee:4},NewExpression:{count:3,fee:4},ThrowStatement:{count:3,fee:4},ThisExpression:{count:4,fee:4},SequenceExpression:{count:0,fee:4},ArrayExpression:{count:2,fee:4},ForInStatement:{count:0,fee:20},WhileStatement:{count:0,fee:20},DoWhileStatement:{count:0,fee:20},WhitePaper:{count:void 0,fee:void 0},getBalance:{count:1,fee:20},address:{count:0,fee:20},buyCoin:{count:0,fee:20},sendCoin:{count:0,fee:20}},A=function(e){function t(){_classCallCheck(this,t);var e=_possibleConstructorReturn(this,(t.__proto__||Object.getPrototypeOf(t)).call(this));return e.balances=[],e}return _inherits(t,_GiantContract2.default),_createClass(t,[{key:"getBalance",value:function(){return this.balances}}]),t}();' +
+            'console.log("*** Module ' + moduleName + ' code ***");console.log("Contract fee");console.log(pfeVars);function pfe(e){console.log(e)}exports.default=A;';
+
+        var res = require('vm').runInThisContext(m.wrap(code))(exports, require, module, __filename, __dirname)
+        logger.info(`Mount module ${moduleName}`)
+        return module.exports
+    }
+
+    initContract(contractAddress) {
+        const contractClass = this.mountModule(contractAddress)
+        console.log(contractClass)
+        const contract = new contractClass.default()
+        console.log(contract)
+        return this.getContractMeta(contractAddress)
+    }
+
     callContract(from, contractAddress, method, args) {
         return this._client.callContract(from, contractAddress, method, args)
+    }
+
+    getContractMeta(contractAddress) {
+        const contract = this._client.getDB().getMetadata()
+            .then((metadata) => {
+                logger.info(`Contracts ${metadata.contracts.length}`)
+                for (var c in metadata.contracts) {
+                    for (var k in metadata.contracts[c]) {
+                        if (k == contractAddress) {
+                            if (typeof metadata.contracts[c][k].dependencies == 'object') {
+                                logger.info(`Contract ${metadata.contracts[c][k].className} \n${k} `)
+                                logger.info(`Contract description: ${metadata.contracts[c][k].description}`)
+                                logger.info(`Contract block: ${metadata.contracts[c][k].block}`)
+                                logger.info(`Initialized: ${metadata.contracts[c][k].initialized}`)
+                            }
+                            //registration of the mounted contracts in giantNode.contractCalls Map
+                            this.contractCalls.set(contractAddress, metadata.contracts[c][k])
+                            logger.warn(`Initializing Contract ${metadata.contracts[c][k].className}`)
+                        }
+                    }
+                }
+                return this.contractCalls.get(contractAddress)
+            })
+    }
+
+    getAllContracts(cb) {
+        this._client.getDB().getMetadata()
+            .then((metadata) => {
+                logger.info(`Contracts ${metadata.contracts.length}`)
+                for (var c in metadata.contracts) {
+                    for (var k in metadata.contracts[c]) {
+                        logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
+                    }
+                }
+                cb(metadata.contracts)
+            })
     }
 
     getInfo(options) {
