@@ -19,9 +19,6 @@ export default class GiantContract {
         this.code.es6 = false
         this.code.es5pfe = false
         this.code.runTime = false
-        this.fileName = GiantPath.getContractFile(name)
-        this.targetFileName = GiantPath.getTargetContractFile(name)
-        this.targetFileNameRunTime = GiantPath.getTargetContractFileRunTime(name)
     }
 
     compile() {
@@ -38,11 +35,11 @@ export default class GiantContract {
              * this.code.es6 - the original, readable contract code
              */
 
-            this.code.es6 = fs.readFileSync(this.fileName, 'utf8')
+            this.code.es6 = fs.readFileSync(GiantPath.getContractFile(this.name), 'utf8')
 
-            fs.writeFileSync(this.targetFileName, this.code.es6)
+            fs.writeFileSync(this.GiantPath.getTargetContractFile(this.name), this.code.es6)
 
-            let {code} = transformFileSync(this.fileName)
+            let {code} = transformFileSync(GiantPath.getContractFile(this.name))
 
             /**
              * this.code.es5 - the es5 transpiled code
@@ -66,7 +63,7 @@ export default class GiantContract {
 
             this.code.runTime = UglifyJS.minify(this.code.es5pfe)
 
-            fs.writeFileSync(this.targetFileNameRunTime, this.code.runTime.code, 'utf-8')
+            fs.writeFileSync(this.GiantPath.getTargetContractFileRunTime(this.name), this.code.runTime.code, 'utf-8')
 
             this.compiled = true
 
@@ -85,7 +82,7 @@ export default class GiantContract {
     validate() {
         let that = this
 
-        transformFileSync(this.fileName, {
+        transformFileSync(GiantPath.getContractFile(this.name), {
             'plugins': [ContractValidator]
         })
 
