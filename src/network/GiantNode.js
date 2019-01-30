@@ -61,12 +61,19 @@ export default class GiantNode extends EventEmitter {
     initContract(contractAddress) {
         this.mountModule(contractAddress, (ContractClass) => {
             console.log(ContractClass)
-            let contract = new ContractClass.default("default")
-            console.log(contract.getBalance())
-            console.log(contract)
             this.getContractMeta(contractAddress, (meta) => {
                 logger.info(`Contract ${meta.className} metadata`)
                 console.log(meta)
+                if(typeof global.contracts == 'undefined' ){
+                    global.contracts = []
+                }
+                global.contracts[meta.className] = new ContractClass.default()
+
+                console.log("call method getBalance")
+                console.log(global.contracts[meta.className].getBalance())
+
+                //TODO: create contract method pfe and call that method inside or after wp methods
+                //console.log(global.contracts[meta.className].pfe())
             })
         })
     }
