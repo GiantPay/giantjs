@@ -24,8 +24,12 @@ const createContract = (name) => {
                     '\t\tthis.balances = []\n' +
                     '\t}\n' +
                     '\n' +
-                    '\tgetBalance () {\n' +
+                    '\tgetBalance() {\n' +
                     '\t\treturn this.balances\n' +
+                    '\t}\n' +
+                    '\n' +
+                    '\tgetPfe() {\n' +
+                    '\t\treturn pfeVars\n' +
                     '\t}\n' +
                     '}',
                     (err) => {

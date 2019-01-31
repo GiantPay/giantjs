@@ -19,6 +19,9 @@ export default class GiantContract {
         this.code.es6 = false
         this.code.es5pfe = false
         this.code.runTime = false
+        this.fileName = GiantPath.getContractFile(name)
+        this.targetFileName = GiantPath.getTargetContractFile(name)
+        this.targetFileNameRunTime = GiantPath.getTargetContractFileRunTime(name)
     }
 
     compile() {
@@ -28,18 +31,17 @@ export default class GiantContract {
             /**
              * TODO : pfeDesc - fn for init payment proccess
              */
-
-            let pfeDesc = '\nfunction pfe(pfeVars){console.log(pfeVars)}'
+            let pfeDesc = '\nfunction pfe(pfeVars){ ' + this.name + '.pfeVars = pfeVars; console.log(pfeVars)}'
 
             /**
              * this.code.es6 - the original, readable contract code
              */
 
-            this.code.es6 = fs.readFileSync(GiantPath.getContractFile(this.name), 'utf8')
+            this.code.es6 = fs.readFileSync(this.fileName, 'utf8')
 
-            fs.writeFileSync(this.GiantPath.getTargetContractFile(this.name), this.code.es6)
+            fs.writeFileSync(this.targetFileName, this.code.es6)
 
-            let {code} = transformFileSync(GiantPath.getContractFile(this.name))
+            let {code} = transformFileSync(this.fileName)
 
             /**
              * this.code.es5 - the es5 transpiled code
@@ -63,7 +65,7 @@ export default class GiantContract {
 
             this.code.runTime = UglifyJS.minify(this.code.es5pfe)
 
-            fs.writeFileSync(this.GiantPath.getTargetContractFileRunTime(this.name), this.code.runTime.code, 'utf-8')
+            fs.writeFileSync(this.targetFileNameRunTime, this.code.runTime.code, 'utf-8')
 
             this.compiled = true
 
@@ -82,7 +84,7 @@ export default class GiantContract {
     validate() {
         let that = this
 
-        transformFileSync(GiantPath.getContractFile(this.name), {
+        transformFileSync(this.fileName, {
             'plugins': [ContractValidator]
         })
 
