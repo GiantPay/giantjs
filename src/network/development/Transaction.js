@@ -2,14 +2,16 @@ import giantConfig from '../../config'
 import Hash from './Hash'
 import TransactionType from './TransactionType'
 import Contract from './Contract'
+import logger from "../../logger";
 
 export default class Transaction {
 
     constructor(options) {
         this.options = options
-        console.log('------------------------Transaction constructor(options)------------------------')
-        console.log(options)
-
+        logger.warn(`Transaction constructor(options) debug ${giantConfig.debug}`)
+        if(giantConfig.debug){
+            console.log(options)
+        }
         this.type = options.type || TransactionType.TRANSFER
 
         //TODO count

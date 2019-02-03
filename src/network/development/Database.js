@@ -1,3 +1,4 @@
+import giantConfig from '../../config'
 import GiantPath from '../../path'
 import MemPool from './MemPool'
 import Block from './Block'
@@ -138,6 +139,12 @@ export default class Database extends EventEmitter {
     validateBlockData (block, callback) {
         const self = this
         const transactions = self.getTransactionsFromBlock(block)
+
+        logger.warn(`Validate Block Data, get Transactions from Block debug ${giantConfig.debug}`)
+        if(giantConfig.debug){
+            console.log(transactions)
+        }
+
         async.each(transactions, (transaction, done) => {
             transaction.validate().finally(() => done())
             transaction.options = ['contract valid']

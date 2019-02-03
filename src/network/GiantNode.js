@@ -46,7 +46,7 @@ export default class GiantNode extends EventEmitter {
         return this._client.deployContract(options)
     }
 
-    getLastContractTip(cb) {
+    getLastContractFromTip(cb) {
         this._client.getDB().getMetadata()
             .then((metadata) => {
                 this._client.getDB().getBlock(metadata.tip)
@@ -67,7 +67,7 @@ export default class GiantNode extends EventEmitter {
             })
     }
 
-    getLastContractFx(cb) {
+    getLastContractFromFx(cb) {
         // TODO : move to tests
         let contractPath = './build/contracts/',
             latestContract = (() => {

@@ -1,5 +1,7 @@
 import EventEmitter from 'events'
 import Contract from "./Contract";
+import logger from "../../logger";
+import giantConfig from "../../config";
 
 export default class MemPool extends EventEmitter {
 
@@ -13,8 +15,7 @@ export default class MemPool extends EventEmitter {
     addTransaction(transaction) {
         const self = this
 
-        console.log('------------------------MemPool addTransaction(transaction) ------------------------')
-        console.log('transaction.id', transaction.id)
+        logger.warn(`MemPool addTransaction transaction ${transaction.id}`)
 
         //TODO   transaction.validate()
 

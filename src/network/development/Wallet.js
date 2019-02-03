@@ -4,10 +4,11 @@ import logger from '../../logger'
 import EventEmitter from 'events'
 
 import colors from 'colors/safe'
+import giantConfig from "../../config";
 
 export default class Wallet extends EventEmitter {
 
-    constructor (options) {
+    constructor(options) {
         super()
 
         this.db = options.db
@@ -65,14 +66,14 @@ export default class Wallet extends EventEmitter {
         ]
     }
 
-    initialize () {
+    initialize() {
         this.db.on('addblock', (block) => this._processBlock(block))
         this.emit('ready')
 
         this._showWarning()
     }
 
-    premine () {
+    premine() {
         const transaction = Transaction.generation()
 
         this.accounts.forEach((account) => {
@@ -85,38 +86,44 @@ export default class Wallet extends EventEmitter {
         this.db.memPool.addTransaction(transaction)
     }
 
-    getAccounts () {
+    getAccounts() {
         return this.accounts.map((key) => key.publicKey)
     }
 
-    getBalance () {
+    getBalance() {
         return 1000
     }
 
-    _loadUnpentOutputs () {
+    _loadUnpentOutputs() {
 
     }
 
-    _processBlock (block) {
+    _processBlock(block) {
         block.data.forEach((transaction) => {
 
 
         })
     }
 
-    _showWarning () {
-        let warn = 'Giant Development Network started\n\nPublic Keys:\n'
-        this.accounts.forEach((account, i) => {
-            warn += `(${i}) ${account.publicKey}\n`
-        })
-        warn += '\nPrivate Keys:\n'
-        this.accounts.forEach((account, i) => {
-            warn += `(${i}) ${account.privateKey}\n`
-        })
+    _showWarning() {
+        logger.warn(`Giant Development Network started debug ${giantConfig.debug}`)
 
-        warn += colors['yellow'].bold('\n⚠️  Important ⚠️  : These keys were created for you by giantjs. It is not secure.\n' +
-            'Ensure you do not use it on production blockchains, or else you risk losing funds.\n\n')
+        if (giantConfig.debug) {
+            let warn = ''
 
-        logger.warn(warn)
+            this.accounts.forEach((account, i) => {
+                warn += `(${i}) ${account.publicKey}\n`
+            })
+            warn += '\nPrivate Keys:\n'
+            this.accounts.forEach((account, i) => {
+                warn += `(${i}) ${account.privateKey}\n`
+            })
+
+            logger.warn(warn)
+        }
+
+        logger.warn(colors['yellow'].bold('\n⚠️  Important ⚠️  : These keys were created for you by giantjs. It is not secure.\n' +
+            'Ensure you do not use it on production blockchains, or else you risk losing funds.\n\n'))
+
     }
 }

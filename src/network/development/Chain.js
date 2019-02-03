@@ -1,3 +1,4 @@
+import giantConfig from '../../config'
 import Miner from './Miner'
 import Block from './Block'
 import Hash from './Hash'
@@ -276,7 +277,11 @@ export default class Chain extends EventEmitter {
     }
 
     _updateTip(block, callback) {
-        logger.info(`Chain updating the tip for [${block.height}]`, block.toObject())
+        logger.warn(`Chain updating the tip for [${block.height}] debug ${giantConfig.debug}`)
+        if(giantConfig.debug){
+            console.log(block.toObject())
+        }
+
         const self = this
 
         // FIXME check block.prevHash !== self.tip.hash and reorg

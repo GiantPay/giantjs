@@ -6,6 +6,8 @@ import Transaction from './Transaction'
 
 import EventEmitter from 'events'
 import TransactionType from "./TransactionType";
+import logger from "../../logger";
+import giantConfig from "../../config";
 
 /**
  * The Giant mock network, used to compile, test, and debug smart contracts in a development environment
@@ -87,8 +89,10 @@ export default class MockClient extends EventEmitter {
                 this.db.memPool.addTransaction(transaction)
 
                     .then(() => {
-                        console.log('Add transaction to memPool. Success.')
-                        //console.log(this.db.memPool.getTransactions())
+                        logger.warn(`Add transaction to memPool. Success. debug ${giantConfig.debug}`)
+                        if(giantConfig.debug){
+                            console.log(this.db.memPool.getTransactions())
+                        }
                     })
                     .catch(function (error) {
                         console.log(error)
@@ -105,6 +109,7 @@ export default class MockClient extends EventEmitter {
 
     callContract(from, contractAddress, method, args) {
         return new Promise((resolve, reject) => {
+
 
         })
     }
