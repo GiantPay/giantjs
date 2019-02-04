@@ -103,7 +103,7 @@ export default class GiantNode extends EventEmitter {
     mountModule(contractAddress, cb) {
         const m = require('module')
         const moduleName = `GMD_${contractAddress}`
-        this.getLastContractTip((code) => {
+        this.getLastContractFromTip((code) => {
             console.log(code)
             var res = require('vm').runInThisContext(m.wrap(code))(exports, require, module, __filename, __dirname)
             logger.info(`Mount module ${moduleName}`)
@@ -112,6 +112,7 @@ export default class GiantNode extends EventEmitter {
     }
 
     initContract(contractAddress) {
+
         this.mountModule(contractAddress, (ContractClass) => {
             console.log(ContractClass)
             this.getContractMeta(contractAddress, (meta) => {
@@ -131,6 +132,9 @@ export default class GiantNode extends EventEmitter {
                     console.log(i + ' ' + pfeVars[i])
                 }
                 logger.info(`Call method getPfe: ${global.contracts[meta.className].getPfe()}`)
+
+                //TODO: deployContract memPool.addTransaction(transaction)
+
             })
         })
     }

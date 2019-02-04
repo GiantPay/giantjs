@@ -1,4 +1,5 @@
 import logger from '../../logger'
+import giantConfig from "../../config";
 
 let pfeVars = {
     Program: {count: 0, max: 1, fee: 10, required: true},
@@ -41,7 +42,7 @@ let pfeVars = {
 }, pfeVarsCount = (type, whitePaper) => {
     if (type) {
         pfeVars.hasOwnProperty(type) ? pfeVars[type].count++ : pfeVars[type] = {count: 1}
-    } else if(whitePaper){
+    } else if (whitePaper) {
         pfeVars.WhitePaper[whitePaper].count++
     }
 }
@@ -83,7 +84,7 @@ export default ({template: template}) => {
                          *
                          */
                         pfeVarsCount(path.type, false)
-                        if(pfeVars.WhitePaper.hasOwnProperty(path.node.value)){
+                        if (pfeVars.WhitePaper.hasOwnProperty(path.node.value)) {
                             pfeVarsCount(false, path.node.value)
                         }
                     },
@@ -203,6 +204,7 @@ export default ({template: template}) => {
              *
              * */
             let foundErrors = []
+            logger.warn(`Count fee debug ${giantConfig.debug}`)
             for (let k in pfeVars) {
                 if (pfeVars[k].required && !pfeVars[k].count) {
                     foundErrors.push('not found ' + k)
@@ -213,7 +215,9 @@ export default ({template: template}) => {
                         ' times payment, expect max ' +
                         pfeVars[k].max)
                 } else {
-                    logger.info(k + ' ' + pfeVars[k].count + ' times payment')
+                    if (giantConfig.debug) {
+                        logger.info(k + ' ' + pfeVars[k].count + ' times payment')
+                    }
                 }
             }
 

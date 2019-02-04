@@ -1,4 +1,5 @@
 import logger from '../../logger'
+import giantConfig from "../../config";
 
 let validatorVars = {
     importDeclaration: {count: 0, max: 20, fee: 2},
@@ -113,6 +114,7 @@ export default () => {
              *
              * */
             let foundErrors = []
+            logger.warn(`Validate contract debug ${giantConfig.debug}`)
             for (let k in validatorVars) {
                 if (!validatorVars[k].count) {
                     foundErrors.push('not found ' + k)
@@ -123,7 +125,9 @@ export default () => {
                             ' times, expect max ' +
                             validatorVars[k].max)
                     } else {
-                        logger.info('found ' + k + ' ' + validatorVars[k].count + ' times')
+                        if(giantConfig.debug){
+                            logger.info('found ' + k + ' ' + validatorVars[k].count + ' times')
+                        }
                     }
                 }
             }
