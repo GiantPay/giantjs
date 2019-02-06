@@ -99,6 +99,8 @@ export default class GiantContract {
             console.log(data)
             logger.warn(`Contract ${that.name} is valid ${GiantPath.getContractFile(that.name)}`)
         })
+
+        this.getMetadata()
     }
 
 

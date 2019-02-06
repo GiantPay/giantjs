@@ -86,6 +86,8 @@ export default class Miner {
         // deploy - get Fee from options
         // TODO : deploy get Fee from options
         // call - from vm
+
+        // get Metadata from babel code reflection
         return 200
     }
 
@@ -111,6 +113,20 @@ export default class Miner {
         cb()
 
         /*
+
+
+Transaction verification
+In order to verify if the inputs are permitted to collect the requisite sums from the outputs of the preceding transactions,
+Bitcoin uses the standard system of the script (see below) of scriptSig input and scriptPubKey output which this transaction references.
+They are evaluated with the help of scriptPubKey using the remaining values in the scriptSig stack.
+
+The input is confirmed if the scriptPubKey script returns a “true” value.
+Using the script system, the sender can create very complex conditions to fulfill by those who wish to obtain the output value.
+For example, it is possible to create an input which any user will obtain without authorization.
+It is equally possible to request that the input be signed by 10 different keys or verified by password.
+
+
+
 
    Input
 
