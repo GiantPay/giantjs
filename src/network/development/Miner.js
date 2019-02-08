@@ -82,13 +82,15 @@ export default class Miner {
     }
 
     countOutput() {
-        // plus Pfe (syntax + wp + sys)
-        // deploy - get Fee from options
-        // TODO : deploy get Fee from options
-        // call - from vm
-
-        // get Metadata from babel code reflection
-        return 200
+        let deployFee = 0
+        this.db.getMetadata().then((metadata) => {
+            let lastContracts = metadata.contracts[metadata.contracts.length - 1]
+            for (let i in lastContracts) {
+                deployFee = lastContracts[i].deployFee
+            }
+            logger.warn(`Miner deploy fee :  ${deployFee} GIC`)
+            return deployFee
+        })
     }
 
     txStructure(cb) {
