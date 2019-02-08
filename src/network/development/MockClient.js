@@ -80,7 +80,7 @@ export default class MockClient extends EventEmitter {
 
         return new Promise((resolve, reject) => {
             try {
-                options.feePrice = options.feePrice || 0.0000001
+                options.feePrice = options.metadata.deployFee || 1000
 
                 const transaction = Transaction.deployContract(options)
                 transaction.inputs = options.inputs || []
