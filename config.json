@@ -1,0 +1,8 @@
+{
+  "network" : "development",
+  "mining" : true,
+  "blockTime" : 500,
+  "maxBlockSize" : 1000,
+  "feePrice" : 10,
+  "debug" : false
+}

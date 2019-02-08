@@ -40,9 +40,8 @@ export default (name, cmd) => {
         options.metadata = giantContract.getMetadata()
         options.metadata.deployFee = giantContract.pfeAmount
 
-        console.log('*****************************************************')
-        console.log('FULL CONTRACT AMOUNT (options.metadata.deployFee)  : ' + options.metadata.deployFee)
-        console.log('*****************************************************')
+        console.log('')
+        logger.info(`Amount  :  ${options.metadata.deployFee} GIC \n`)
 
         options.from = accounts[0]
 

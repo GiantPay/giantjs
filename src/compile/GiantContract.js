@@ -27,6 +27,8 @@ export default class GiantContract {
     }
 
     compile() {
+        let self = this
+
         if (this.valid) {
             let self = this
 
@@ -40,8 +42,13 @@ export default class GiantContract {
                     console.dir(err);
                     return;
                 }
+
                 console.log(data)
+
                 logger.warn(`Succeseful! Contract ${self.name} was compiled ${GiantPath.getTargetContractFileRunTime(self.name)}`)
+
+                console.log('')
+                logger.info(`FULL CONTRACT AMOUNT (someContract.metadata.deployFee)  :  ${self.pfeAmount} GIC \n`)
             })
         }
     }
@@ -89,19 +96,45 @@ export default class GiantContract {
 
         this.mountModule((ContractClass) => {
             let contractObject = new ContractClass.default("A")
+
             //console.log(contractObject)
             let pfeVars = contractObject.getPfe()
+
+            let giantConfigDebug = giantConfig.debug
+            giantConfig.debug = true
+
             for (let i in pfeVars) {
+                if (i == 'WhitePaper') {
+                    console.log(`Found WhitePaper Declarations`)
+
+                    /**
+                     *   MetaCoin methods
+                     *   described ./src/babel/babel-plugin-contract-fee/index.js
+                     *
+                     getBalance: {count: 0, max: 10, fee: 20, required: false},
+                     address: {count: 0, max: 10, fee: 20, required: false},
+                     buyCoin: {count: 0, max: 10, fee: 20, required: false},
+                     sendCoin: {count: 0, max: 10, fee: 20, required: false},
+                     */
+
+                    if (typeof pfeVars['WhitePaper'].count == 'undefined') {
+                        logger.error(`WhitePaper count undefined`)
+                    }
+                }
+
                 if (pfeVars[i].count) {
                     this.pfeAmount += pfeVars[i].count * pfeVars[i].fee
-                    giantConfig.debug = true
+
                     if (giantConfig.debug) {
                         console.log(`Declaration ${i} counted`)
                     }
-                    giantConfig.debug = false
                 }
             }
+
+            giantConfig.debug = giantConfigDebug
+
             logger.warn(`Contract full pfe amount ${this.pfeAmount}`)
+
         })
 
         transformFileSync(this.fileName, {
@@ -123,11 +156,14 @@ export default class GiantContract {
     }
 
     mountModule(cb) {
-        const m = require('module')
-        const moduleName = `Deploy`
-        console.log(this.code.runTime.code)
+        const m = require('module'), moduleName = `Deploy`
+
+        //console.log(this.code.runTime.code)
+
         var res = require('vm').runInThisContext(m.wrap(this.code.runTime.code))(exports, require, module, __filename, __dirname)
+
         logger.info(`Mount module ${moduleName}`)
+
         cb(module.exports)
     }
 

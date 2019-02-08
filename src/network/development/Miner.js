@@ -84,20 +84,38 @@ export default class Miner {
     countOutput() {
         let deployFee = 0
         this.db.getMetadata().then((metadata) => {
-            let lastContracts = metadata.contracts[metadata.contracts.length - 1]
+            const lastContracts = metadata.contracts[metadata.contracts.length - 1]
+
             for (let i in lastContracts) {
                 deployFee = lastContracts[i].deployFee
             }
+
+            const chainOwner = this.wallet.accounts[1]
+
+            const chainOwnerBalance = chainOwner.premine
+
+            logger.warn(`Miner balance:  ${chainOwnerBalance} GIC`)
+
             logger.warn(`Miner deploy fee :  ${deployFee} GIC`)
+
             return deployFee
         })
     }
 
-    txStructure(cb) {
+    getReceipient() {
+        let receipient = Math.floor((Math.random() * 9) + 2)
 
+        logger.info(`Found receipient :  ${this.wallet.accounts[receipient].publicKey}`)
+
+        logger.info(`Receipient balance:  ${this.wallet.accounts[receipient].premine} GIC`)
+
+        return this.wallet.accounts[receipient]
+    }
+
+    txStructure(cb) {
         let walletOwner = this.wallet.accounts[0]
         let chainOwner = this.wallet.accounts[1]
-        let receipient = this.wallet.accounts[2] // mb get rand num between accounts[2] and accounts.length
+        let receipient = this.getReceipient()
 
         let input = {
             value: walletOwner.premine,
@@ -111,7 +129,8 @@ export default class Miner {
             ScryptPubKey: ''
         }
 
-        console.log(input.value)
+        logger.info(`Your balance :  ${walletOwner.premine} GIC`)
+
         cb()
 
         /*

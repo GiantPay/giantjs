@@ -88,7 +88,7 @@ export default class MockClient extends EventEmitter {
 
                 this.db.memPool.addTransaction(transaction)
                     .then(() => {
-                        logger.warn(`Add transaction to memPool. Success. debug ${giantConfig.debug}`)
+                        logger.warn(`Add transaction to memPool. Success. Debug ${giantConfig.debug}`)
                         if(giantConfig.debug){
                             console.log(this.db.memPool.getTransactions())
                         }
