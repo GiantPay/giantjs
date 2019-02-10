@@ -102,7 +102,7 @@ export default class GiantNode extends EventEmitter {
     mountModule(contractAddress, cb) {
         const m = require('module')
         const moduleName = `GMD_${contractAddress}`
-        this.getLastContractTip((code) => {
+        this.getLastContractFromTip((code) => {
             console.log(code)
             var res = require('vm').runInThisContext(m.wrap(code))(exports, require, module, __filename, __dirname)
             logger.info(`Mount module ${moduleName}`)
@@ -134,16 +134,8 @@ export default class GiantNode extends EventEmitter {
 
                 //TODO: pfeVars.WhitePaper
                 for (let i in pfeVars) {
-                    console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!---`)
-                    console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!`)
                     if (i == 'WhitePaper') {
-                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!`)
-                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!---`)
-                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!---`)
-                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!---`)
-                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!`)
-                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!`)
-                        console.log(`${i} ${pfeVars[i]}`)
+                        console.log(`pfeVars.WhitePaper ${i} ${pfeVars[i]}`)
                     }
                 }
 
