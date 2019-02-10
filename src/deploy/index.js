@@ -40,6 +40,10 @@ export default (name, cmd) => {
         options.metadata = giantContract.getMetadata()
         options.metadata.deployFee = giantContract.pfeAmount
 
+
+        console.log('')
+        console.log('')
+        console.log('')
         console.log('')
         logger.info(`Amount  :  ${options.metadata.deployFee} GIC \n`)
 
@@ -48,6 +52,7 @@ export default (name, cmd) => {
         giantNode.deployContract(options)
 
             .then((contract) => {
+                console.log(giantNode.getMemPool())
                 logger.info(`Your account :  ${accounts[0]}`)
                 logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)
                 logger.info(`Your contract  :  ${giantContract.name} was deployed`)

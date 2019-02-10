@@ -17,10 +17,6 @@ export default (name, cmd) => {
     const giantNode = new GiantNode(options)
 
     giantNode.on('ready', () => {
-        // print network info
-        // print accounts info
         giantNode.getInfo(options)
-
-        // print deployed contracts info
     })
 }

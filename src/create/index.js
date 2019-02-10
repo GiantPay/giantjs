@@ -24,8 +24,24 @@ const createContract = (name) => {
                     '\t\tthis.balances = []\n' +
                     '\t}\n' +
                     '\n' +
-                    '\tgetBalance() {\n' +
-                    '\t\treturn this.balances\n' +
+                    '\tgetNodeOwner() {\n' +
+                    '\t\tthis.owner = this.getOwnerAddress()\n' +
+                    '\t\treturn this.owner\n' +
+                    '\t}\n' +
+                    '\n' +
+                    '\tgetNodeOwnerBalance() {\n' +
+                    '\t\tthis.ownerBalance = this.getOwnerPremine()\n' +
+                    '\t\treturn this.ownerBalance\n' +
+                    '\t}\n' +
+                    '\n' +
+                    '\tgetCaller() {\n' +
+                    '\t\tthis.caller = this.getCallerAddress()\n' +
+                    '\t\treturn this.caller\n' +
+                    '\t}\n' +
+                    '\n' +
+                    '\tgetCallerBalance() {\n' +
+                    '\t\tthis.callerBalance = this.getCallerPremine()\n' +
+                    '\t\treturn this.callerBalance\n' +
                     '\t}\n' +
                     '\n' +
                     '\tgetPfe() {\n' +

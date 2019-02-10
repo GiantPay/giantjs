@@ -2,6 +2,7 @@ import giantConfig from '../../config'
 import Block from './Block'
 import Wallet from './Wallet'
 import logger from '../../logger'
+import TransactionType from './TransactionType'
 
 import async from 'async'
 
@@ -103,7 +104,11 @@ export default class Miner {
     }
 
     getReceipient() {
-        let receipient = Math.floor((Math.random() * 9) + 2)
+        let receipient = Math.floor((Math.random() * 10) + 2)
+
+        if (typeof this.wallet.accounts[receipient] == 'undefined') {
+            return this.wallet.accounts[1] //chainOwner
+        }
 
         logger.info(`Found receipient :  ${this.wallet.accounts[receipient].publicKey}`)
 
@@ -113,6 +118,13 @@ export default class Miner {
     }
 
     txStructure(cb) {
+        /***
+         CONTRACT_DEPLOY : walletOwner, chainOwner
+         CONTRACT_CALL : walletOwner, receipient, chainOwner
+         TRANSFER : walletOwner, receipient, chainOwner
+         *
+         **/
+
         let walletOwner = this.wallet.accounts[0]
         let chainOwner = this.wallet.accounts[1]
         let receipient = this.getReceipient()
@@ -204,7 +216,6 @@ It is equally possible to request that the input be signed by 10 different keys 
                     callback()
                 })
             })
-
         } else {
             callback()
             logger.debug('miner: transaction doesn\'t found')

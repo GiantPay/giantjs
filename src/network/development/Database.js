@@ -24,7 +24,7 @@ const PREFIXES = {
 
 export default class Database extends EventEmitter {
 
-    constructor (options) {
+    constructor(options) {
         super()
         if (!options) {
             options = {}
@@ -45,22 +45,22 @@ export default class Database extends EventEmitter {
         })
     }
 
-    initialize () {
+    initialize() {
         this.emit('ready')
     }
 
-    buildGenesisData () {
+    buildGenesisData() {
         return {
             merkleRoot: null,
             data: []
         }
     }
 
-    putMetadata (metadata, callback) {
+    putMetadata(metadata, callback) {
         this.store.put('metadata', JSON.stringify(metadata), {}, callback)
     }
 
-    getMetadata () {
+    getMetadata() {
         const self = this
 
         return new Promise((resolve, reject) => {
@@ -80,7 +80,7 @@ export default class Database extends EventEmitter {
         })
     }
 
-    getBlock (hash) {
+    getBlock(hash) {
         const self = this
 
         return new Promise((resolve, reject) => {
@@ -99,7 +99,7 @@ export default class Database extends EventEmitter {
         })
     }
 
-    putBlock (block, callback) {
+    putBlock(block, callback) {
         const self = this
         const key = `${PREFIXES.BLOCK}-${block.hash}`
         const options = {
@@ -115,18 +115,37 @@ export default class Database extends EventEmitter {
         })
     }
 
-    addTransactionsToBlock (block, transactions) {
+    addTransactionsToBlock(block, transactions) {
+        const self = this
+
+        if (this.memPool.transactions.length > giantConfig.maxBlockSize) {
+            /**
+             * TODO :  Transactions type TRANSFER from Loop
+             * this.memPool.addTransaction(tx)
+             */
+
+            logger.warn(`Maximum Block Size ${giantConfig.maxBlockSize} exceeded! New Block Preparation`)
+
+            /**
+             * TODO :  Put Block
+             *
+             * self.putBlock(block, callback)
+             *
+             */
+            return
+        }
+
         let txs = this.getTransactionsFromBlock(block)
         txs = txs.concat(transactions)
         block.merkleRoot = this.getMerkleRoot(txs)
         block.data = txs
     }
 
-    getTransactionsFromBlock (block) {
+    getTransactionsFromBlock(block) {
         return block.data
     }
 
-    getMerkleRoot (transactions) {
+    getMerkleRoot(transactions) {
         const tree = this.getMerkleTree(transactions)
         const merkleRoot = tree[tree.length - 1]
         if (!merkleRoot) {
@@ -136,12 +155,12 @@ export default class Database extends EventEmitter {
         }
     }
 
-    validateBlockData (block, callback) {
+    validateBlockData(block, callback) {
         const self = this
         const transactions = self.getTransactionsFromBlock(block)
 
         logger.warn(`Validate Block Data, get Transactions from Block debug ${giantConfig.debug}`)
-        if(giantConfig.debug){
+        if (giantConfig.debug) {
             console.log(transactions)
         }
 
@@ -151,7 +170,13 @@ export default class Database extends EventEmitter {
         }, callback)
     }
 
-    getMerkleTree (transactions) {
+    getMemPool() {
+        logger.warn(`Found  ${this.memPool.transactions.length} transactions in memPool`)
+
+        return this.memPool
+    }
+
+    getMerkleTree(transactions) {
         var tree = transactions.map((tx) => tx.hash)
 
         var j = 0
@@ -167,7 +192,7 @@ export default class Database extends EventEmitter {
         return tree
     }
 
-    _onChainAddBlock (block, callback) {
+    _onChainAddBlock(block, callback) {
         var self = this
 
         logger.debug('DB handling new chain block')
@@ -196,11 +221,11 @@ export default class Database extends EventEmitter {
         })
     }
 
-    _updatePrevHashIndex (block, callback) {
+    _updatePrevHashIndex(block, callback) {
         this.store.put(`${PREFIXES.PREV_HASH}-${block.hash}`, block.prevHash, callback)
     }
 
-    _updateTransactions (block, add, callback) {
+    _updateTransactions(block, add, callback) {
         const self = this
         const txs = self.getTransactionsFromBlock(block)
 
@@ -229,7 +254,7 @@ export default class Database extends EventEmitter {
         callback(null, operations)
     }
 
-    _updateValues (block, add, callback) {
+    _updateValues(block, add, callback) {
         const self = this
         const operations = []
         const action = add ? '_patch' : '_unpatch'
@@ -254,7 +279,7 @@ export default class Database extends EventEmitter {
         })
     }
 
-    _patch (key, diff, callback) {
+    _patch(key, diff, callback) {
         const self = this
 
         self.get(key, (err, original) => {
@@ -278,7 +303,7 @@ export default class Database extends EventEmitter {
         })
     }
 
-    _unpatch (key, diff, callback) {
+    _unpatch(key, diff, callback) {
         const self = this
 
         self.get(key, (err, original) => {

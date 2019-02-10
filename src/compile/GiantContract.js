@@ -26,6 +26,40 @@ export default class GiantContract {
         this.pfeAmount = 0
     }
 
+    /**
+     * WP some methods List
+     *
+     * getCallerAddress - White Paper method
+     */
+
+    getCallerAddress() {
+        return giantConfig.caller.publicKey
+    }
+
+    /**
+     * getCallerPremine - White Paper method
+     */
+
+    getCallerPremine() {
+        return giantConfig.caller.premine
+    }
+
+    /**
+     * getOwnerAddress - White Paper method
+     */
+
+    getOwnerAddress() {
+        return giantConfig.owner.publicKey
+    }
+
+    /**
+     * getOwnerPremine - White Paper method
+     */
+
+    getOwnerPremine() {
+        return giantConfig.owner.premine
+    }
+
     compile() {
         let self = this
 
@@ -94,10 +128,11 @@ export default class GiantContract {
 
         this.code.runTime = UglifyJS.minify(this.code.es5pfe)
 
+
         this.mountModule((ContractClass) => {
+
             let contractObject = new ContractClass.default("A")
 
-            //console.log(contractObject)
             let pfeVars = contractObject.getPfe()
 
             let giantConfigDebug = giantConfig.debug
@@ -105,17 +140,9 @@ export default class GiantContract {
 
             for (let i in pfeVars) {
                 if (i == 'WhitePaper') {
-                    console.log(`Found WhitePaper Declarations`)
+                    logger.warn(`Found WhitePaper Declarations`)
 
-                    /**
-                     *   MetaCoin methods
-                     *   described ./src/babel/babel-plugin-contract-fee/index.js
-                     *
-                     getBalance: {count: 0, max: 10, fee: 20, required: false},
-                     address: {count: 0, max: 10, fee: 20, required: false},
-                     buyCoin: {count: 0, max: 10, fee: 20, required: false},
-                     sendCoin: {count: 0, max: 10, fee: 20, required: false},
-                     */
+                    console.log(pfeVars['WhitePaper'])
 
                     if (typeof pfeVars['WhitePaper'].count == 'undefined') {
                         logger.error(`WhitePaper count undefined`)
@@ -134,6 +161,14 @@ export default class GiantContract {
             giantConfig.debug = giantConfigDebug
 
             logger.warn(`Contract full pfe amount ${this.pfeAmount}`)
+
+            /**
+             * call other wp methods
+             */
+            console.log(`!!! wp method !!!`)
+            console.log(`Owner Info ${contractObject.getNodeOwner()}`)
+            console.log(`Caller Info ${contractObject.getCallerAddress()} `)
+            console.log(`Caller premine balance ${contractObject.getCallerBalance()} `)
 
         })
 

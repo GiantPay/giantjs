@@ -15,6 +15,7 @@ export default class GiantNode extends EventEmitter {
         this.options = options
         this.vm = vm
         this.contractCalls = new Map()
+        this.contracts = []
         const self = this
         // TODO need to set up network parameters from giantjs-config.js
         // TODO need to set up current network settings from console arguments
@@ -56,9 +57,7 @@ export default class GiantNode extends EventEmitter {
                         const tx = block.data[0]
                         console.log(tx.type)
                         /**
-                         * //if tx.type == 'call'
-                         * TODO : validation logic then cb(tx.code.runTime.code)
-                         *
+                         * TODO : tx.type == 'call' validation logic then cb(tx.code.runTime.code)
                          */
 
                         //if tx.type == 'deploy'
@@ -67,7 +66,7 @@ export default class GiantNode extends EventEmitter {
             })
     }
 
-    getLastContractFromFx(cb) {
+    getLastContractFromFs(cb) {
         // TODO : move to tests
         let contractPath = './build/contracts/',
             latestContract = (() => {
@@ -103,7 +102,7 @@ export default class GiantNode extends EventEmitter {
     mountModule(contractAddress, cb) {
         const m = require('module')
         const moduleName = `GMD_${contractAddress}`
-        this.getLastContractFromTip((code) => {
+        this.getLastContractTip((code) => {
             console.log(code)
             var res = require('vm').runInThisContext(m.wrap(code))(exports, require, module, __filename, __dirname)
             logger.info(`Mount module ${moduleName}`)
@@ -114,27 +113,41 @@ export default class GiantNode extends EventEmitter {
     initContract(contractAddress) {
 
         this.mountModule(contractAddress, (ContractClass) => {
+
             console.log(ContractClass)
+
             this.getContractMeta(contractAddress, (meta) => {
+
                 logger.info(`Contract ${meta.className} metadata`)
+
                 console.log(meta)
-                if (typeof global.contracts == 'undefined') {
-                    global.contracts = []
+
+                if (typeof this.contracts == 'undefined') {
+                    this.contracts = []
                 }
-                global.contracts[meta.className] = new ContractClass.default()
 
-                logger.info(`Call method getBalance: ${global.contracts[meta.className].getBalance()}`)
+                this.contracts[meta.className] = new ContractClass.default()
 
-                let pfeVars = global.contracts[meta.className].getPfe()
+                logger.info(`Call method getBalance: ${this.contracts[meta.className].getBalance()}`)
+
+                let pfeVars = this.contracts[meta.className].getPfe()
 
                 //TODO: pfeVars.WhitePaper
                 for (let i in pfeVars) {
-                    console.log(i + ' ' + pfeVars[i])
+                    console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!---`)
+                    console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!`)
+                    if (i == 'WhitePaper') {
+                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!`)
+                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!---`)
+                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!---`)
+                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!---`)
+                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!`)
+                        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!`)
+                        console.log(`${i} ${pfeVars[i]}`)
+                    }
                 }
-                logger.info(`Call method getPfe: ${global.contracts[meta.className].getPfe()}`)
 
-                //TODO: deployContract memPool.addTransaction(transaction)
-
+                logger.info(`Call method getPfe: ${this.contracts[meta.className].getPfe()}`)
             })
         })
     }
@@ -195,12 +208,13 @@ export default class GiantNode extends EventEmitter {
                 console.log(this._client.getAccounts())
 
                 logger.info(`Contracts ${metadata.contracts.length}`)
+
                 for (var c in metadata.contracts) {
                     for (var k in metadata.contracts[c]) {
                         logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
                     }
-
                 }
+
                 this._client.getDB().getBlock(metadata.tip)
                     .then((block) => {
                         //console.log(block)

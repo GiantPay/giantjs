@@ -8,8 +8,9 @@ export default class Transaction {
 
     constructor(options) {
         this.options = options
+        //giantConfig.debug = true
         logger.warn(`Transaction constructor(options) debug ${giantConfig.debug}`)
-        if(giantConfig.debug){
+        if (giantConfig.debug) {
             console.log(options)
         }
         this.type = options.type || TransactionType.TRANSFER
@@ -93,6 +94,22 @@ export default class Transaction {
                 // TODO call contract method
                 const result = null // Result of contract's method execution
                 resolve(result)
+            } else if (this.type === 'transfer') {
+                /*sendCoin (receiver) {
+                    const tx = getTransaction()
+                    const sender = getCallerAddress()
+                    const senderBalance = this.balances.get(sender)
+                    if (senderBalance < tx.amount) {
+                        return false
+                    }
+
+                    const receiverBalance = this.balances.get(receiver)
+                    this.balances.set(sender, senderBalance - tx.amount)
+                    this.balances.set(receiver, (receiverBalance ? receiverBalance : 0) + tx.amount)
+
+                    return true
+                }*/
+                resolve(null)
             } else {
                 resolve(null)
             }

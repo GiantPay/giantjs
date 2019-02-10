@@ -26,6 +26,10 @@ export default class Contract {
 
     }
 
+    getMetadata() {
+        return this.metadata
+    }
+
     /**
      * calculates sufficient fee to call the constructor
      * @param options
