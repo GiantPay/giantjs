@@ -34,9 +34,9 @@ let pfeVars = {
     WhileStatement: {count: 0, max: 10, fee: 20, required: false},
     DoWhileStatement: {count: 0, max: 10, fee: 20, required: false},
     WhitePaper: {
-        getOwnerAddress: {count: 0, max: 10, fee: 20, required: false},
-        getOwnerPremine: {count: 0, max: 10, fee: 20, required: false},
-        getCallerAddress: {count: 0, max: 10, fee: 20, required: false},
+        getNodeOwner: {count: 0, max: 10, fee: 20, required: false},
+        getNodeOwnerBalance: {count: 0, max: 10, fee: 20, required: false},
+        getCaller: {count: 0, max: 10, fee: 20, required: false},
         getCallerBalance: {count: 0, max: 10, fee: 20, required: false},
     },
 }, pfeVarsCount = (type, whitePaper) => {

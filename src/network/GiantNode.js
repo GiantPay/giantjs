@@ -141,18 +141,41 @@ export default class GiantNode extends EventEmitter {
                     logger.info(`MultiplePayment status ${result.status}`)
                 })
 
-                let pfeVars = this.contracts[meta.className].getPfe()
+                logger.info(`Creation fee info for methods in metadata`)
 
-                //TODO: pfeVars.WhitePaper
-                for (let i in pfeVars) {
-                    if (i == 'WhitePaper') {
-                        console.log(`pfeVars.WhitePaper ${i} ${pfeVars['WhitePaper']}`)
-                    }
-                }
+                this.setMetaMethodsFee(meta)
 
-                logger.info(`Call method getPfe: ${this.contracts[meta.className].getPfe()}`)
+                console.log(meta.methods)
             })
         })
+    }
+
+    setMetaMethodsFee(meta) {
+        let metaMethodsList = [] //Meta methods list
+
+        let pfeVars = this.contracts[meta.className].getPfe()
+
+        for (let i in pfeVars) {
+            if (i == 'WhitePaper') {
+                console.log(`pfeVars.WhitePaper ${i} ${pfeVars['WhitePaper']}`)
+            }
+        }
+
+        for (let i in meta.methods) {
+            metaMethodsList.push(meta.methods[i].name)
+        }
+
+        const metaMethodsListStr = metaMethodsList.toString()
+
+        for (let m in pfeVars) {
+            if (metaMethodsListStr.indexOf(m) + 1) {
+                for (let i in meta.methods) {
+                    if (meta.methods[i].name == m) {
+                        meta.methods[i].fee = pfeVars[m].fee
+                    }
+                }
+            }
+        }
     }
 
     callContract(from, contractAddress, method, args) {
