@@ -111,6 +111,7 @@ export default class GiantNode extends EventEmitter {
     }
 
     initContract(contractAddress) {
+        const self = this
 
         this.mountModule(contractAddress, (ContractClass) => {
 
@@ -128,14 +129,24 @@ export default class GiantNode extends EventEmitter {
 
                 this.contracts[meta.className] = new ContractClass.default()
 
-                logger.info(`Call method getBalance: ${this.contracts[meta.className].getBalance()}`)
+                logger.info(`WP getCallerBalance : ${this.contracts[meta.className].getCallerBalance()} GIC`)
+
+                //Sending some amount GIC for each account
+                const billAmount = 20
+                const contractAddressArr = self._client.wallet.accounts
+                const mockCaller = self._client
+                console.log(contractAddressArr)
+
+                this.contracts[meta.className].multiplePayment(mockCaller, contractAddressArr, billAmount, (result) => {
+                    logger.info(`MultiplePayment status ${result.status}`)
+                })
 
                 let pfeVars = this.contracts[meta.className].getPfe()
 
                 //TODO: pfeVars.WhitePaper
                 for (let i in pfeVars) {
                     if (i == 'WhitePaper') {
-                        console.log(`pfeVars.WhitePaper ${i} ${pfeVars[i]}`)
+                        console.log(`pfeVars.WhitePaper ${i} ${pfeVars['WhitePaper']}`)
                     }
                 }
 

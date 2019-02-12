@@ -70,6 +70,7 @@ export default class MockClient extends EventEmitter {
     }
 
     sendFrom(from, to, amount) {
+        logger.warn(`MockClient call tx transfer. Debug ${giantConfig.debug}`)
         return new Promise((resolve, reject) => {
 
         })
