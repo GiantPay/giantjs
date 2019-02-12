@@ -121,13 +121,17 @@ export default class GiantNode extends EventEmitter {
 
                 logger.info(`Contract ${meta.className} metadata`)
 
-                console.log(meta)
-
                 if (typeof this.contracts == 'undefined') {
                     this.contracts = []
                 }
 
                 this.contracts[meta.className] = new ContractClass.default()
+
+                logger.info(`Set pfe info for methods in metadata`)
+
+                this.setWPMethodsFee(meta)
+
+                console.log(meta.methods)
 
                 logger.info(`WP getCallerBalance : ${this.contracts[meta.className].getCallerBalance()} GIC`)
 
@@ -140,32 +144,30 @@ export default class GiantNode extends EventEmitter {
                 this.contracts[meta.className].multiplePayment(mockCaller, contractAddressArr, billAmount, (result) => {
                     logger.info(`MultiplePayment status ${result.status}`)
                 })
-
-                logger.info(`Creation fee info for methods in metadata`)
-
-                this.setMetaMethodsFee(meta)
-
-                console.log(meta.methods)
             })
         })
     }
 
-    setMetaMethodsFee(meta) {
-        let metaMethodsList = [] //Meta methods list
+    setWPMethodsFee(metadata) {
+        let metaMethodsList = [] //metadata methods list
 
-        for (let i in meta.methods) {
-            metaMethodsList.push(meta.methods[i].name)
+        for (let i in metadata.methods) {
+            metaMethodsList.push(metadata.methods[i].name)
         }
 
-        let pfeVars = this.contracts[meta.className].getPfe()
+        const pfeVars = this.contracts[metadata.className].getPfe()
 
         const metaMethodsListStr = metaMethodsList.toString()
 
         for (let m in pfeVars) {
+            /**
+             * Check and update method in metadatadata
+             */
             if (metaMethodsListStr.indexOf(m) + 1) {
-                for (let i in meta.methods) {
-                    if (meta.methods[i].name == m) {
-                        meta.methods[i].fee = pfeVars[m].fee
+                for (let i in metadata.methods) {
+                    if (metadata.methods[i].name == m) {
+                        metadata.methods[i].params.push({'wp': true, 'initialized': false})
+                        metadata.methods[i].fee = pfeVars[m].fee
                     }
                 }
             }
