@@ -153,17 +153,11 @@ export default class GiantNode extends EventEmitter {
     setMetaMethodsFee(meta) {
         let metaMethodsList = [] //Meta methods list
 
-        let pfeVars = this.contracts[meta.className].getPfe()
-
-        for (let i in pfeVars) {
-            if (i == 'WhitePaper') {
-                console.log(`pfeVars.WhitePaper ${i} ${pfeVars['WhitePaper']}`)
-            }
-        }
-
         for (let i in meta.methods) {
             metaMethodsList.push(meta.methods[i].name)
         }
+
+        let pfeVars = this.contracts[meta.className].getPfe()
 
         const metaMethodsListStr = metaMethodsList.toString()
 
