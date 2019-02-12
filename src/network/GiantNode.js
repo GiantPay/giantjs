@@ -129,9 +129,9 @@ export default class GiantNode extends EventEmitter {
 
                 logger.info(`Set pfe info for methods in metadata`)
 
-                this.setWPMethodsFee(meta)
+                this.contracts[meta.className].metadata = this.setWPMethodsFee(meta)
 
-                console.log(meta.methods)
+                console.log(this.contracts[meta.className].metadata)
 
                 logger.info(`WP getCallerBalance : ${this.contracts[meta.className].getCallerBalance()} GIC`)
 
@@ -161,7 +161,7 @@ export default class GiantNode extends EventEmitter {
 
         for (let m in pfeVars) {
             /**
-             * Check and update method in metadatadata
+             * Check and update method in metadata
              */
             if (metaMethodsListStr.indexOf(m) + 1) {
                 for (let i in metadata.methods) {
@@ -172,6 +172,7 @@ export default class GiantNode extends EventEmitter {
                 }
             }
         }
+        return metadata
     }
 
     callContract(from, contractAddress, method, args) {
