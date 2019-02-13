@@ -99,6 +99,20 @@ export default class GiantNode extends EventEmitter {
     mountModule(contractAddress, cb) {
         const m = require('module')
         const moduleName = `GMD_${contractAddress}`
+
+        this.getLastContractFromTip((code) => {
+            console.log(code)
+            var res = require('vm').runInThisContext(m.wrap(code))(exports, require, module, __filename, __dirname)
+            logger.info(`Mount module ${moduleName}`)
+            cb(module.exports)
+        })
+    }
+
+    initMethod(options) {
+        console.log(options)
+
+        this.contracts[options.contractName][options.method]({'a': 1, 'b': 1})
+
         /**
          * getLastContractReceipts
          *
@@ -115,20 +129,6 @@ export default class GiantNode extends EventEmitter {
   "status": "0x1"
          }
          */
-        this.getLastContractFromTip((code) => {
-            console.log(code)
-            var res = require('vm').runInThisContext(m.wrap(code))(exports, require, module, __filename, __dirname)
-            logger.info(`Mount module ${moduleName}`)
-            cb(module.exports)
-        })
-    }
-
-    initMethod(options) {
-        /*
-        options.name
-        options.params
-        options.contractAddress
-        */
     }
 
     initContract(contractAddress, cb) {
@@ -151,7 +151,7 @@ export default class GiantNode extends EventEmitter {
         })
     }
 
-    WPFee(metadata) {
+    whitePaperFee(metadata) {
         let metaMethodsList = [] //metadata methods list
 
         for (let i in metadata.methods) {
@@ -178,9 +178,10 @@ export default class GiantNode extends EventEmitter {
         return metadata
     }
 
-    callContract(from, contractAddress, method, args) {
+    /** initContract -> initMethod
+     * callContract(from, contractAddress, method, args) {
         return this._client.callContract(from, contractAddress, method, args)
-    }
+    }*/
 
     getContractMeta(contractAddress, cb) {
         const contract = this._client.getDB().getMetadata()

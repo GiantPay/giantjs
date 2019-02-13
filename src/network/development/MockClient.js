@@ -107,12 +107,12 @@ export default class MockClient extends EventEmitter {
         })
     }
 
-    callContract(from, contractAddress, method, args) {
+   /*callContract(from, contractAddress, method, args) {
         return new Promise((resolve, reject) => {
 
 
         })
-    }
+    }*/
 
     stop() {
         this.chain.stop()

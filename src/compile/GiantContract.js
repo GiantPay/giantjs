@@ -41,6 +41,7 @@ export default class GiantContract {
      */
 
     getCallerPremine() {
+        console.log('GiantContract Base Class - getCallerPremine()  ')
         return giantConfig.caller.premine
     }
 

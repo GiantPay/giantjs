@@ -36,7 +36,7 @@ program
     .action(deploy);
 
 program
-    .command('exec <name>')
+    .command('exec <name> <method> <args>')
     .description('')
     .action(exec);
 
