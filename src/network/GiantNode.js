@@ -31,6 +31,10 @@ export default class GiantNode extends EventEmitter {
         })
     }
 
+    getCaller() {
+        return this._client
+    }
+
     getAccounts() {
         return this._client.getAccounts()
     }
@@ -52,15 +56,8 @@ export default class GiantNode extends EventEmitter {
             .then((metadata) => {
                 this._client.getDB().getBlock(metadata.tip)
                     .then((block) => {
-                        // TODO : check Wallet
-
                         const tx = block.data[0]
                         console.log(tx.type)
-                        /**
-                         * TODO : tx.type == 'call' validation logic then cb(tx.code.runTime.code)
-                         */
-
-                        //if tx.type == 'deploy'
                         cb(tx.data[0].code.runTime.code)
                     })
             })
@@ -102,6 +99,22 @@ export default class GiantNode extends EventEmitter {
     mountModule(contractAddress, cb) {
         const m = require('module')
         const moduleName = `GMD_${contractAddress}`
+        /**
+         * getLastContractReceipts
+         *
+         * receipt:
+          {
+  "transactionHash": "0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b",
+  "transactionIndex": 0,
+  "blockHash": "0xef95f2f1ed3ca60b048b4bf67cde2195961e0bba6f70bcbea9a2c4e133e34b46",
+  "blockNumber": 3,
+  "contractAddress": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b",
+  "cumulativeGicUsed": 314159,
+  «gicUsed": 30234,
+  "logs": [],
+  "status": "0x1"
+         }
+         */
         this.getLastContractFromTip((code) => {
             console.log(code)
             var res = require('vm').runInThisContext(m.wrap(code))(exports, require, module, __filename, __dirname)
@@ -110,45 +123,35 @@ export default class GiantNode extends EventEmitter {
         })
     }
 
-    initContract(contractAddress) {
+    initMethod(options) {
+        /*
+        options.name
+        options.params
+        options.contractAddress
+        */
+    }
+
+    initContract(contractAddress, cb) {
         const self = this
 
         this.mountModule(contractAddress, (ContractClass) => {
+            //console.log(ContractClass)
 
-            console.log(ContractClass)
-
-            this.getContractMeta(contractAddress, (meta) => {
-
-                logger.info(`Contract ${meta.className} metadata`)
+            this.getContractMeta(contractAddress, (metadata) => {
+                logger.info(`Contract ${metadata.className} metadata`)
 
                 if (typeof this.contracts == 'undefined') {
                     this.contracts = []
                 }
 
-                this.contracts[meta.className] = new ContractClass.default()
+                this.contracts[metadata.className] = new ContractClass.default()
 
-                logger.info(`Set pfe info for methods in metadata`)
-
-                this.contracts[meta.className].metadata = this.setWPMethodsFee(meta)
-
-                console.log(this.contracts[meta.className].metadata)
-
-                logger.info(`WP getCallerBalance : ${this.contracts[meta.className].getCallerBalance()} GIC`)
-
-                //Sending some amount GIC for each account
-                const billAmount = 20
-                const contractAddressArr = self._client.wallet.accounts
-                const mockCaller = self._client
-                console.log(contractAddressArr)
-
-                this.contracts[meta.className].multiplePayment(mockCaller, contractAddressArr, billAmount, (result) => {
-                    logger.info(`MultiplePayment status ${result.status}`)
-                })
+                cb(metadata)
             })
         })
     }
 
-    setWPMethodsFee(metadata) {
+    WPFee(metadata) {
         let metaMethodsList = [] //metadata methods list
 
         for (let i in metadata.methods) {
@@ -216,6 +219,24 @@ export default class GiantNode extends EventEmitter {
                 }
                 cb(metadata.contracts)
             })
+    }
+
+    getLastContract(cb) {
+        let contractAddress = ''
+
+        this.getAllContracts((contracts) => {
+            if (!contracts.length) {
+                console.log("Contracts not found")
+                return
+            }
+
+            for (let i in contracts) {
+                for (let c in contracts[i]) {
+                    contractAddress = c
+                }
+            }
+            cb(contractAddress)
+        })
     }
 
     getInfo(options) {

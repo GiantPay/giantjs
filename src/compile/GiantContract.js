@@ -217,14 +217,17 @@ export default class GiantContract {
 
     multiplePayment(mockCaller, contractAddressArr, billAmount, cb) {
         logger.warn(`Multiple payment : ${contractAddressArr.length} wallets. Sending ${billAmount} GIC for each : `)
+
         for (let i in contractAddressArr) {
-            logger.warn(`${contractAddressArr[i].publicKey} balance before tx ${contractAddressArr[i].premine}.`)
-            const from = this.getCallerAddress()
-            const to = contractAddressArr[i].publicKey
-            /**
-             * call contractAddressArr txs type transfer
-             */
-            mockCaller.sendFrom(from, to, billAmount)
+            if (typeof contractAddressArr[i] != 'undefined') {
+                //logger.warn(`${contractAddressArr[i].publicKey} balance before tx ${contractAddressArr[i].premine}.`)
+                const from = this.getCallerAddress()
+                const to = contractAddressArr[i].publicKey
+                /**
+                 * call contractAddressArr txs type transfer
+                 */
+                mockCaller.sendFrom(from, to, billAmount)
+            }
         }
         cb({'status': true})
     }
