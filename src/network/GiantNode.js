@@ -109,9 +109,9 @@ export default class GiantNode extends EventEmitter {
     }
 
     initMethod(options) {
+        logger.warn(`Call method GiantContract.${options.method}`)
         console.log(options)
-
-        this.contracts[options.contractName][options.method]({'a': 1, 'b': 1})
+        this.contracts[options.contractName][options.method](options.args)
 
         /**
          * getLastContractReceipts

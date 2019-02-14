@@ -33,6 +33,9 @@ export default class GiantContract {
      */
 
     getCallerAddress() {
+        if (giantConfig.debug) {
+            logger.warn(`Called method GiantContract.getCallerAddress, return ${giantConfig.caller.publicKey}`)
+        }
         return giantConfig.caller.publicKey
     }
 
@@ -41,7 +44,9 @@ export default class GiantContract {
      */
 
     getCallerPremine() {
-        console.log('GiantContract Base Class - getCallerPremine()  ')
+        if (giantConfig.debug) {
+            logger.warn(`Called method GiantContract.getCallerPremine, return ${giantConfig.caller.premine}`)
+        }
         return giantConfig.caller.premine
     }
 
@@ -50,7 +55,13 @@ export default class GiantContract {
      */
 
     getOwnerAddress() {
+        giantConfig.debug = true
+        if (giantConfig.debug) {
+            logger.warn(`Called method GiantContract.getOwnerAddress, return ${giantConfig.owner.publicKey}`)
+        }
+
         return giantConfig.owner.publicKey
+
     }
 
     /**
@@ -58,6 +69,9 @@ export default class GiantContract {
      */
 
     getOwnerPremine() {
+        if (giantConfig.debug) {
+            logger.warn(`Called method GiantContract.getOwnerPremine, return ${giantConfig.owner.publicKey}`)
+        }
         return giantConfig.owner.premine
     }
 
