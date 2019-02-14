@@ -70,7 +70,7 @@ export default class GiantContract {
 
     getOwnerPremine() {
         if (giantConfig.debug) {
-            logger.warn(`Called method GiantContract.getOwnerPremine, return ${giantConfig.owner.publicKey}`)
+            logger.warn(`Called method GiantContract.getOwnerPremine, return ${giantConfig.owner.premine}`)
         }
         return giantConfig.owner.premine
     }
