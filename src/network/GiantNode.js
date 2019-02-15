@@ -179,11 +179,6 @@ export default class GiantNode extends EventEmitter {
         return metadata
     }
 
-    /** initContract -> initMethod
-     * callContract(from, contractAddress, method, args) {
-        return this._client.callContract(from, contractAddress, method, args)
-    }*/
-
     getContractMeta(contractAddress, cb) {
         const contract = this._client.getDB().getMetadata()
             .then((metadata) => {
@@ -226,8 +221,6 @@ export default class GiantNode extends EventEmitter {
     }
 
     checkContractAddress(address, cb) {
-        const self = this
-
         let testContractName = address.split('0x')
 
         if (typeof testContractName[1] != 'undefined') {
@@ -283,7 +276,6 @@ export default class GiantNode extends EventEmitter {
                     })
             }
         }
-
     }
 
     getLastContract(cb) {

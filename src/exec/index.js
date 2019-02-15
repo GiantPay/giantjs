@@ -14,6 +14,20 @@ export default (address, method, args) => {
     giantNode.on('ready', () => {
         giantNode.checkContractAddress(address, contractAddress => {
             if (contractAddress) {
+                //create tx
+                /**
+
+                 MockClient.callContract(from, contractAddress, method, args, ()=>{
+                    self.db.validateBlockData(block, () => {
+
+                    // initContract here
+
+                    self.chain.addBlock(block, (err) => {
+
+                    })
+                 })
+
+                 */
                 giantNode.initContract(contractAddress, metadata => {
                     logger.info(`Set pfe info for methods in metadata`)
 
