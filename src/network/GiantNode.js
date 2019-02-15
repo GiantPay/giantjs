@@ -4,6 +4,7 @@ import EventEmitter from 'events'
 import vm from 'vm'
 import fs from 'fs'
 import path from 'path'
+import giantConfig from '../config'
 
 /**
  * Encapsulates all methods of working with the Giant network
@@ -213,13 +214,76 @@ export default class GiantNode extends EventEmitter {
         this._client.getDB().getMetadata()
             .then((metadata) => {
                 logger.info(`Contracts ${metadata.contracts.length}`)
-                for (var c in metadata.contracts) {
-                    for (var k in metadata.contracts[c]) {
-                        logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
+                if (giantConfig.debug) {
+                    for (var c in metadata.contracts) {
+                        for (var k in metadata.contracts[c]) {
+                            logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
+                        }
                     }
                 }
                 cb(metadata.contracts)
             })
+    }
+
+    checkContractAddress(address, cb) {
+        const self = this
+
+        let testContractName = address.split('0x')
+
+        if (typeof testContractName[1] != 'undefined') {
+            if (testContractName[1].length = 64) {
+                logger.info(`Contract address is well formed`)
+
+                cb(address)
+            }
+        } else {
+            logger.info(`Contract address is not well formed, check by a contract name`)
+            let name = address
+
+            if (name == 'last') {
+                this.getLastContract(contractAddress => {
+                    logger.info(`Found last contract ${contractAddress}`)
+
+                    cb(contractAddress)
+                })
+            } else {
+                this._client.getDB().getMetadata()
+                    .then((metadata) => {
+                        let contractNameArr = []
+
+                        for (var c in metadata.contracts) {
+                            for (var k in metadata.contracts[c]) {
+                                if (name == metadata.contracts[c][k].className) {
+                                    contractNameArr.push(k)
+
+                                    logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
+                                }
+                            }
+                        }
+
+                        if (contractNameArr.length) {
+                            if (contractNameArr.length == 1) {
+                                logger.info(`Found contract ${metadata.contracts.length} ${name}`)
+
+                                cb(contractNameArr[0])
+                            }
+
+                            if (contractNameArr.length > 1) {
+                                let last = contractNameArr[contractNameArr.length - 1]
+
+                                logger.info(`Found ${metadata.contracts.length} times contract ${name}, try last ${last}`)
+
+                                cb(last)
+                            }
+                        } else {
+                            logger.info(`Contract by name ${name} not found`)
+
+                            cb(false)
+                        }
+                    })
+            }
+        }
+
     }
 
     getLastContract(cb) {
