@@ -12,8 +12,6 @@ export default (address, method, args) => {
     const giantNode = new GiantNode(options)
 
     giantNode.on('ready', () => {
-        // [tmp] get last contract address
-        let contractAddress = address
         giantNode.checkContractAddress(address, contractAddress => {
             if (contractAddress) {
                 giantNode.initContract(contractAddress, metadata => {
@@ -54,6 +52,5 @@ export default (address, method, args) => {
                 })
             }
         })
-
     })
 }
