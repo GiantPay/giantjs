@@ -120,10 +120,6 @@ export default class Chain extends EventEmitter {
 
         self.db.getMetadata()
             .then((metadata) => {
-                let contractsArr = []
-                if (typeof metadata != 'undefined') {
-                    contractsArr = metadata.contracts
-                }
                 if (typeof metadata.contracts == 'undefined') {
                     metadata.contracts = [1, 2]
                 }
@@ -134,7 +130,10 @@ export default class Chain extends EventEmitter {
                 self.db.getBlock(self.tip.hash)
                     .then((block) => {
                         let contract = {}
-
+                        var contractsArr = []
+                        if (typeof metadata != 'undefined' && typeof metadata.contracts != 'undefined') {
+                            contractsArr = metadata.contracts
+                        }
 
                         if (typeof block.data != 'undefined') {
                             if (true) {//giantConfig.debug
@@ -143,7 +142,6 @@ export default class Chain extends EventEmitter {
 
                             if (typeof block.data[0] != 'undefined' && typeof block.data[0].data != 'undefined') {
                                 let contractMetadata = block.data[0].data[0].metadata
-                                console.log('----------->>>')
 
                                 contractMetadata.version = "1.0"
                                 contractMetadata.block = blockId

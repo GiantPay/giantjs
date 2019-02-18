@@ -87,15 +87,18 @@ export default class Transaction {
     }
 
     getInputs() {
-        let walletOwner = this.wallet.accounts[0]
         let input = [{
-            value: walletOwner.premine,
+            value: giantConfig.owner.premine,
             prevTx: this.getPrevTx(),
             index: 0,
             scriptSig: ''
         }]
 
         return input
+    }
+
+    getPrevTx(){
+        return 'a08443546d4439d6341107cd20fe0d727aafab8d383613780d811926a1b9f2b2'
     }
 
     getOutputs() {
