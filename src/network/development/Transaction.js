@@ -109,7 +109,7 @@ export default class Transaction {
 
     countOutput() {
         let deployFee = 0
-        this.db.getMetadata().then((metadata) => {
+      /*  this.db.getMetadata().then((metadata) => {
             const lastContracts = metadata.contracts[metadata.contracts.length - 1]
 
             for (let i in lastContracts) {
@@ -125,7 +125,7 @@ export default class Transaction {
             logger.warn(`Miner deploy fee :  ${deployFee} GIC`)
 
             return deployFee
-        })
+        })*/
     }
 
 

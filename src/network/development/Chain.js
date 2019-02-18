@@ -121,8 +121,11 @@ export default class Chain extends EventEmitter {
         self.db.getMetadata()
             .then((metadata) => {
                 let contractsArr = []
-                if (typeof metadata != 'undefined' && typeof metadata.contracts != 'undefined') {
+                if (typeof metadata != 'undefined') {
                     contractsArr = metadata.contracts
+                }
+                if (typeof metadata.contracts == 'undefined') {
+                    metadata.contracts = [1, 2]
                 }
 
                 let contractId = '0x' + Hash.sha256(metadata.contracts.length)
@@ -132,33 +135,46 @@ export default class Chain extends EventEmitter {
                     .then((block) => {
                         let contract = {}
 
-                        let contractMetadata = block.data[0].data[0].metadata
 
-                        contractMetadata.version = "1.0"
-                        contractMetadata.block = blockId
-                        contractMetadata.txid = "13239077a4754a5c41c2621f67efbb0b10bc67babaf9e369ffd58f88202a7b67"
-                        contractMetadata.owner = "GUuf1RCuFmLAbyNFT5WifEpZTnLYk2rtVd"
-                        contractMetadata.initialized = false
-                        contractMetadata.description = "sandbox Contract"
-                        contractMetadata.dependencies = {
-                            "giant-exchange-api": "^0.1.0",
-                            "some-giant-api": "^0.3.6"
+                        if (typeof block.data != 'undefined') {
+                            if (true) {//giantConfig.debug
+                                console.log(block.data)
+                            }
+
+                            if (typeof block.data[0] != 'undefined' && typeof block.data[0].data != 'undefined') {
+                                let contractMetadata = block.data[0].data[0].metadata
+                                console.log('----------->>>')
+
+                                contractMetadata.version = "1.0"
+                                contractMetadata.block = blockId
+
+                                //tm&&p txid
+                                contractMetadata.txid = Hash.sha256(self.tip.hash)
+
+                                contractMetadata.owner = giantConfig.caller.privateKey
+                                contractMetadata.initialized = false
+                                contractMetadata.description = "sandbox Contract"
+                                contractMetadata.dependencies = {
+                                    "giant-exchange-api": "^0.1.0",
+                                    "some-giant-api": "^0.3.6"
+                                }
+
+                                contract[contractId] = contractMetadata
+                                contractsArr.push(contract)
+
+                                const metadata = {
+                                    tip: self.tip ? self.tip.hash : null,
+                                    tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
+                                    cache: self.cache,
+                                    contracts: contractsArr
+                                }
+
+                                //console.log(contractsArr)
+
+                                self.lastSavedMetadata = new Date()
+                                self.db.putMetadata(metadata, callback)
+                            }
                         }
-
-                        contract[contractId] = contractMetadata
-                        contractsArr.push(contract)
-
-                        const metadata = {
-                            tip: self.tip ? self.tip.hash : null,
-                            tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
-                            cache: self.cache,
-                            contracts: contractsArr
-                        }
-
-                        //console.log(contractsArr)
-
-                        self.lastSavedMetadata = new Date()
-                        self.db.putMetadata(metadata, callback)
                     })
             })
     }
@@ -278,7 +294,7 @@ export default class Chain extends EventEmitter {
 
     _updateTip(block, callback) {
         logger.warn(`Chain updating the tip for [${block.height}] debug ${giantConfig.debug}`)
-        if(giantConfig.debug){
+        if (giantConfig.debug) {
             console.log(block.toObject())
         }
 

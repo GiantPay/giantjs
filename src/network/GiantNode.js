@@ -300,26 +300,29 @@ export default class GiantNode extends EventEmitter {
         console.log(this.options)
         this._client.getDB().getMetadata()
             .then((metadata) => {
-                logger.info(`Network ${options.network} ${metadata.tipHeight} Blocks`)
+                if (typeof metadata.cache != 'undefined') {
+                    logger.info(`Network ${options.network} ${metadata.tipHeight} Blocks`)
 
-                logger.info(`Hashes`)
-                console.log(Object.keys(metadata.cache.hashes))
+                    logger.info(`Hashes`)
+                    console.log(Object.keys(metadata.cache.hashes))
 
-                logger.info(`Accounts`)
-                console.log(this._client.getAccounts())
 
-                logger.info(`Contracts ${metadata.contracts.length}`)
+                    logger.info(`Accounts`)
+                    console.log(this._client.getAccounts())
 
-                for (var c in metadata.contracts) {
-                    for (var k in metadata.contracts[c]) {
-                        logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
+                    logger.info(`Contracts ${metadata.contracts.length}`)
+
+                    for (var c in metadata.contracts) {
+                        for (var k in metadata.contracts[c]) {
+                            logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
+                            logger.info(`txid ${metadata.contracts[c][k].txid}  `)
+                        }
                     }
-                }
 
-                this._client.getDB().getBlock(metadata.tip)
-                    .then((block) => {
-                        //console.log(block)
-                        logger.info(`
+                    this._client.getDB().getBlock(metadata.tip)
+                        .then((block) => {
+                            //console.log(block)
+                            logger.info(`
                         LAST BLOCK v${block.version} : ${metadata.tip}
                         --------------------------------------------------------------------------------
                         Prev hash : ${block.prevHash}
@@ -328,7 +331,10 @@ export default class GiantNode extends EventEmitter {
                         Timestamp : ${block.timestamp} 
                         Nonce : ${block.nonce}
                         `)
-                    })
+                        })
+                } else {
+                    logger.info(`Blocks not found`)
+                }
             })
     }
 

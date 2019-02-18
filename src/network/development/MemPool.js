@@ -20,11 +20,12 @@ export default class MemPool extends EventEmitter {
         //TODO   transaction.validate()
 
         return new Promise((resolve, reject) => {
-            transaction.validate()
+            transaction.validate() //result like contract move to create method
                 .then((result) => {
                     if (!self.hasTransaction(transaction.hash)) {
                         self.transactions.push(transaction)
                         self.emit('transaction', transaction)
+                        result.txid = transaction.hash
                         resolve(result)
                     } else {
                         resolve(result)

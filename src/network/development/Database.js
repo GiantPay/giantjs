@@ -80,6 +80,30 @@ export default class Database extends EventEmitter {
         })
     }
 
+    updateWallets(wallets, cb) {
+        this.store.put('wallets', JSON.stringify(wallets), cb)
+    }
+
+    getWallets(wallets, cb) {
+        const self = this
+
+        return new Promise((resolve, reject) => {
+            self.store.get('wallets', {}, (err, data) => {
+                if (err instanceof levelup.errors.NotFoundError) {
+                    resolve({})
+                } else if (err) {
+                    reject(err)
+                } else {
+                    try {
+                        resolve(JSON.parse(data))
+                    } catch (e) {
+                        reject(new Error('Could not parse wallets'))
+                    }
+                }
+            })
+        })
+    }
+
     getBlock(hash) {
         const self = this
 
