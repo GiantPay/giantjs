@@ -36,14 +36,16 @@ export default (name, cmd) => {
         const accounts = giantNode.getAccounts()
 
 
-        giantNode.getPrevTxId((prevTxId) => {
+        giantNode.getPrevBlockHash((prevBlockHash) => {
+            console.log(prevBlockHash)
+
             let options = {}
 
             options.contractCode = giantContract.code
 
             options.contractName = giantContract.name
 
-            options.contractAddress = '0x' + Hash.sha256(prevTxId + giantContract.code)
+            options.contractAddress = '0x' + Hash.sha256(prevBlockHash + giantContract.code)
 
             options.metadata = giantContract.getMetadata()
 
