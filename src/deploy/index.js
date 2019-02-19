@@ -34,32 +34,41 @@ export default (name, cmd) => {
 
         // TODO it's necessary to take from the parameters
         const accounts = giantNode.getAccounts()
-        let options = {}
-        options.contractCode = giantContract.code
-        options.contractName = giantContract.name
-        options.contractAddress = Hash.sha256(giantContract.code)//+contract.timestamp for unique
-        options.metadata = giantContract.getMetadata()
-        options.metadata.deployFee = giantContract.pfeAmount
 
-        logger.info(`Amount  :  ${options.metadata.deployFee} GIC \n`)
 
-        options.from = accounts[0]
+        giantNode.getPrevTxId((prevTxId) => {
+            let options = {}
 
-        giantNode.deployContract(options)
+            options.contractCode = giantContract.code
 
-            .then((contract) => {
-                // console.log(giantNode.getMemPool())
-                logger.info(`Your account :  ${accounts[0]}`)
-                logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)
-                logger.info(`Your contract  :  ${giantContract.name} was deployed`)
-            })
-            .catch((err) => {
-                logger.error(err)
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    giantNode.stop()
-                }, 2000)
-            })
+            options.contractName = giantContract.name
+
+            options.contractAddress = '0x' + Hash.sha256(prevTxId + giantContract.code)
+
+            options.metadata = giantContract.getMetadata()
+
+            options.metadata.deployFee = giantContract.pfeAmount
+
+            logger.info(`Amount  :  ${options.metadata.deployFee} GIC \n`)
+
+            options.from = accounts[0]
+
+            giantNode.deployContract(options)
+
+                .then((contract) => {
+                    // console.log(giantNode.getMemPool())
+                    logger.info(`Your account :  ${accounts[0]}`)
+                    logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)
+                    logger.info(`Your contract  :  ${giantContract.name} was deployed`)
+                })
+                .catch((err) => {
+                    logger.error(err)
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        giantNode.stop()
+                    }, 2000)
+                })
+        })
     })
 }

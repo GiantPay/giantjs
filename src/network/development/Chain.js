@@ -140,7 +140,10 @@ export default class Chain extends EventEmitter {
                             }
 
                             if (typeof block.data[0] != 'undefined' && typeof block.data[0].data != 'undefined') {
+                                //prevTxId = giantNode.getPrevTxId
+                                //let contractId = '0x' + Hash.sha256(prevTxId+ block.data[0].data[0].code)
                                 let contractId = '0x' + Hash.sha256(block.data[0].data[0].code)
+
                                 let contractMetadata = block.data[0].data[0].metadata
 
                                 contractMetadata.version = "1.0"
