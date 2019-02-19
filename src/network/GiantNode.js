@@ -338,6 +338,21 @@ export default class GiantNode extends EventEmitter {
             })
     }
 
+    getPrevTxId(cb) {
+        this._client.getDB().getMetadata()
+            .then((metadata) => {
+                if (typeof metadata.tip != 'undefined') {
+                    this._client.getDB().getBlock(metadata.tip)
+                        .then((block) => {
+                            //block.data[0].txid
+                            cb(block)
+                        })
+                } else {
+                    logger.info(`Blocks not found`)
+                }
+            })
+    }
+
     stop() {
         this._client.stop()
     }

@@ -8,6 +8,7 @@ import EventEmitter from 'events'
 import TransactionType from "./TransactionType";
 import logger from "../../logger";
 import giantConfig from "../../config";
+import Hash from "./Hash";
 
 /**
  * The Giant mock network, used to compile, test, and debug smart contracts in a development environment
@@ -83,9 +84,9 @@ export default class MockClient extends EventEmitter {
             try {
                 options.feePrice = options.metadata.deployFee || 1000
 
+                options.txid = Hash.sha256(options)
+
                 const transaction = Transaction.deployContract(options)
-                transaction.inputs = options.inputs || []
-                transaction.outputs = options.outputs || []
 
                 this.db.memPool.addTransaction(transaction)
                     .then(() => {

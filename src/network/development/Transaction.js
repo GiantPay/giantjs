@@ -97,7 +97,9 @@ export default class Transaction {
         return input
     }
 
-    getPrevTx(){
+    getPrevTx() {
+        //  self.db.getBlock(self.tip.hash)
+        //  method moved to GIant Node
         return 'a08443546d4439d6341107cd20fe0d727aafab8d383613780d811926a1b9f2b2'
     }
 
@@ -112,23 +114,23 @@ export default class Transaction {
 
     countOutput() {
         let deployFee = 0
-      /*  this.db.getMetadata().then((metadata) => {
-            const lastContracts = metadata.contracts[metadata.contracts.length - 1]
+        /*  this.db.getMetadata().then((metadata) => {
+              const lastContracts = metadata.contracts[metadata.contracts.length - 1]
 
-            for (let i in lastContracts) {
-                deployFee = lastContracts[i].deployFee
-            }
+              for (let i in lastContracts) {
+                  deployFee = lastContracts[i].deployFee
+              }
 
-            const chainOwner = giantConfig.owner
+              const chainOwner = giantConfig.owner
 
-            const chainOwnerBalance = chainOwner.premine
+              const chainOwnerBalance = chainOwner.premine
 
-            logger.warn(`Miner balance:  ${chainOwnerBalance} GIC`)
+              logger.warn(`Miner balance:  ${chainOwnerBalance} GIC`)
 
-            logger.warn(`Miner deploy fee :  ${deployFee} GIC`)
+              logger.warn(`Miner deploy fee :  ${deployFee} GIC`)
 
-            return deployFee
-        })*/
+              return deployFee
+          })*/
     }
 
 

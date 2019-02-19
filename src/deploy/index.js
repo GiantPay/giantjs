@@ -2,6 +2,7 @@ import giantConfig from '../config'
 import GiantNode from '../network/GiantNode'
 import GiantContract from '../compile/GiantContract'
 import logger from '../logger'
+import Hash from "../network/development/Hash";
 
 export default (name, cmd) => {
     const giantNode = new GiantNode({
@@ -15,7 +16,7 @@ export default (name, cmd) => {
         giantContract.validate()
         if (giantContract.valid) {
             try {
-                logger.debug('Compile')
+                logger.debug('Compile Contract')
                 giantContract.compile()
             }
             catch (error) {
@@ -36,15 +37,10 @@ export default (name, cmd) => {
         let options = {}
         options.contractCode = giantContract.code
         options.contractName = giantContract.name
-        options.contractAddress = '0x1G9033a3HdF74E1d7619347bC491d73A36967d72'
+        options.contractAddress = Hash.sha256(giantContract.code)//+contract.timestamp for unique
         options.metadata = giantContract.getMetadata()
         options.metadata.deployFee = giantContract.pfeAmount
 
-
-        console.log('')
-        console.log('')
-        console.log('')
-        console.log('')
         logger.info(`Amount  :  ${options.metadata.deployFee} GIC \n`)
 
         options.from = accounts[0]
@@ -52,7 +48,7 @@ export default (name, cmd) => {
         giantNode.deployContract(options)
 
             .then((contract) => {
-                console.log(giantNode.getMemPool())
+                // console.log(giantNode.getMemPool())
                 logger.info(`Your account :  ${accounts[0]}`)
                 logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)
                 logger.info(`Your contract  :  ${giantContract.name} was deployed`)

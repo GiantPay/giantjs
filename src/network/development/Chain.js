@@ -124,7 +124,6 @@ export default class Chain extends EventEmitter {
                     metadata.contracts = [1, 2]
                 }
 
-                let contractId = '0x' + Hash.sha256(metadata.contracts.length)
                 let blockId = metadata.tip
 
                 self.db.getBlock(self.tip.hash)
@@ -136,18 +135,18 @@ export default class Chain extends EventEmitter {
                         }
 
                         if (typeof block.data != 'undefined') {
-                            if (true) {//giantConfig.debug
+                            if (false) {//giantConfig.debug
                                 console.log(block.data)
                             }
 
                             if (typeof block.data[0] != 'undefined' && typeof block.data[0].data != 'undefined') {
+                                let contractId = '0x' + Hash.sha256(block.data[0].data[0].code)
                                 let contractMetadata = block.data[0].data[0].metadata
 
                                 contractMetadata.version = "1.0"
                                 contractMetadata.block = blockId
 
-                                //tm&&p txid
-                                contractMetadata.txid = Hash.sha256(self.tip.hash)
+                                contractMetadata.txid = Hash.sha256(block.data[0])
 
                                 contractMetadata.owner = giantConfig.caller.privateKey
                                 contractMetadata.initialized = false
