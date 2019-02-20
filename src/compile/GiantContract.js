@@ -55,13 +55,11 @@ export default class GiantContract {
      */
 
     getOwnerAddress() {
-        giantConfig.debug = true
         if (giantConfig.debug) {
             logger.warn(`Called method GiantContract.getOwnerAddress, return ${giantConfig.owner.publicKey}`)
         }
 
         return giantConfig.owner.publicKey
-
     }
 
     /**
@@ -143,15 +141,12 @@ export default class GiantContract {
 
         this.code.runTime = UglifyJS.minify(this.code.es5pfe)
 
-
         this.mountModule((ContractClass) => {
-
             let contractObject = new ContractClass.default("A")
 
             let pfeVars = contractObject.getPfe()
 
             let giantConfigDebug = giantConfig.debug
-            giantConfig.debug = true
 
             for (let i in pfeVars) {
                 if (i == 'WhitePaper') {
@@ -207,8 +202,6 @@ export default class GiantContract {
 
     mountModule(cb) {
         const m = require('module'), moduleName = `Deploy`
-
-        //console.log(this.code.runTime.code)
 
         var res = require('vm').runInThisContext(m.wrap(this.code.runTime.code))(exports, require, module, __filename, __dirname)
 

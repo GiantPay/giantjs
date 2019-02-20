@@ -344,7 +344,10 @@ export default class GiantNode extends EventEmitter {
                 if (typeof metadata.tip != 'undefined') {
                     this._client.getDB().getBlock(metadata.tip)
                         .then((block) => {
-                            cb(block.hash)
+                         
+                            console.log(block.prevHash, ' --- ',  block.data[0].data[0].txId)
+
+                            cb(block.prevHash, block.data[0].data[0].prevTxId)
                         })
                 } else {
                     logger.info(`Blocks not found`)

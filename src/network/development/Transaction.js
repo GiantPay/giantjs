@@ -15,7 +15,6 @@ export default class Transaction {
         }
         this.type = options.type || TransactionType.TRANSFER
 
-        //TODO count
         this.feePrice = options.feePrice || giantConfig.feePrice
 
         if (typeof options.contractName != 'undefined') {
@@ -24,6 +23,10 @@ export default class Transaction {
         }
 
         this.inputs = options.inputs || this.getInputs()
+
+        this.prevBlockHash = options.prevBlockHash
+
+        this.prevTxId = options.prevTxId
 
         this.outputs = options.outputs || this.getOutputs()
 
@@ -36,7 +39,13 @@ export default class Transaction {
         }
 
         Object.defineProperty(this, 'hash', hashProperty)
+
         Object.defineProperty(this, 'id', hashProperty)
+        /**
+         * hashProperty not unique
+         * unique
+         * transaction.id = Hash.sha256(transaction.getHash() + block.prevHash)
+         */
     }
 
     static generation() {
@@ -83,24 +92,18 @@ export default class Transaction {
     }
 
     getHash() {
-        return Hash.sha256(this.toJson())
+        return Hash.sha256(this.toJson() + this.prevBlockHash)
     }
 
     getInputs() {
         let input = [{
             value: giantConfig.owner.premine,
-            prevTx: this.getPrevTx(),
+            prevTx: this.prevTxId,
             index: 0,
             scriptSig: ''
         }]
 
         return input
-    }
-
-    getPrevTx() {
-        //  self.db.getBlock(self.tip.hash)
-        //  method moved to GIant Node
-        return 'a08443546d4439d6341107cd20fe0d727aafab8d383613780d811926a1b9f2b2'
     }
 
     getOutputs() {

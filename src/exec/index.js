@@ -14,25 +14,12 @@ export default (address, method, args) => {
     giantNode.on('ready', () => {
         giantNode.checkContractAddress(address, contractAddress => {
             if (contractAddress) {
-                //create tx
-                /**
+                //applly methods call self.db.validateBlockData
 
-                 MockClient.callContract(from, contractAddress, method, args, ()=>{
-                    self.db.validateBlockData(block, () => {
-
-                    // initContract here
-
-                    self.chain.addBlock(block, (err) => {
-
-                    })
-                 })
-
-                 */
                 giantNode.initContract(contractAddress, metadata => {
                     logger.info(`Set pfe info for methods in metadata`)
 
                     if (typeof giantNode.contracts[metadata.className] != 'undefined') {
-
 
                         let contract = giantNode.contracts[metadata.className]
 
@@ -42,24 +29,19 @@ export default (address, method, args) => {
 
                         console.log(contract.metadata)
 
-                        /**
-                         * Example call wp method getCallerBalance
-                         * TODO : contract.initMethod({'name': 'getCallerBalance', 'args': {'a': 1, 'b': 1}})
-                         */
-
                         giantNode.initMethod({'contractName': metadata.className, 'method': method, 'args': args}) //args obj {'a': 1, 'b': 1}
 
                         //logger.info(`WP getCallerBalance : ${contract.getCallerBalance()} GIC`)
 
                         //Sending some amount GIC for each account
-                        const billAmount = 20
+                        /*const billAmount = 20
                         const contractAddressArr = giantNode.getAccounts()
                         const mockCaller = giantNode.getCaller()
                         //console.log(contractAddressArr)
 
                         giantNode.contracts[metadata.className].multiplePayment(mockCaller, contractAddressArr, billAmount, (result) => {
                             logger.info(`MultiplePayment status ${result.status}`)
-                        })
+                        })*/
                     } else {
                         logger.info(`Contract ${contractAddress} not found`)
                     }

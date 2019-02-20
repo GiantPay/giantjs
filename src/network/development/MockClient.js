@@ -84,14 +84,22 @@ export default class MockClient extends EventEmitter {
             try {
                 options.feePrice = options.metadata.deployFee || 1000
 
-                options.txid = Hash.sha256(options)
+                let transaction = Transaction.deployContract(options)
 
-                const transaction = Transaction.deployContract(options)
+                /**
+                 * unique
+                 * transaction.id = Hash.sha256(transaction.getHash() + block.prevHash)
+                 */
+
+                transaction.txId = transaction.getHash()
+                logger.warn(`Transaction prevBlockHash ${transaction.prevBlockHash}`)
+                logger.warn(`Transaction ${transaction.id}`)
 
                 this.db.memPool.addTransaction(transaction)
                     .then(() => {
                         logger.warn(`Add transaction to memPool. Success. Debug ${giantConfig.debug}`)
                         if(giantConfig.debug){
+                            logger.warn(`Transaction in memPool.`)
                             console.log(this.db.memPool.getTransactions())
                         }
                     })
@@ -101,9 +109,7 @@ export default class MockClient extends EventEmitter {
                     })
 
             } catch (err) {
-
-                console.log(err);
-
+                console.log(err)
             }
         })
     }

@@ -32,13 +32,9 @@ export default (name, cmd) => {
             }
         }
 
-        // TODO it's necessary to take from the parameters
         const accounts = giantNode.getAccounts()
 
-
-        giantNode.getPrevBlockHash((prevBlockHash) => {
-            console.log(prevBlockHash)
-
+        giantNode.getPrevBlockHash((prevBlockHash, prevTxId) => {
             let options = {}
 
             options.contractCode = giantContract.code
@@ -49,6 +45,10 @@ export default (name, cmd) => {
 
             options.metadata = giantContract.getMetadata()
 
+            options.prevBlockHash = prevBlockHash
+
+            options.prevTxId = prevTxId
+
             options.metadata.deployFee = giantContract.pfeAmount
 
             logger.info(`Amount  :  ${options.metadata.deployFee} GIC \n`)
@@ -58,7 +58,6 @@ export default (name, cmd) => {
             giantNode.deployContract(options)
 
                 .then((contract) => {
-                    // console.log(giantNode.getMemPool())
                     logger.info(`Your account :  ${accounts[0]}`)
                     logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)
                     logger.info(`Your contract  :  ${giantContract.name} was deployed`)
