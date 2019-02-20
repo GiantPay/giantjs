@@ -314,8 +314,9 @@ export default class GiantNode extends EventEmitter {
 
                     for (var c in metadata.contracts) {
                         for (var k in metadata.contracts[c]) {
-                            logger.info(`contract ${metadata.contracts[c][k].className}  ${k} `)
-                            logger.info(`txid ${metadata.contracts[c][k].txid}  `)
+                            logger.warn(`contract key ${k}`)
+                            logger.info(`contract from md ${metadata.contracts[c][k].className} ${metadata.contracts[c][k].contractAddress}`)
+                            logger.info(`txid ${metadata.contracts[c][k].txid} `)
                         }
                     }
 
@@ -338,16 +339,15 @@ export default class GiantNode extends EventEmitter {
             })
     }
 
-    getPrevBlockHash(cb) {
+    getLastBlockHash(cb) {
         this._client.getDB().getMetadata()
             .then((metadata) => {
                 if (typeof metadata.tip != 'undefined') {
                     this._client.getDB().getBlock(metadata.tip)
                         .then((block) => {
-                         
-                            console.log(block.prevHash, ' --- ',  block.data[0].data[0].txId)
+                            console.log(block.prevHash, ' --- ', block.data[0].data[0].txId)
 
-                            cb(block.prevHash, block.data[0].data[0].prevTxId)
+                            cb(block.prevHash, 1111)
                         })
                 } else {
                     logger.info(`Blocks not found`)

@@ -140,26 +140,35 @@ export default class Chain extends EventEmitter {
                             }
 
                             if (typeof block.data[0] != 'undefined' && typeof block.data[0].data != 'undefined') {
-                                //prevBlockHash = giantNode.prevBlockHash
-                                //let contractId = '0x' + Hash.sha256(prevBlockHash+ block.data[0].data[0].code)
-                                let contractId = '0x' + Hash.sha256(block.data[0].data[0].code)
+                                //TODO : move contractAddress in contract options
+                                //let contractId = block.data[0].contractAddress
+
+                                /**
+                                 * TODO : fix contractId (contractAddress) - case not all types tx have contractAddress
+                                 * and we cant use self.tip for that
+                                 *
+                                 */
+
+                                let contractId = '0x' + Hash.sha256(block.prevHash + block.data[0].data[0])
 
                                 let contractMetadata = block.data[0].data[0].metadata
 
                                 contractMetadata.version = "1.0"
+
                                 contractMetadata.block = blockId
 
-                                contractMetadata.txid = Hash.sha256(block.data[0])
+                               // contractMetadata.txid = Hash.sha256(block.data[0])
 
                                 contractMetadata.owner = giantConfig.caller.privateKey
                                 contractMetadata.initialized = false
-                                contractMetadata.description = "sandbox Contract"
+                                contractMetadata.description = `Sandbox Contract :  ${contractId}`
                                 contractMetadata.dependencies = {
                                     "giant-exchange-api": "^0.1.0",
                                     "some-giant-api": "^0.3.6"
                                 }
 
                                 contract[contractId] = contractMetadata
+
                                 contractsArr.push(contract)
 
                                 const metadata = {
@@ -168,8 +177,6 @@ export default class Chain extends EventEmitter {
                                     cache: self.cache,
                                     contracts: contractsArr
                                 }
-
-                                //console.log(contractsArr)
 
                                 self.lastSavedMetadata = new Date()
                                 self.db.putMetadata(metadata, callback)

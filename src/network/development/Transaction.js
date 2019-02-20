@@ -22,11 +22,17 @@ export default class Transaction {
             this.data = [contract]
         }
 
+        if (options.type == 'deploy') {
+            this.contractAddress = options.contractAddress
+        }
+
         this.inputs = options.inputs || this.getInputs()
 
         this.prevBlockHash = options.prevBlockHash
 
         this.prevTxId = options.prevTxId
+
+        this.txId = this.getHash()
 
         this.outputs = options.outputs || this.getOutputs()
 
@@ -100,6 +106,7 @@ export default class Transaction {
             value: giantConfig.owner.premine,
             prevTx: this.prevTxId,
             index: 0,
+            scriptSig2: '',
             scriptSig: ''
         }]
 
