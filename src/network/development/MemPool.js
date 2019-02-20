@@ -21,15 +21,18 @@ export default class MemPool extends EventEmitter {
 
         return new Promise((resolve, reject) => {
             transaction.validate() //result like contract move to create method
-                .then((result) => {
-                    if (result) {
-                        if (!self.hasTransaction(transaction.id)) {
+                .then((contract) => {
+                    contract.txid = contract.metadata.txid = transaction.getHash()
+
+                    logger.warn(`Mempool contract.txid : ${contract.txid}`)
+
+                    if (contract) {
+                        if (!self.hasTransaction(contract.txid)) {
                             self.transactions.push(transaction)
                             self.emit('transaction', transaction)
-                            resolve(result)
-                        } else {
-                            resolve(result)
                         }
+
+                        resolve(contract)
                     }
                 })
                 .catch(reject)

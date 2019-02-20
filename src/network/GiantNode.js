@@ -339,15 +339,13 @@ export default class GiantNode extends EventEmitter {
             })
     }
 
-    getLastBlockHash(cb) {
+    getLastHashes(cb) {
         this._client.getDB().getMetadata()
             .then((metadata) => {
                 if (typeof metadata.tip != 'undefined') {
                     this._client.getDB().getBlock(metadata.tip)
                         .then((block) => {
-                            console.log(block.prevHash, ' --- ', block.data[0].data[0].txId)
-
-                            cb(block.prevHash, 1111)
+                            cb(block.prevHash, block.data[0].data[0].metadata.contractAddress)
                         })
                 } else {
                     logger.info(`Blocks not found`)

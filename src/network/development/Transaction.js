@@ -22,9 +22,7 @@ export default class Transaction {
             this.data = [contract]
         }
 
-        if (options.type == 'deploy') {
-            this.contractAddress = options.contractAddress
-        }
+        this.contractAddress = options.contractAddress
 
         this.inputs = options.inputs || this.getInputs()
 
@@ -84,7 +82,8 @@ export default class Transaction {
             type: this.type,
             data: this.data,
             inputs: this.inputs,
-            outputs: this.outputs
+            outputs: this.outputs,
+            prevBlockHash: this.prevBlockHash
         }
 
         if (this.type === TransactionType.CONTRACT_DEPLOY || this.type === TransactionType.CONTRACT_CALL) {
@@ -98,7 +97,7 @@ export default class Transaction {
     }
 
     getHash() {
-        return Hash.sha256(this.toJson() + this.prevBlockHash)
+        return Hash.sha256(this.toJson())
     }
 
     getInputs() {
@@ -106,7 +105,6 @@ export default class Transaction {
             value: giantConfig.owner.premine,
             prevTx: this.prevTxId,
             index: 0,
-            scriptSig2: '',
             scriptSig: ''
         }]
 
