@@ -13,7 +13,9 @@ export default (name, cmd) => {
 
     giantNode.on('ready', () => {
         const giantContract = new GiantContract(name)
+
         giantContract.validate()
+
         if (giantContract.valid) {
             try {
                 logger.debug('Compile Contract')
@@ -39,7 +41,22 @@ export default (name, cmd) => {
 
             const contractAddress = '0x' + Hash.sha256(prevBlockHash + giantContract.code)
 
-            options.metadata = giantContract.getMetadata()
+            let wp = giantContract.pfeVars.WhitePaper
+
+            let md = giantContract.getMetadata()
+
+            for (let i in md.methods) {
+                if (wp.hasOwnProperty(md.methods[i].name)) {
+                    logger.info(`Insert ${md.methods[i].name} fee ${wp[md.methods[i].name].fee} GIC in metadata`)
+                    md.methods[i].params.push(wp[md.methods[i].name])
+                }
+            }
+
+            logger.info(`The contract metadata`)
+
+            console.log(md)
+
+            options.metadata = md
 
             options.metadata.contractAddress = options.contractAddress = contractAddress
 
@@ -53,12 +70,11 @@ export default (name, cmd) => {
 
             options.metadata.deployFee = giantContract.pfeAmount
 
-            logger.info(`Amount  :  ${options.metadata.deployFee} GIC \n`)
+            logger.info(`Syntax and wp amount :  ${options.metadata.deployFee} GIC \n`)
 
             options.from = accounts[0]
 
             giantNode.deployContract(options)
-
                 .then((contract) => {
                     logger.info(`Your account :  ${accounts[0]}`)
                     logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)

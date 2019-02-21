@@ -35,9 +35,9 @@ let pfeVars = {
     DoWhileStatement: {count: 0, max: 10, fee: 20, required: false},
     WhitePaper: {
         getNodeOwner: {count: 0, max: 10, fee: 20, required: false},
-        getNodeOwnerBalance: {count: 0, max: 10, fee: 20, required: false},
-        getCaller: {count: 0, max: 10, fee: 20, required: false},
-        getCallerBalance: {count: 0, max: 10, fee: 20, required: false},
+        getNodeOwnerBalance: {count: 0, max: 10, fee: 30, required: false},
+        getCaller: {count: 0, max: 10, fee: 40, required: false},
+        getCallerBalance: {count: 0, max: 10, fee: 50, required: false},
     },
 }, pfeVarsCount = (type, whitePaper) => {
     if (type) {
@@ -58,10 +58,11 @@ export default ({template: template}) => {
         for (let i in pfeVars) {
             str += i + `: {count: ${pfeVars[i]['count']}, fee: ${pfeVars[i]['fee']}},\n`
         }
+        str += `WhitePaper: {`
         for (let i in pfeVars.WhitePaper) {
             str += i + `: {count: ${pfeVars.WhitePaper[i]['count']}, fee: ${pfeVars.WhitePaper[i]['fee']}},\n`
         }
-        str += '}'
+        str += '}}'
         return template(`var pfeVars = ${str}`, {
             sourceType: 'module'
         })()

@@ -12,14 +12,15 @@ import giantConfig from "../config";
 export default class GiantContract {
 
     constructor(name) {
-        this.valid = false
-        this.compiled = false
+        this.valid = null
+        this.compiled = null
         this.name = name
         this.code = {}
-        this.code.es5 = false
-        this.code.es6 = false
-        this.code.es5pfe = false
-        this.code.runTime = false
+        this.code.es5 = null
+        this.code.es6 = null
+        this.code.es5pfe = null
+        this.code.runTime = null
+        this.pfeVars = null
         this.fileName = GiantPath.getContractFile(name)
         this.targetFileName = GiantPath.getTargetContractFile(name)
         this.targetFileNameRunTime = GiantPath.getTargetContractFileRunTime(name)
@@ -144,23 +145,23 @@ export default class GiantContract {
         this.mountModule((ContractClass) => {
             let contractObject = new ContractClass.default("A")
 
-            let pfeVars = contractObject.getPfe()
+            this.pfeVars = contractObject.getPfe()
 
             let giantConfigDebug = giantConfig.debug
 
-            for (let i in pfeVars) {
+            for (let i in this.pfeVars) {
                 if (i == 'WhitePaper') {
                     logger.warn(`Found WhitePaper Declarations`)
 
-                    console.log(pfeVars['WhitePaper'])
+                    console.log(this.pfeVars['WhitePaper'])
 
-                    if (typeof pfeVars['WhitePaper'].count == 'undefined') {
+                    if (typeof this.pfeVars['WhitePaper'].count == 'undefined') {
                         logger.error(`WhitePaper count undefined`)
                     }
                 }
 
-                if (pfeVars[i].count) {
-                    this.pfeAmount += pfeVars[i].count * pfeVars[i].fee
+                if (this.pfeVars[i].count) {
+                    this.pfeAmount += this.pfeVars[i].count * this.pfeVars[i].fee
 
                     if (giantConfig.debug) {
                         console.log(`Declaration ${i} counted`)
@@ -197,7 +198,6 @@ export default class GiantContract {
             console.log(data)
             logger.warn(`Contract ${self.name} is valid ${GiantPath.getContractFile(self.name)}`)
         })
-        this.getMetadata()
     }
 
     mountModule(cb) {
