@@ -18,8 +18,12 @@ export default class MemPool extends EventEmitter {
         logger.warn(`MemPool addTransaction transaction ${transaction.id}`)
 
         if(transaction.type == 'generation'){
-            logger.warn(`Transaction type : ${transaction.type}`)
-            return
+
+            return new Promise((resolve, reject) => {
+                logger.warn(`Transaction type : ${transaction.type}`)
+                resolve()
+            })
+
         }else{
             return new Promise((resolve, reject) => {
                 transaction.validate() //result like contract move to create method

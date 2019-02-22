@@ -56,7 +56,9 @@ export default class GiantNode extends EventEmitter {
     }
 
     chainFirstBlock() {
-        this._client.wallet.premine()
+        let firstTx = this._client.wallet.premine()
+        let memPool = this._client.getDB().getMemPool()
+        memPool.transactions.push(firstTx)
     }
 
     sendFrom(from, to, amount) {

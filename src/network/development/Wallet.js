@@ -74,7 +74,7 @@ export default class Wallet extends EventEmitter {
     }
 
     premine() {
-        const transaction = Transaction.generation()
+        let transaction = Transaction.generation()
 
         this.accounts.forEach((account) => {
             transaction.outputs.push({
@@ -83,7 +83,7 @@ export default class Wallet extends EventEmitter {
             })
         })
 
-        this.db.memPool.addTransaction(transaction)
+        return transaction
     }
 
     getAccounts() {
