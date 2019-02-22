@@ -149,7 +149,7 @@ export default class Chain extends EventEmitter {
                                  *
                                  */
 
-                                let contractId = '0x' + Hash.sha256(block.prevHash + block.data[0].data[0])
+                                let contractAddress = block.data[0].data[0].metadata.contractAddress
 
                                 let contractMetadata = block.data[0].data[0].metadata
 
@@ -157,17 +157,18 @@ export default class Chain extends EventEmitter {
 
                                 contractMetadata.block = blockId
 
-                               // contractMetadata.txid = Hash.sha256(block.data[0])
-
                                 contractMetadata.owner = giantConfig.caller.privateKey
+
                                 contractMetadata.initialized = false
-                                contractMetadata.description = `Sandbox Contract :  ${contractId}`
+
+                                contractMetadata.description = `Sandbox Contract :  ${contractAddress}`
+
                                 contractMetadata.dependencies = {
                                     "giant-exchange-api": "^0.1.0",
                                     "some-giant-api": "^0.3.6"
                                 }
 
-                                contract[contractId] = contractMetadata
+                                contract[contractAddress] = contractMetadata
 
                                 contractsArr.push(contract)
 

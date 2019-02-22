@@ -75,7 +75,7 @@ export default (name, cmd) => {
             options.from = accounts[0]
 
             giantNode.deployContract(options)
-                .then((contract) => {
+                .then(() => {
                     logger.info(`Your account :  ${accounts[0]}`)
                     logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)
                     logger.info(`Your contract  :  ${giantContract.name} was deployed`)
