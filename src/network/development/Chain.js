@@ -149,9 +149,11 @@ export default class Chain extends EventEmitter {
                                  *
                                  */
 
-                                let contractAddress = block.data[0].data[0].metadata.contractAddress
+                                const tx = block.data[0]
 
-                                let contractMetadata = block.data[0].data[0].metadata
+                                const contractMetadata = tx.data[0].metadata
+
+                                const contractAddress = contractMetadata.contractAddress
 
                                 contractMetadata.version = "1.0"
 

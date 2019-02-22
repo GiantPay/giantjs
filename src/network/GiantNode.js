@@ -44,6 +44,21 @@ export default class GiantNode extends EventEmitter {
         return this._client.getBalance()
     }
 
+    checkChain(cb) {
+        this._client.getDB().getMetadata()
+            .then((metadata) => {
+                if (typeof metadata.tip == 'undefined') {
+                    cb(false)
+                } else {
+                    cb(true)
+                }
+            })
+    }
+
+    chainFirstBlock() {
+        this._client.wallet.premine()
+    }
+
     sendFrom(from, to, amount) {
         return this._client.sendFrom(from, to, amount)
     }
@@ -314,8 +329,7 @@ export default class GiantNode extends EventEmitter {
 
                     for (var c in metadata.contracts) {
                         for (var k in metadata.contracts[c]) {
-                            logger.warn(`contract key ${k}`)
-                            logger.info(`contract from md ${metadata.contracts[c][k].className} ${metadata.contracts[c][k].contractAddress}`)
+                            logger.info(`contract metadata : name ${metadata.contracts[c][k].className}, address ${metadata.contracts[c][k].contractAddress}`)
                             logger.info(`txid ${metadata.contracts[c][k].txid} `)
                         }
                     }

@@ -8,7 +8,7 @@ export default class Transaction {
 
     constructor(options) {
         this.options = options
-        //giantConfig.debug = true
+        giantConfig.debug = true
         logger.warn(`Transaction constructor(options) debug ${giantConfig.debug}`)
         if (giantConfig.debug) {
             console.log(options)
@@ -173,7 +173,7 @@ export default class Transaction {
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
                 const contract = new Contract(this.options)
-                resolve(contract)
+                resolve({})
             } else if (this.type === 'call') {
                 // TODO call contract method
                 const result = null // Result of contract's method execution
