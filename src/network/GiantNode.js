@@ -363,7 +363,7 @@ export default class GiantNode extends EventEmitter {
                             if (typeof  block.data[0].data != 'undefined') {
                                 cb(block.prevHash, block.data[0].data[0].metadata.contractAddress)
                             }else{
-                                cb(block.prevHash, 'first')
+                                cb(block.prevHash, block.prevHash)
                             }
                         })
                 } else {

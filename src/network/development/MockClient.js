@@ -86,9 +86,7 @@ export default class MockClient extends EventEmitter {
 
                 let transaction = Transaction.deployContract(options)
 
-                logger.warn(`Transaction  ${transaction.txid} prevBlockHash ${transaction.prevBlockHash}`)
-
-                logger.warn(`Transaction ${transaction.id}`)
+                logger.warn(`Transaction  ${transaction.id} prevBlockHash ${transaction.prevBlockHash}`)
 
                 this.db.memPool.addTransaction(transaction)
                     .then(() => {
@@ -97,10 +95,12 @@ export default class MockClient extends EventEmitter {
                             logger.warn(`Transaction in memPool.`)
                             console.log(this.db.memPool.getTransactions())
                         }
+
                         resolve()
                     })
                     .catch(function (error) {
                         console.log(error)
+
                         reject()
                     })
 

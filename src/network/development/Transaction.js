@@ -173,10 +173,11 @@ export default class Transaction {
         return new Promise((resolve, reject) => {
             if (this.type === 'deploy') {
                 const contract = new Contract(this.options)
-                resolve({})
+
+                resolve(contract)
             } else if (this.type === 'call') {
-                // TODO call contract method
                 const result = null // Result of contract's method execution
+
                 resolve(result)
             } else if (this.type === 'transfer') {
                 /*sendCoin (receiver) {

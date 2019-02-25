@@ -15,7 +15,7 @@ export default class MemPool extends EventEmitter {
     addTransaction(transaction) {
         const self = this
 
-        logger.warn(`MemPool addTransaction transaction ${transaction.id}`)
+        logger.warn(`MemPool addTransaction transaction ${transaction.id} type ${transaction.type}`)
 
         if (transaction.type == 'generation') {
 
@@ -30,19 +30,19 @@ export default class MemPool extends EventEmitter {
             })
 
         } else {
+
             return new Promise((resolve, reject) => {
                 transaction.validate() //result like contract move to create method
                     .then((contract) => {
                         if (contract) {
-                            if (typeof contract.txid != 'undefined') {
-                                contract.txid = contract.metadata.txid = transaction.getHash()
 
-                                logger.warn(`Mempool contract.txid : ${contract.txid}`)
+                            contract.txid = contract.metadata.txid = transaction.getHash()
 
-                                if (!self.hasTransaction(contract.txid)) {
-                                    self.transactions.push(transaction)
-                                    self.emit('transaction', transaction)
-                                }
+                            logger.warn(`Mempool contract.txid : ${contract.txid}`)
+
+                            if (!self.hasTransaction(contract.txid)) {
+                                self.transactions.push(transaction)
+                                self.emit('transaction', transaction)
                             }
 
                             resolve(contract)

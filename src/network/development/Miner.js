@@ -81,10 +81,13 @@ export default class Miner {
 
         if (memPoolTransactions.length) {
             let transactions = []
+
             transactions = transactions.concat(memPoolTransactions)
+
             const block = new Block({
                 prevHash: self.chain.tip.hash
             })
+
             self.db.validateBlockData(block, () => {
 
                 self.db.addTransactionsToBlock(block, transactions)
