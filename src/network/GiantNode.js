@@ -323,7 +323,6 @@ export default class GiantNode extends EventEmitter {
                     logger.info(`Hashes`)
                     console.log(Object.keys(metadata.cache.hashes))
 
-
                     logger.info(`Accounts`)
                     console.log(this._client.getAccounts())
 
@@ -361,7 +360,11 @@ export default class GiantNode extends EventEmitter {
                 if (typeof metadata.tip != 'undefined') {
                     this._client.getDB().getBlock(metadata.tip)
                         .then((block) => {
-                            cb(block.prevHash, block.data[0].data[0].metadata.contractAddress)
+                            if (typeof  block.data[0].data != 'undefined') {
+                                cb(block.prevHash, block.data[0].data[0].metadata.contractAddress)
+                            }else{
+                                cb(block.prevHash, 'first')
+                            }
                         })
                 } else {
                     logger.info(`Blocks not found`)

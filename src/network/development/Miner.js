@@ -75,7 +75,6 @@ export default class Miner {
         return this.wallet.accounts[0]
     }
 
-
     mineBlock(callback) {
         const self = this
         const memPoolTransactions = self.memPool.getTransactions()
@@ -97,6 +96,48 @@ export default class Miner {
                         self.chain.emit('error', err)
                     } else {
                         logger.debug(`Builder successfully added block ${block.hash} to chain`)
+
+                        self.db.getMetadata()
+                            .then((metadata) => {
+                                console.log('metadata')
+                                console.log(metadata)
+                                if (typeof metadata.cache != 'undefined') {
+                                    logger.info(`${metadata.tipHeight} Blocks`)
+
+                                    logger.info(`Hashes`)
+                                    console.log(Object.keys(metadata.cache.hashes))
+
+                                    logger.info(`Accounts`)
+                                    console.log(this._client.getAccounts())
+
+                                    logger.info(`Contracts ${metadata.contracts.length}`)
+
+                                    for (var c in metadata.contracts) {
+                                        for (var k in metadata.contracts[c]) {
+                                            logger.info(`contract metadata : name ${metadata.contracts[c][k].className}, address ${metadata.contracts[c][k].contractAddress}`)
+                                            logger.info(`txid ${metadata.contracts[c][k].txid} `)
+                                        }
+                                    }
+
+                                    self.db.getBlock(metadata.tip)
+                                        .then((block) => {
+                                            //console.log(block)
+                                            logger.info(`
+                        LAST BLOCK v${block.version} : ${metadata.tip}
+                        --------------------------------------------------------------------------------
+                        Prev hash : ${block.prevHash}
+                        Merkel root : ${block.merkleRoot} 
+                        Height: : ${block.height} 
+                        Timestamp : ${block.timestamp} 
+                        Nonce : ${block.nonce}
+                        `)
+                                        })
+                                } else {
+                                    logger.info(`Blocks not found`)
+                                }
+                            })
+
+                        // giantNode.getInfo(options)
                     }
                     callback()
                 })

@@ -75,6 +75,7 @@ export default class Chain extends EventEmitter {
                         if (err) {
                             self.emit('error', err)
                         } else {
+                            console.log(self.tip)
                             self.db._onChainAddBlock(self.genesis, (err) => {
                                 if (err) {
                                     self.emit('error', err)
@@ -87,7 +88,6 @@ export default class Chain extends EventEmitter {
                         }
                     })
                 } else {
-                    metadata.tip = metadata.tip
                     self.db.getBlock(metadata.tip)
                         .then((tip) => {
                             self.tip = tip
@@ -120,10 +120,6 @@ export default class Chain extends EventEmitter {
 
         self.db.getMetadata()
             .then((metadata) => {
-                if (typeof metadata.contracts == 'undefined') {
-                    metadata.contracts = [1, 2]
-                }
-
                 let blockId = metadata.tip
 
                 self.db.getBlock(self.tip.hash)
@@ -173,18 +169,18 @@ export default class Chain extends EventEmitter {
                                 contract[contractAddress] = contractMetadata
 
                                 contractsArr.push(contract)
-
-                                const metadata = {
-                                    tip: self.tip ? self.tip.hash : null,
-                                    tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
-                                    cache: self.cache,
-                                    contracts: contractsArr
-                                }
-
-                                self.lastSavedMetadata = new Date()
-                                self.db.putMetadata(metadata, callback)
                             }
                         }
+
+                        const metadata = {
+                            tip: self.tip ? self.tip.hash : null,
+                            tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
+                            cache: self.cache,
+                            contracts: contractsArr
+                        }
+
+                        self.lastSavedMetadata = new Date()
+                        self.db.putMetadata(metadata, callback)
                     })
             })
     }
