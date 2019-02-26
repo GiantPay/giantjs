@@ -110,8 +110,10 @@ export default class Miner {
                                     logger.info(`Hashes`)
                                     console.log(Object.keys(metadata.cache.hashes))
 
-                                    logger.info(`Accounts`)
-                                    console.log(this._client.getAccounts())
+                                    if (typeof this._client != 'undefined') {
+                                        logger.info(`Accounts`)
+                                        console.log(this._client.getAccounts())
+                                    }
 
                                     logger.info(`Contracts ${metadata.contracts.length}`)
 

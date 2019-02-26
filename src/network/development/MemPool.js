@@ -21,11 +21,12 @@ export default class MemPool extends EventEmitter {
 
             return new Promise((resolve, reject) => {
                 logger.warn(`Transaction type : ${transaction.type}`)
-                console.log(transaction)
+
                 if (!self.hasTransaction(transaction.txId)) {
                     self.transactions.push(transaction)
                     self.emit('transaction', transaction)
                 }
+
                 resolve({'id': transaction.txId})
             })
 

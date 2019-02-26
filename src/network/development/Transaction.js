@@ -45,11 +45,6 @@ export default class Transaction {
         Object.defineProperty(this, 'hash', hashProperty)
 
         Object.defineProperty(this, 'id', hashProperty)
-        /**
-         * hashProperty not unique
-         * unique
-         * transaction.id = Hash.sha256(transaction.getHash() + block.prevHash)
-         */
     }
 
     static generation() {
@@ -68,7 +63,10 @@ export default class Transaction {
 
     static deployContract(options) {
         options.type = TransactionType.CONTRACT_DEPLOY
-        return new Transaction(options)
+        let tx = new Transaction(options)
+        tx.getInputs()
+        tx.getOutputs()
+        return tx
     }
 
     static callContract() {
@@ -101,28 +99,47 @@ export default class Transaction {
     }
 
     getInputs() {
-        let input = [{
+        this.input = [{
             value: giantConfig.owner.premine,
             prevTx: this.prevTxId,
             index: 0,
             scriptSig: ''
         }]
-
-        return input
     }
 
-    getOutputs() {
-        let output = [{
-            value: this.countOutput(),
-            ScryptPubKey: ''
-        }]
+    /**
+     * premine
+     outputs:
+     [ { ScryptPubKey: '' },
+     { to: 'GUuf1RCuFmLAbyNFT5WifEpZTnLYk2rtVd', value: 20000 },
+     { to: 'GPLkrYE3GdXDoZMz4zhxyBmTiF1N3AQvpH', value: 20010 },
+     { to: 'Gf84TLVMVaEBD1Vb5ZSax39i8VorgB5nC3', value: 20020 },
+     { to: 'GKFej3xYYzbv8qD5p2Q6CGxQVz1uFXZcVo', value: 20030 },
+     { to: 'GRfRyKN7wkswAeDrmLvg9JSjfoZd29gkTv', value: 20040 },
+     { to: 'GPe8tZMKBATcvJMu3AY2waXm2Hj6nE3YEM', value: 20050 },
+     { to: 'GSQoMjQFm2b942Z9AnGHnfGSspuAZbcfJa', value: 20060 },
+     { to: 'GbHkZrS9X6LRifRY73pA87ZuUw4Nn7nd3a', value: 20070 },
+     { to: 'GJrnCVYHuzNMNkHstvmUxY6znp5iTcXAmB', value: 20080 },
+     { to: 'GcKg5sgUUXFLxhKoScUFMQMN95iFbrkqVa', value: 20090 } ] } ]
+     */
 
-        return output
+    getOutputs() {
+        this.output = [{ScryptPubKey: ''},
+            {to: giantConfig.owner.publicKey, value: this.countOutput()}]
     }
 
     countOutput() {
-        let deployFee = 0
-        /*  this.db.getMetadata().then((metadata) => {
+        let deployFee = 20
+        return deployFee
+        /*
+
+        [{
+            value: ,
+            to: ,
+            ScryptPubKey: ''
+        }]
+
+        this.db.getMetadata().then((metadata) => {
               const lastContracts = metadata.contracts[metadata.contracts.length - 1]
 
               for (let i in lastContracts) {

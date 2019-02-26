@@ -314,7 +314,6 @@ export default class GiantNode extends EventEmitter {
     }
 
     getInfo(options) {
-        console.log(this.options)
         this._client.getDB().getMetadata()
             .then((metadata) => {
                 if (typeof metadata.cache != 'undefined') {
@@ -337,7 +336,7 @@ export default class GiantNode extends EventEmitter {
 
                     this._client.getDB().getBlock(metadata.tip)
                         .then((block) => {
-                            //console.log(block)
+                            console.log(block)
                             logger.info(`
                         LAST BLOCK v${block.version} : ${metadata.tip}
                         --------------------------------------------------------------------------------
@@ -360,9 +359,9 @@ export default class GiantNode extends EventEmitter {
                 if (typeof metadata.tip != 'undefined') {
                     this._client.getDB().getBlock(metadata.tip)
                         .then((block) => {
-                            if (typeof  block.data[0].data != 'undefined') {
+                            if (typeof block.data[0] != 'undefined' && typeof block.data[0].data != 'undefined') {
                                 cb(block.prevHash, block.data[0].data[0].metadata.contractAddress)
-                            }else{
+                            } else {
                                 cb(block.prevHash, block.prevHash)
                             }
                         })
