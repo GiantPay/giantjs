@@ -63,9 +63,17 @@ export default class Transaction {
 
     static deployContract(options) {
         options.type = TransactionType.CONTRACT_DEPLOY
+        
         let tx = new Transaction(options)
+
         tx.getInputs()
+
+        console.log(tx.inputs)
+
         tx.getOutputs()
+
+        console.log(tx.outputs)
+
         return tx
     }
 
@@ -99,12 +107,14 @@ export default class Transaction {
     }
 
     getInputs() {
-        this.input = [{
+        this.inputs = [{
             value: giantConfig.owner.premine,
             prevTx: this.prevTxId,
             index: 0,
             scriptSig: ''
         }]
+
+        return this.inputs
     }
 
     /**
@@ -124,38 +134,14 @@ export default class Transaction {
      */
 
     getOutputs() {
-        this.output = [{ScryptPubKey: ''},
+        this.outputs = [{ScryptPubKey: ''},
             {to: giantConfig.owner.publicKey, value: this.countOutput()}]
+
+        return this.outputs
     }
 
     countOutput() {
-        let deployFee = 20
-        return deployFee
-        /*
-
-        [{
-            value: ,
-            to: ,
-            ScryptPubKey: ''
-        }]
-
-        this.db.getMetadata().then((metadata) => {
-              const lastContracts = metadata.contracts[metadata.contracts.length - 1]
-
-              for (let i in lastContracts) {
-                  deployFee = lastContracts[i].deployFee
-              }
-
-              const chainOwner = giantConfig.owner
-
-              const chainOwnerBalance = chainOwner.premine
-
-              logger.warn(`Miner balance:  ${chainOwnerBalance} GIC`)
-
-              logger.warn(`Miner deploy fee :  ${deployFee} GIC`)
-
-              return deployFee
-          })*/
+        return this.options.metadata.deployFee
     }
 
 

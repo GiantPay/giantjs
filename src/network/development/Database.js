@@ -184,6 +184,7 @@ export default class Database extends EventEmitter {
         const transactions = self.getTransactionsFromBlock(block)
 
         logger.warn(`Validate Block Data, get Transactions from Block debug ${giantConfig.debug}`)
+        giantConfig.debug = false
         if (giantConfig.debug) {
             console.log(transactions)
         }
