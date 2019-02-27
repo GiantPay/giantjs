@@ -13,8 +13,8 @@ export default (name, cmd) => {
     })
 
     giantNode.on('ready', () => {
-        giantNode.checkChain(check => {
-            if (check) {
+        giantNode.checkChain(tipHeight => {
+            if (tipHeight) {
                 const giantContract = new GiantContract(name)
 
                 giantContract.validate()
@@ -61,6 +61,8 @@ export default (name, cmd) => {
 
                     options.metadata = md
 
+                    options.metadata.tipHeight = tipHeight
+
                     options.metadata.contractAddress = options.contractAddress = contractAddress
 
                     options.contractCode = giantContract.code
@@ -78,9 +80,13 @@ export default (name, cmd) => {
                     options.from = accounts[0]
 
                     giantNode.deployContract(options)
-                        .then(() => {
+                        .then((wallets) => {
+                            /* database updateWallets(wallets, cb) - getWallets(wallets, cb)*/
+
+                            console.log(wallets)
+
                             logger.info(`Your account :  ${accounts[0]}`)
-                            logger.info(`Your balance  :  ${giantNode.getBalance()} GIC`)
+
                             logger.info(`Your contract  :  ${giantContract.name} was deployed`)
                         })
                         .catch((err) => {

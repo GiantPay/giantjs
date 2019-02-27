@@ -8,7 +8,7 @@ export default class Transaction {
 
     constructor(options) {
         this.options = options
-        giantConfig.debug = true
+
         logger.warn(`Transaction constructor(options) debug ${giantConfig.debug}`)
         if (giantConfig.debug) {
             console.log(options)
@@ -63,7 +63,7 @@ export default class Transaction {
 
     static deployContract(options) {
         options.type = TransactionType.CONTRACT_DEPLOY
-        
+
         let tx = new Transaction(options)
 
         tx.getInputs()
@@ -95,6 +95,7 @@ export default class Transaction {
         if (this.type === TransactionType.CONTRACT_DEPLOY || this.type === TransactionType.CONTRACT_CALL) {
             json.feePrice = this.feePrice
         }
+
         return json
     }
 
@@ -108,10 +109,10 @@ export default class Transaction {
 
     getInputs() {
         this.inputs = [{
-            value: giantConfig.owner.premine,
+            value: this.countInput(), //giantConfig.caller.premine,
             prevTx: this.prevTxId,
             index: 0,
-            scriptSig: ''
+            scriptSig: giantConfig.caller.publicKey
         }]
 
         return this.inputs
@@ -141,9 +142,25 @@ export default class Transaction {
     }
 
     countOutput() {
-        return this.options.metadata.deployFee
+        if (typeof this.options.metadata != 'undefined') {
+            return this.options.metadata.deployFee
+        } else {
+            return 0
+        }
     }
 
+    countInput() {
+        if (this.type == 'deploy') {
+            if (this.options.metadata.tipHeight == 1) {
+                return giantConfig.caller.premine
+            } else {
+                //UTXO pool (array)
+                return 200000
+            }
+        } else {
+
+        }
+    }
 
     scriptSig() {
         /**

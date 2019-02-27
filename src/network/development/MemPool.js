@@ -29,9 +29,7 @@ export default class MemPool extends EventEmitter {
 
                 resolve({'id': transaction.txId})
             })
-
         } else {
-
             return new Promise((resolve, reject) => {
                 transaction.validate() //result like contract move to create method
                     .then((contract) => {
@@ -46,7 +44,21 @@ export default class MemPool extends EventEmitter {
                                 self.emit('transaction', transaction)
                             }
 
-                            resolve(contract)
+                            const wallets = [
+                                {to: 'GUuf1RCuFmLAbyNFT5WifEpZTnLYk2rtVd', value: 20000},
+                                {to: 'GPLkrYE3GdXDoZMz4zhxyBmTiF1N3AQvpH', value: 20010},
+                                {to: 'Gf84TLVMVaEBD1Vb5ZSax39i8VorgB5nC3', value: 20020},
+                                {to: 'GKFej3xYYzbv8qD5p2Q6CGxQVz1uFXZcVo', value: 20030}
+                            ]
+
+                            /**
+                             * TODO : count utxo
+                             */
+                            wallets.push(transaction.inputs)
+                            wallets.push(transaction.outputs)
+
+
+                            resolve(wallets)
                         } else {
                             reject()
                         }

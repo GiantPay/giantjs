@@ -50,7 +50,7 @@ export default class GiantNode extends EventEmitter {
                 if (typeof metadata.tip == 'undefined') {
                     cb(false)
                 } else {
-                    cb(true)
+                    cb(metadata.tipHeight)
                 }
             })
     }
