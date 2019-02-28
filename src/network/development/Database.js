@@ -90,7 +90,7 @@ export default class Database extends EventEmitter {
         })
     }
 
-    getWallets(wallets, cb) {
+    getWallets() {
         const self = this
 
         return new Promise((resolve, reject) => {

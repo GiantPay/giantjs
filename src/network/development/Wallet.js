@@ -1,13 +1,10 @@
 import Transaction from './Transaction'
 import logger from '../../logger'
-
 import EventEmitter from 'events'
-
 import colors from 'colors/safe'
 import giantConfig from "../../config";
 
 export default class Wallet extends EventEmitter {
-
     constructor(options) {
         super()
 

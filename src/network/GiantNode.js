@@ -313,6 +313,13 @@ export default class GiantNode extends EventEmitter {
         })
     }
 
+    getWallets() {
+        this._client.getDB().getWallets()
+            .then((wallets) => {
+                return wallets
+            })
+    }
+
     getInfo(options) {
         this._client.getDB().getMetadata()
             .then((metadata) => {
@@ -346,6 +353,7 @@ export default class GiantNode extends EventEmitter {
                         Timestamp : ${block.timestamp} 
                         Nonce : ${block.nonce}
                         `)
+                            this.getWallets()
                         })
                 } else {
                     logger.info(`Blocks not found`)
