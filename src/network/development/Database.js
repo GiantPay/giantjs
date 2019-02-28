@@ -81,7 +81,13 @@ export default class Database extends EventEmitter {
     }
 
     updateWallets(wallets, cb) {
-        this.store.put('wallets', JSON.stringify(wallets), cb)
+        this.store.put('wallets', JSON.stringify(wallets), (err) => {
+            if (err) {
+                cb(err)
+            } else {
+                cb(`Wallets updated`)
+            }
+        })
     }
 
     getWallets(wallets, cb) {

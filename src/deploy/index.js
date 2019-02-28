@@ -80,10 +80,10 @@ export default (name, cmd) => {
                     options.from = accounts[0]
 
                     giantNode.deployContract(options)
-                        .then((wallets) => {
+                        .then((inputsOutputs) => {
                             /* database updateWallets(wallets, cb) - getWallets(wallets, cb)*/
 
-                            console.log(wallets)
+                            console.log(inputsOutputs)
 
                             logger.info(`Your account :  ${accounts[0]}`)
 

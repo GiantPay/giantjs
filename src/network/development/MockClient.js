@@ -14,7 +14,6 @@ import Hash from "./Hash";
  * The Giant mock network, used to compile, test, and debug smart contracts in a development environment
  */
 export default class MockClient extends EventEmitter {
-
     constructor(options) {
         super()
 
@@ -89,21 +88,49 @@ export default class MockClient extends EventEmitter {
                 logger.warn(`Transaction  ${transaction.id} prevBlockHash ${transaction.prevBlockHash}`)
 
                 this.db.memPool.addTransaction(transaction)
-                    .then((wallets) => {
+                    .then((inputsOutputs) => {
                         logger.warn(`Add transaction to memPool. Success. Debug ${giantConfig.debug}`)
+
                         if (giantConfig.debug) {
                             logger.warn(`Transaction in memPool.`)
-                            //console.log(this.db.memPool.getTransactions())
+                            console.log(this.db.memPool.getTransactions())
                         }
 
-                        resolve(wallets)
+                        //https://bitcoin.org/en/glossary/signature-script
+                        //scriptSig = <sig> <pubKey>
+                        //scriptPubKey = OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
+
+                        let inputs = inputsOutputs[0][0]
+
+                        let outputs = inputsOutputs[1][1]
+
+                        for (let i in this.wallet.accounts) {
+                            if (this.wallet.accounts[i].publicKey == inputs.scriptSig) {
+                                if (this.wallet.accounts[i].premine > outputs.value) {
+                                    this.wallet.accounts[i].premine = this.wallet.accounts[i].premine - outputs.value
+
+                                    logger.info(`Caller ${this.wallet.accounts[i].publicKey} spent ${outputs.value} GIC`)
+                                } else {
+                                    logger.error(`Caller ${this.wallet.accounts[i].publicKey} can't spent ${outputs.value}, 
+                                    case have only ${this.wallet.accounts[i].premine} GIC`)
+                                }
+                            }
+
+                            if (this.wallet.accounts[i].publicKey == outputs.to) {
+                                this.wallet.accounts[i].premine = this.wallet.accounts[i].premine + outputs.value
+                            }
+                        }
+                        this.db.updateWallets(this.wallet.accounts, (response) => {
+                            logger.info(response)
+
+                            resolve(this.wallet.accounts)
+                        })
                     })
                     .catch(function (error) {
                         console.log(error)
 
                         reject()
                     })
-
             } catch (err) {
                 console.log(err)
             }
