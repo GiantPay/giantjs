@@ -15,36 +15,42 @@ export default (address, method, args) => {
         giantNode.checkContractAddress(address, contractAddress => {
             if (contractAddress) {
                 //applly methods call self.db.validateBlockData
+                giantNode.getLastHashes((prevBlockHash, prevTxId) => {
+                    giantNode.initContract(contractAddress, metadata => {
+                        logger.info(`Set pfe info for methods in metadata`)
 
-                giantNode.initContract(contractAddress, metadata => {
-                    logger.info(`Set pfe info for methods in metadata`)
+                        if (typeof giantNode.contracts[metadata.className] != 'undefined') {
 
-                    if (typeof giantNode.contracts[metadata.className] != 'undefined') {
+                            let contract = giantNode.contracts[metadata.className]
 
-                        let contract = giantNode.contracts[metadata.className]
+                            contract.metadata = giantNode.whitePaperFee(metadata)
 
-                        contract.metadata = giantNode.whitePaperFee(metadata)
+                            logger.info(`Class ${metadata.className} metadata`)
 
-                        logger.info(`Class ${metadata.className} metadata`)
+                            console.log(contract.metadata)
 
-                        console.log(contract.metadata)
+                            const options = {
+                                'contractAddress': contractAddress,
+                                'contractName': metadata.className,
+                                'method': method,
+                                'args': args,
+                                'prevBlockHash': prevBlockHash,
+                                'prevTxId': prevTxId
+                            }
 
-                        giantNode.initMethod({'contractName': metadata.className, 'method': method, 'args': args}) //args obj {'a': 1, 'b': 1}
+                            giantNode.initMethod(options) //args obj {'a': 1, 'b': 1}
+                            /*const billAmount = 20
+                            const contractAddressArr = giantNode.getAccounts()
+                            const mockCaller = giantNode.getCaller()
+                            //console.log(contractAddressArr)
 
-                        //logger.info(`WP getCallerBalance : ${contract.getCallerBalance()} GIC`)
-
-                        //Sending some amount GIC for each account
-                        /*const billAmount = 20
-                        const contractAddressArr = giantNode.getAccounts()
-                        const mockCaller = giantNode.getCaller()
-                        //console.log(contractAddressArr)
-
-                        giantNode.contracts[metadata.className].multiplePayment(mockCaller, contractAddressArr, billAmount, (result) => {
-                            logger.info(`MultiplePayment status ${result.status}`)
-                        })*/
-                    } else {
-                        logger.info(`Contract ${contractAddress} not found`)
-                    }
+                            giantNode.contracts[metadata.className].multiplePayment(mockCaller, contractAddressArr, billAmount, (result) => {
+                                logger.info(`MultiplePayment status ${result.status}`)
+                            })*/
+                        } else {
+                            logger.info(`Contract ${contractAddress} not found`)
+                        }
+                    })
                 })
             }
         })

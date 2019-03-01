@@ -81,8 +81,6 @@ export default (name, cmd) => {
 
                     giantNode.deployContract(options)
                         .then((wallets) => {
-                            /* database updateWallets(wallets, cb) - getWallets(wallets, cb)*/
-
                             console.log(wallets)
 
                             logger.info(`Your account :  ${accounts[0]}`)

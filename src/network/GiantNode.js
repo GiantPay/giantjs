@@ -69,6 +69,29 @@ export default class GiantNode extends EventEmitter {
         return this._client.deployContract(options)
     }
 
+    /**
+     * getLastContractReceipts
+     *
+     * receipt:
+      {
+  "transactionHash": "0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b",
+  "transactionIndex": 0,
+  "blockHash": "0xef95f2f1ed3ca60b048b4bf67cde2195961e0bba6f70bcbea9a2c4e133e34b46",
+  "blockNumber": 3,
+  "contractAddress": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b",
+  "cumulativeGicUsed": 314159,
+  «gicUsed": 30234,
+  "logs": [],
+  "status": "0x1"
+         }
+     */
+    initMethod(options) {
+        logger.warn(`Call method GiantContract.${options.method}`)
+        //this.contracts[options.contractName][options.method](options.args)
+
+        return this._client.callContract(options)
+    }
+
     getLastContractFromTip(cb) {
         this._client.getDB().getMetadata()
             .then((metadata) => {
@@ -124,29 +147,6 @@ export default class GiantNode extends EventEmitter {
             logger.info(`Mount module ${moduleName}`)
             cb(module.exports)
         })
-    }
-
-    initMethod(options) {
-        logger.warn(`Call method GiantContract.${options.method}`)
-        console.log(options)
-        this.contracts[options.contractName][options.method](options.args)
-
-        /**
-         * getLastContractReceipts
-         *
-         * receipt:
-          {
-  "transactionHash": "0x9fc76417374aa880d4449a1f7f31ec597f00b1f6f3dd2d66f4c9c6c445836d8b",
-  "transactionIndex": 0,
-  "blockHash": "0xef95f2f1ed3ca60b048b4bf67cde2195961e0bba6f70bcbea9a2c4e133e34b46",
-  "blockNumber": 3,
-  "contractAddress": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b",
-  "cumulativeGicUsed": 314159,
-  «gicUsed": 30234,
-  "logs": [],
-  "status": "0x1"
-         }
-         */
     }
 
     initContract(contractAddress, cb) {

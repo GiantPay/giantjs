@@ -17,7 +17,9 @@ export default class Transaction {
 
         this.feePrice = options.feePrice || giantConfig.feePrice
 
-        if (typeof options.contractName != 'undefined') {
+        this.data = []
+
+        if (options.type == 'deploy') {
             let contract = new Contract(options)
             this.data = [contract]
         }
@@ -77,10 +79,20 @@ export default class Transaction {
         return tx
     }
 
-    static callContract() {
-        return new Transaction({
-            type: TransactionType.CONTRACT_CALL
-        })
+    static callContract(options) {
+        options.type = TransactionType.CONTRACT_CALL
+
+        let tx = new Transaction(options)
+
+        tx.getInputs()
+
+        console.log(tx.inputs)
+
+        tx.getOutputs()
+
+        console.log(tx.outputs)
+
+        return tx
     }
 
     toObject() {
@@ -118,22 +130,6 @@ export default class Transaction {
         return this.inputs
     }
 
-    /**
-     * premine
-     outputs:
-     [ { ScryptPubKey: '' },
-     { to: 'GUuf1RCuFmLAbyNFT5WifEpZTnLYk2rtVd', value: 20000 },
-     { to: 'GPLkrYE3GdXDoZMz4zhxyBmTiF1N3AQvpH', value: 20010 },
-     { to: 'Gf84TLVMVaEBD1Vb5ZSax39i8VorgB5nC3', value: 20020 },
-     { to: 'GKFej3xYYzbv8qD5p2Q6CGxQVz1uFXZcVo', value: 20030 },
-     { to: 'GRfRyKN7wkswAeDrmLvg9JSjfoZd29gkTv', value: 20040 },
-     { to: 'GPe8tZMKBATcvJMu3AY2waXm2Hj6nE3YEM', value: 20050 },
-     { to: 'GSQoMjQFm2b942Z9AnGHnfGSspuAZbcfJa', value: 20060 },
-     { to: 'GbHkZrS9X6LRifRY73pA87ZuUw4Nn7nd3a', value: 20070 },
-     { to: 'GJrnCVYHuzNMNkHstvmUxY6znp5iTcXAmB', value: 20080 },
-     { to: 'GcKg5sgUUXFLxhKoScUFMQMN95iFbrkqVa', value: 20090 } ] } ]
-     */
-
     getOutputs() {
         this.outputs = [{ScryptPubKey: ''},
             {to: giantConfig.owner.publicKey, value: this.countOutput()}]
@@ -142,6 +138,10 @@ export default class Transaction {
     }
 
     countOutput() {
+        if (this.type == 'call') {
+            return this.feePrice
+        }
+
         if (typeof this.options.metadata != 'undefined') {
             return this.options.metadata.deployFee
         } else {
@@ -150,15 +150,10 @@ export default class Transaction {
     }
 
     countInput() {
-        if (this.type == 'deploy') {
-            if (this.options.metadata.tipHeight == 1) {
-                return giantConfig.caller.premine
-            } else {
-                //UTXO pool (array)
-                return 200000
-            }
+        if (typeof this.options.metadata != 'undefined' && this.options.metadata.tipHeight == 1) {
+            return giantConfig.caller.premine
         } else {
-
+            return this.options.inputValue
         }
     }
 

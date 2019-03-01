@@ -23,7 +23,9 @@ export default class MockClient extends EventEmitter {
         options.client = this
 
         this.db = options.db = new Database(options)
+
         this.wallet = options.wallet = new Wallet(options)
+
         this.chain = options.chain = new Chain(options)
 
         const self = this
@@ -137,11 +139,53 @@ export default class MockClient extends EventEmitter {
         })
     }
 
-    callContract(from, contractAddress, method, args) {
-        return new Promise((resolve, reject) => {
+    callContract(options) {
+        const self = this
 
+        let wallets = this.db.getWallets()
+            .then((wallets) => {
+                for (let i in wallets) {
+                    console.log(wallets[i].publicKey)
+                    if (wallets[i].publicKey == giantConfig.caller.publicKey) {
+                        options.inputValue = wallets[i].premine
+                        console.log(wallets[i].premine)
+                    }
+                }
 
-        })
+                this.db.getMetadata()
+                    .then((metadata) => {
+                        /**
+                         * TODO : find contract in metadata.contracts array
+                         */
+                        const methods = metadata.contracts[0][options.contractAddress].methods
+
+                        options.methodFee = 0
+
+                        for (let i in methods) {
+                            if (options.method == methods[i].name) {
+                                options.feePrice = methods[i].params[0].fee
+                            }
+                        }
+
+                        if (!options.feePrice) {
+                            logger.error(`Can't find method fee`)
+                            return
+                        }
+
+                        return new Promise((resolve, reject) => {
+                            try {
+                                let transaction = Transaction.callContract(options)
+                                console.log('----------..transaction..-----------')
+                                console.log(transaction)
+                                console.log('----------..transaction..-----------')
+                                resolve()
+
+                            } catch (err) {
+                                console.log(err)
+                            }
+                        })
+                    })
+            })
     }
 
     stop() {
