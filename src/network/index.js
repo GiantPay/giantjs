@@ -1,6 +1,5 @@
 import GiantNode from '../network/GiantNode'
 import GiantContract from '../compile/GiantContract'
-import logger from '../logger'
 
 /**
  * For each or a particular network, we print the following:
@@ -10,18 +9,14 @@ import logger from '../logger'
  *
  */
 export default (name, cmd) => {
-    const giantNode = new GiantNode({
+
+    const options = {
         network: 'development',
         mining: false
-    })
+    }
+    const giantNode = new GiantNode(options)
 
     giantNode.on('ready', () => {
-        // print network info
-        // const networkInfo = giantNode.getInfo()
-
-        // print accounts info
-        // print deployed contracts info
-
-
+        giantNode.getInfo(options)
     })
 }

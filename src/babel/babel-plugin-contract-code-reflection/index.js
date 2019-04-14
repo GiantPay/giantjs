@@ -1,3 +1,4 @@
+import giantConfig from '../../config'
 import logger from '../../logger'
 
 const getMetadata = (path) => {
@@ -21,9 +22,10 @@ export default (babel) => {
 
                 metadata.className = declaration.get('id').node.name
                 metadata.methods = []
+                metadata.deployFee = 0
 
                 declaration.traverse({
-                    ClassMethod (path) {
+                    ClassMethod(path) {
                         metadata.methods.push({
                             name: path.get('key').node.name,
                             params: path.get('params').map((param) => param.node.name),

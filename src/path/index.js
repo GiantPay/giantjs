@@ -42,6 +42,7 @@ const networkPath = touchPath(path.resolve(currentPath, './networks'))
 export default {
     getBuildPath: () => buildPath,
     getTargetContractFile: (name) => path.resolve(buildPath, `./${name}.js`),
+    getTargetContractFileRunTime: (name) => path.resolve(buildPath, `./${name}RunTime.js`),
     getContractPath: () => contractPath,
     getContractFile: (name) => path.resolve(contractPath, `./${name}.js`),
     getNetworkPath: (name) => path.resolve(networkPath, `./${name}/`),

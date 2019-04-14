@@ -13,18 +13,41 @@ With **Giantjs**, you get:
 ### Install
 
 ```
-$ npm install -g gcdk
+$ git clone https://github.com/GiantPay/giantjs.git gcdk; cd gcdk 
+$ npm install
+```
+
+### Build project
+
+```
+$ npm run build 
 ```
 
 ### Quick Usage
 
-For a default set of contracts and tests, run the following within an empty project directory:
+Compile your contracts, deploy those contracts to the network.
 
 ```
-$ giantjs init
+node dist/giant create contract {ContractName}
+node dist/giant deploy {ContractName}
 ```
 
-From there, you can run `giantjs compile`, `giantjs migrate` and `giantjs test` to compile your contracts, deploy those contracts to the network, and run their associated unit tests.
+### Tests
+
+Run their associated unit tests.
+
+```
+$ npm test 
+```
+
+### Autocompile mode
+
+For autocompile mode open new terminal window.
+
+```
+$ npm run watch 
+```
+
 
 **Giantjs** comes bundled with a local development blockchain server that launches automatically when you invoke the commands above.
 

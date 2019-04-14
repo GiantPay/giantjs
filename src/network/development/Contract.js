@@ -6,41 +6,36 @@ import ContractCodeReflection from '../../babel/babel-plugin-contract-code-refle
  */
 export default class Contract {
 
-    constructor (options) {
+    constructor(options) {
         if (!options) {
             throw new TypeError('"options" is expected')
         }
-        if (!options.hasOwnProperty('code') || !options.code || options.code.length <= 2) {
-            throw new TypeError('"code" is expected')
+        if (!options.hasOwnProperty('contractName') || !options.contractName) {
+            throw new TypeError('"contractName" is expected')
+        }
+        if (!options.hasOwnProperty('contractAddress') || !options.contractAddress) {
+            throw new TypeError('"contractAddress" is expected')
         }
         if (!options.hasOwnProperty('feePrice')) {
             throw new TypeError('"feePrice" is expected')
         }
 
-        this.code = options.code
+        this.code = options.contractCode
         this.feePrice = options.feePrice
+        this.metadata = options.metadata
 
-        const result = transform(this.code, {
-            plugins: [
-                [ContractCodeReflection]
-            ],
-            ast: true,
-            comments: false,
-            code: false
-        })
+    }
 
-        this.ast = result.ast
-        this.className = result.ast.metadata.className
-        this.methods = result.ast.metadata.methods
+    getMetadata() {
+        return this.metadata
     }
 
     /**
      * calculates sufficient fee to call the constructor
      * @param options
      */
-    getConstructorFee (options) {
+    getConstructorFee(options) {
         const loops = options.loops || 1
-
         return {}
     }
 
@@ -48,7 +43,7 @@ export default class Contract {
      * calculates sufficient fee to call the specified method
      * @param options
      */
-    getMethodFee (options) {
+    getMethodFee(options) {
 
     }
 }

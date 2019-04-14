@@ -3,8 +3,12 @@
 import fs from 'fs'
 import path from 'path'
 
+import {transform, transformFileSync} from 'babel-core'
+import ContractFee from "../dist/babel/babel-plugin-contract-fee";
+
 import 'chai/register-should'
 import Contract from '../src/network/development/Contract'
+import UglifyJS from 'uglify-js'
 
 const metaCoinCode = fs.readFileSync(path.resolve(__dirname, './contracts/MetaCoin.js'), {
     encoding: 'utf8'
@@ -73,6 +77,92 @@ describe('Contract', () => {
             })
 
             should.exist(constructorFee)
+        })
+    })
+
+    describe('#runTime', () => {
+
+        it('Some contracts files exist', () => {
+            fs.readdir('./build/contracts', function (err, flist) {
+                if (err) console.log('Some contracts files error', err.message, err.stack)
+                flist.should.not.be.null
+            })
+        })
+
+        it('All contracts have RunTime version', () => {
+
+            fs.readdir('./build/contracts', function (err, flist) {
+                if (err) console.log('Some contracts files error', err.message, err.stack)
+                const contractsRunTime = flist.filter(f => f.indexOf('RunTime.js') > -1)
+                const contracts = flist.filter(f => f.indexOf('RunTime.js') == -1 && f.indexOf('.js') > -1)
+
+                contracts.length.should.be.equal(contractsRunTime.length)
+
+                let c = 0
+                for (let i in contracts) {
+                    let RunTimeName = contracts[i].slice(0, -3) + 'RunTime.js'
+                    const found = flist.find(f => f == RunTimeName)
+                    if (typeof found != 'undefined') {
+                        c++
+                    }
+                }
+
+                contracts.length.should.be.equal(c)
+            })
+        })
+
+        it('Last readable contract should be equal by his RunTime version', () => {
+
+            let contractPath = './build/contracts/', contract, contractRunTime,
+                contractData,
+                contractRunTimeData,
+                newContractRunTimeData,
+                pfeDesc = '\nfunction pfe(pfeVars){console.log(pfeVars)}',
+                getLatestFile = () => {
+                    let latest;
+                    const files = fs.readdirSync(contractPath);
+                    files.forEach(filename => {
+                        const stat = fs.lstatSync(path.join(contractPath, filename));
+                        if (stat.isDirectory())
+                            return;
+                        if (!latest) {
+                            latest = {filename, mtime: stat.mtime};
+                            return;
+                        }
+                        if (stat.mtime > latest.mtime) {
+                            latest.filename = filename;
+                            latest.mtime = stat.mtime;
+                        }
+                    });
+                    return latest.filename;
+                }
+
+            let latestContract = getLatestFile()
+
+            if (latestContract.indexOf('RunTime.js') == -1) {
+                contract = latestContract
+                contractRunTime = latestContract.slice(0, -3) + 'RunTime.js'
+            } else {
+                contract = latestContract.slice(0, -10) + '.js'
+                contractRunTime = latestContract
+            }
+
+            new Promise(function (resolve, reject) {
+                contractRunTimeData = fs.readFileSync(contractPath + contractRunTime, 'utf8')
+                resolve()
+            }).then(() => {
+                let {code} = transformFileSync(contractPath + contract)
+
+                let result = transform(code, {
+                    'plugins': [ContractFee]
+                })
+
+                newContractRunTimeData = result.code + pfeDesc
+
+                let runTimeCode = UglifyJS.minify(newContractRunTimeData)
+
+                contractRunTimeData.should.be.equal(runTimeCode.code)
+            })
         })
     })
 

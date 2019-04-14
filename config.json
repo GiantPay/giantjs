@@ -1,0 +1,18 @@
+{
+  "network": "development",
+  "mining": true,
+  "blockTime": 500,
+  "maxBlockSize": 5,
+  "feePrice": 10,
+  "debug": false,
+  "caller": {
+    "privateKey": "YULqUkbYnFT6Fw6YS9Es1H94THRe4BrujuXNgtqT52UMgivrqq7K",
+    "publicKey": "GUuf1RCuFmLAbyNFT5WifEpZTnLYk2rtVd",
+    "premine": 20000
+  },
+  "owner": {
+    "privateKey": "YUsc83YuzURjo5eqezyCKUQXAMXets1Ko6edm9paexd7wD8DYhrU",
+    "publicKey": "GPLkrYE3GdXDoZMz4zhxyBmTiF1N3AQvpH",
+    "premine": 2010
+  }
+}

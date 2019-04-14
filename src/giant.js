@@ -31,13 +31,13 @@ program
 
 program
     .command('deploy <name>')
-    .description('Deploy smart contract by name')
+    .description('Deploy the smart contract by name')
     .option('-c, --clean', 'Clean development network data')
     .action(deploy);
 
 program
-    .command('exec <name>')
-    .description('')
+    .command('exec <name> <method> <args>')
+    .description('Call for a smart contract method using name or hash of the contract')
     .action(exec);
 
 program

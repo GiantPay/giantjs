@@ -1,5 +1,7 @@
+import giantConfig from '../../config'
 import Miner from './Miner'
 import Block from './Block'
+import Hash from './Hash'
 import logger from '../../logger'
 
 import EventEmitter from 'events'
@@ -9,7 +11,7 @@ import levelup from 'levelup'
 
 export default class Chain extends EventEmitter {
 
-    constructor (options) {
+    constructor(options) {
         super()
 
         const self = this
@@ -50,7 +52,7 @@ export default class Chain extends EventEmitter {
         })
     }
 
-    initialize () {
+    initialize() {
         const self = this
 
         if (!this.genesis) {
@@ -73,6 +75,7 @@ export default class Chain extends EventEmitter {
                         if (err) {
                             self.emit('error', err)
                         } else {
+                            console.log(self.tip)
                             self.db._onChainAddBlock(self.genesis, (err) => {
                                 if (err) {
                                     self.emit('error', err)
@@ -85,7 +88,6 @@ export default class Chain extends EventEmitter {
                         }
                     })
                 } else {
-                    metadata.tip = metadata.tip
                     self.db.getBlock(metadata.tip)
                         .then((tip) => {
                             self.tip = tip
@@ -102,12 +104,12 @@ export default class Chain extends EventEmitter {
             })
     }
 
-    addBlock (block, callback) {
+    addBlock(block, callback) {
         this.blockQueue.push([block, callback])
         this._processBlockQueue()
     }
 
-    saveMetadata (callback) {
+    saveMetadata(callback) {
         const self = this
         callback = callback || function () {
         }
@@ -116,17 +118,81 @@ export default class Chain extends EventEmitter {
             return callback()
         }
 
-        const metadata = {
-            tip: self.tip ? self.tip.hash : null,
-            tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
-            cache: self.cache
-        }
+        self.db.getMetadata()
+            .then((metadata) => {
+                let blockId = metadata.tip
 
-        self.lastSavedMetadata = new Date()
-        self.db.putMetadata(metadata, callback)
+                self.db.getBlock(self.tip.hash)
+                    .then((block) => {
+                        let contract = {}
+                        var contractsArr = []
+                        if (typeof metadata != 'undefined' && typeof metadata.contracts != 'undefined') {
+                            contractsArr = metadata.contracts
+                        }
+
+                        if (typeof block.data != 'undefined') {
+                            if (false) {//giantConfig.debug
+                                console.log(block.data)
+                            }
+
+                            if (typeof block.data[0] != 'undefined' && typeof block.data[0].data != 'undefined') {
+                                //TODO : move contractAddress in contract options
+                                //let contractId = block.data[0].contractAddress
+
+                                /**
+                                 * TODO : fix contractId (contractAddress) - case not all types tx have contractAddress
+                                 * and we cant use self.tip for that
+                                 *
+                                 */
+
+                                const tx = block.data[0]
+
+                                const contractMetadata = tx.data[0].metadata
+
+                                const contractAddress = contractMetadata.contractAddress
+
+                                contractMetadata.version = "1.0"
+
+                                contractMetadata.block = blockId
+
+                                contractMetadata.owner = giantConfig.caller.privateKey
+
+                                contractMetadata.initialized = false
+
+                                contractMetadata.description = `Sandbox Contract :  ${contractAddress}`
+
+                                contractMetadata.dependencies = {
+                                    "giant-exchange-api": "^0.1.0",
+                                    "some-giant-api": "^0.3.6"
+                                }
+
+                                contract[contractAddress] = contractMetadata
+
+                                contractsArr.push(contract)
+                            }
+                        }
+
+                        const metadata = {
+                            tip: self.tip ? self.tip.hash : null,
+                            tipHeight: self.tip && self.tip.height ? self.tip.height : 0,
+                            cache: self.cache,
+                            contracts: contractsArr
+                        }
+
+                        self.lastSavedMetadata = new Date()
+                        self.db.putMetadata(metadata, callback)
+                    })
+            })
     }
 
-    startMiner () {
+    getMetadata() {
+        self.db.getMetadata()
+            .then((metadata) => {
+                return metadata
+            })
+    }
+
+    startMiner() {
         logger.info('startMiner')
         if (!this.miner) {
             this.miner = new Miner({
@@ -139,7 +205,7 @@ export default class Chain extends EventEmitter {
         }
     }
 
-    buildGenesisBlock (options) {
+    buildGenesisBlock(options) {
         if (!options) {
             options = {}
         }
@@ -155,13 +221,13 @@ export default class Chain extends EventEmitter {
         return genesis
     }
 
-    stop () {
+    stop() {
         if (this.miner) {
             this.miner.stop()
         }
     }
 
-    _validateMerkleRoot (block) {
+    _validateMerkleRoot(block) {
         const transactions = this.db.getTransactionsFromBlock(block)
         const merkleRoot = this.db.getMerkleRoot(transactions)
         if (!merkleRoot || block.merkleRoot === merkleRoot) {
@@ -170,7 +236,7 @@ export default class Chain extends EventEmitter {
         return new Error('Invalid merkleRoot for block, expected merkleRoot to equal: ' + merkleRoot + ' instead got: ' + block.merkleRoot)
     }
 
-    _processBlockQueue () {
+    _processBlockQueue() {
         var self = this
 
         if (self.processingBlockQueue) {
@@ -196,7 +262,7 @@ export default class Chain extends EventEmitter {
         )
     }
 
-    _processBlock (block, callback) {
+    _processBlock(block, callback) {
         const merkleError = this._validateMerkleRoot(block)
         if (merkleError) {
             return callback(merkleError)
@@ -210,7 +276,7 @@ export default class Chain extends EventEmitter {
         )
     }
 
-    _writeBlock (block, callback) {
+    _writeBlock(block, callback) {
         const self = this
 
         self.db.getBlock(block.hash)
@@ -232,8 +298,12 @@ export default class Chain extends EventEmitter {
             })
     }
 
-    _updateTip (block, callback) {
-        logger.info(`Chain updating the tip for [${block.height}]`, block.toObject())
+    _updateTip(block, callback) {
+        logger.warn(`Chain updating the tip for [${block.height}] debug ${giantConfig.debug}`)
+        if (giantConfig.debug) {
+            console.log(block.toObject())
+        }
+
         const self = this
 
         // FIXME check block.prevHash !== self.tip.hash and reorg
@@ -258,12 +328,12 @@ export default class Chain extends EventEmitter {
         )
     }
 
-    _validateBlock (block, callback) {
+    _validateBlock(block, callback) {
         logger.info(`Chain is validating block: ${block.hash}`)
         block.validate(this, callback)
     }
 
-    _onMempoolBlock () {
+    _onMempoolBlock() {
         var self = this
         this.addBlock(block, (err) => {
             if (err) {
